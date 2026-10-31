@@ -1,20 +1,16 @@
-
 #!/bin/sh
 set -eu
 
 CA_FILE="/etc/secrets/ca.pem"
 TRUSTSTORE_FILE="/tmp/aiven-truststore.p12"
 
-# Comprobar la contraseña del almacén.
 : "${DB_TRUSTSTORE_PASSWORD:?Falta configurar DB_TRUSTSTORE_PASSWORD en Render}"
 
-# Comprobar que Render haya montado el certificado.
 if [ ! -r "$CA_FILE" ]; then
     echo "ERROR: No se puede leer el certificado $CA_FILE" >&2
     exit 1
 fi
 
-# Crear un almacén PKCS12 privado.
 umask 077
 rm -f "$TRUSTSTORE_FILE"
 
@@ -27,7 +23,6 @@ keytool -importcert \
     -storetype PKCS12 \
     -storepass "$DB_TRUSTSTORE_PASSWORD"
 
-# Entregar la ubicación del almacén a Spring Boot.
 export DB_TRUSTSTORE_URL="file:${TRUSTSTORE_FILE}"
 
 echo "Certificado Aiven preparado correctamente."
