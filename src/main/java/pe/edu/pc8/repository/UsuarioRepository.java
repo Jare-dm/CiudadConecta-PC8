@@ -1,5 +1,6 @@
 package pe.edu.pc8.repository;
 import pe.edu.pc8.model.Usuario;
+import pe.edu.pc8.model.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
@@ -7,4 +8,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
   boolean existsByCorreoIgnoreCase(String correo);
   boolean existsByDni(String dni);
   long countByRolAndActivoTrue(pe.edu.pc8.model.Rol rol);
+    boolean existsByRol(Rol rol);
 }
