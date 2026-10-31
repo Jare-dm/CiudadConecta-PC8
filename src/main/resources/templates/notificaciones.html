@@ -1,0 +1,715 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/base :: head('Notificaciones')}">
+</head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<style>
+    /* ==========================================
+       CIUDADCONECTA PC8
+       CENTRO DE NOTIFICACIONES
+       ========================================== */
+
+    .pc8-notif-card {
+        border-radius: 1rem;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .pc8-notif-card:hover {
+        box-shadow:
+            0 6px 20px rgba(16, 43, 70, 0.09) !important;
+    }
+
+    .pc8-notif-nueva {
+        background-color: #f1f7ff;
+        border-left: 4px solid #1463a5 !important;
+    }
+
+    .pc8-notif-leida {
+        background-color: #ffffff;
+        border-left: 4px solid #e2e8f0 !important;
+    }
+
+    .pc8-notif-mensaje {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.6;
+    }
+
+    .pc8-notif-fecha {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .pc8-notif-icono {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background-color: #dceeff;
+        color: #075aa1;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 575.98px) {
+
+        .pc8-notif-acciones .btn {
+            width: 100%;
+        }
+
+        .pc8-notif-icono {
+            width: 38px;
+            height: 38px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .pc8-notif-card {
+            transition: none;
+        }
+    }
+</style>
+
+<main id="contenido" class="container py-5">
+
+    <!-- ==========================================
+         REGRESAR SEGÚN EL ROL
+         ========================================== -->
+
+    <a sec:authorize="hasRole('CIUDADANO')"
+       class="small link-secondary text-decoration-none"
+       th:href="@{/mis-reportes}">
+
+        ← Mis reportes
+
+    </a>
+
+    <a sec:authorize="hasRole('MANTENIMIENTO')"
+       class="small link-secondary text-decoration-none"
+       th:href="@{/gestion}">
+
+        ← Panel municipal
+
+    </a>
+
+    <!-- ==========================================
+         ENCABEZADO
+         ========================================== -->
+
+    <header class="d-flex flex-wrap gap-3
+                   align-items-center justify-content-between
+                   mt-4 mb-4">
+
+        <div>
+
+            <p class="eyebrow-dark mb-1">
+                Centro de avisos
+            </p>
+
+            <h1 class="h2 fw-bold mb-2">
+                Notificaciones
+            </h1>
+
+            <p class="text-secondary mb-0">
+                Consulta las novedades de tus reportes,
+                las propuestas de categorías y las
+                comunicaciones municipales.
+            </p>
+
+        </div>
+
+        <div class="d-flex flex-column
+                    align-items-start
+                    align-items-md-end gap-2">
+
+            <!-- NOTIFICACIONES SIN LEER -->
+
+            <span class="badge rounded-pill
+                         text-bg-primary px-3 py-2"
+                  th:if="${noLeidas > 0}"
+                  th:text="${noLeidas == 1
+                      ? '1 notificación sin leer'
+                      : noLeidas + ' notificaciones sin leer'}">
+
+                2 notificaciones sin leer
+
+            </span>
+
+            <!-- TODAS LEÍDAS -->
+
+            <span class="badge rounded-pill
+                         text-bg-secondary px-3 py-2"
+                  th:if="${noLeidas == 0}">
+
+                Todo leído
+
+            </span>
+
+            <!-- TOTAL -->
+
+            <span class="small text-secondary"
+                  th:text="${#lists.size(notificaciones) == 1
+                      ? '1 notificación recibida'
+                      : #lists.size(notificaciones)
+                        + ' notificaciones recibidas'}">
+
+                0 notificaciones recibidas
+
+            </span>
+
+        </div>
+
+    </header>
+
+    <!-- ==========================================
+         MENSAJE INFORMATIVO POR ROL
+         ========================================== -->
+
+    <div class="alert alert-info border-0"
+         role="status"
+         sec:authorize="hasRole('MANTENIMIENTO')">
+
+        <strong>Panel de mantenimiento.</strong>
+
+        Aquí recibirás avisos sobre los reportes
+        que te asignen y las solicitudes de
+        nueva revisión.
+
+    </div>
+
+    <div class="alert alert-info border-0"
+         role="status"
+         sec:authorize="hasRole('CIUDADANO')">
+
+        <strong>Seguimiento ciudadano.</strong>
+
+        Aquí recibirás avisos sobre el estado de
+        tus reportes y las decisiones de la municipalidad
+        respecto a las categorías que propongas.
+
+    </div>
+
+    <!-- ==========================================
+         SIN NOTIFICACIONES
+         ========================================== -->
+
+    <section th:if="${#lists.isEmpty(notificaciones)}"
+             class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-body text-center p-5">
+
+            <div class="display-4 mb-3"
+                 aria-hidden="true">
+                📭
+            </div>
+
+            <h2 class="h5 fw-bold mb-2">
+                Todavía no tienes notificaciones
+            </h2>
+
+            <p class="text-secondary mb-4">
+
+                Cuando haya novedades sobre tus reportes
+                o propuestas de categorías, aparecerán aquí.
+
+            </p>
+
+            <a sec:authorize="hasRole('CIUDADANO')"
+               class="btn btn-primary"
+               th:href="@{/mis-reportes}">
+
+                Ir a mis reportes
+
+            </a>
+
+            <a sec:authorize="hasRole('MANTENIMIENTO')"
+               class="btn btn-primary"
+               th:href="@{/gestion}">
+
+                Ver incidencias asignadas
+
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- ==========================================
+         CONTENIDO SI HAY NOTIFICACIONES
+         ========================================== -->
+
+    <section th:unless="${#lists.isEmpty(notificaciones)}"
+             aria-labelledby="titulo-lista">
+
+        <h2 id="titulo-lista"
+            class="visually-hidden">
+
+            Lista de notificaciones
+
+        </h2>
+
+        <!-- ======================================
+             BUSCADOR Y FILTROS
+             ====================================== -->
+
+        <div class="card border-0 shadow-sm
+                    rounded-4 mb-4">
+
+            <div class="card-body p-3 p-md-4">
+
+                <div class="row g-3 align-items-end">
+
+                    <!-- BUSCADOR -->
+
+                    <div class="col-md-7">
+
+                        <label for="buscar-notificacion"
+                               class="form-label fw-semibold">
+
+                            Buscar notificaciones
+
+                        </label>
+
+                        <input type="search"
+                               id="buscar-notificacion"
+                               class="form-control"
+                               placeholder="Buscar por mensaje o categoría"
+                               autocomplete="off">
+
+                    </div>
+
+                    <!-- FILTRO -->
+
+                    <div class="col-md-5">
+
+                        <label for="filtro-notificaciones"
+                               class="form-label fw-semibold">
+
+                            Mostrar
+
+                        </label>
+
+                        <select id="filtro-notificaciones"
+                                class="form-select">
+
+                            <option value="todas">
+                                Todas las notificaciones
+                            </option>
+
+                            <option value="nuevas">
+                                Sin leer
+                            </option>
+
+                            <option value="leidas">
+                                Leídas
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ======================================
+             CONTADOR DE RESULTADOS
+             ====================================== -->
+
+        <div class="d-flex justify-content-between
+                    align-items-center mb-3">
+
+            <h3 class="h6 fw-bold mb-0">
+                Avisos recibidos
+            </h3>
+
+            <span id="resultado-notificaciones"
+                  class="small text-secondary"
+                  aria-live="polite">
+            </span>
+
+        </div>
+
+        <!-- ======================================
+             LISTA DE NOTIFICACIONES
+             ====================================== -->
+
+        <div id="lista-notificaciones"
+             class="d-grid gap-3">
+
+            <article
+                th:each="n : ${notificaciones}"
+                class="card shadow-sm pc8-notif-card"
+                th:classappend="${n.leida}
+                    ? 'pc8-notif-leida'
+                    : 'pc8-notif-nueva'"
+                th:attr="data-leida=${n.leida},
+                         data-mensaje=${n.mensaje}">
+
+                <div class="card-body p-3 p-md-4">
+
+                    <div class="d-flex gap-3">
+
+                        <!-- ======================
+                             ICONO
+                             ====================== -->
+
+                        <div class="pc8-notif-icono"
+                             aria-hidden="true">
+
+                            <!-- NOTIFICACIÓN DE REPORTE -->
+
+                            <span class="fs-5"
+                                  th:if="${n.reporte != null}">
+
+                                🔔
+
+                            </span>
+
+                            <!-- NOTIFICACIÓN DE CATEGORÍA -->
+
+                            <span class="fs-5"
+                                  th:if="${n.reporte == null}">
+
+                                📂
+
+                            </span>
+
+                        </div>
+
+                        <!-- ======================
+                             INFORMACIÓN
+                             ====================== -->
+
+                        <div class="flex-grow-1"
+                             style="min-width: 0;">
+
+                            <div class="d-flex flex-wrap
+                                        align-items-center
+                                        gap-2 mb-2">
+
+                                <!-- NUEVA -->
+
+                                <span th:unless="${n.leida}"
+                                      class="badge rounded-pill
+                                             text-bg-primary">
+
+                                    Nuevo
+
+                                </span>
+
+                                <!-- LEÍDA -->
+
+                                <span th:if="${n.leida}"
+                                      class="badge rounded-pill
+                                             text-bg-secondary">
+
+                                    Leída
+
+                                </span>
+
+                                <!-- FECHA -->
+
+                                <span class="pc8-notif-fecha"
+                                      th:text="${#temporals.format(
+                                          n.creadaEn,
+                                          'dd/MM/yyyy HH:mm'
+                                      )}">
+
+                                    30/10/2026 19:40
+
+                                </span>
+
+                            </div>
+
+                            <!-- ======================
+                                 TIPO DE AVISO
+                                 ====================== -->
+
+                            <div class="mb-2">
+
+                                <!-- REPORTE -->
+
+                                <span th:if="${n.reporte != null}"
+                                      class="badge text-bg-light
+                                             border text-dark">
+
+                                    Seguimiento de reporte
+
+                                </span>
+
+                                <!-- CATEGORÍA -->
+
+                                <span th:if="${n.reporte == null}"
+                                      class="badge text-bg-info">
+
+                                    Propuesta de categoría
+
+                                </span>
+
+                            </div>
+
+                            <!-- ======================
+                                 MENSAJE
+                                 ====================== -->
+
+                            <p class="pc8-notif-mensaje
+                                      fw-medium mb-3"
+                               th:text="${n.mensaje}">
+
+                                Mensaje de notificación
+
+                            </p>
+
+                            <!-- ======================
+                                 ACCIONES
+                                 ====================== -->
+
+                            <div class="d-flex flex-wrap gap-2
+                                        pc8-notif-acciones">
+
+                                <!-- ==================
+                                     REPORTE CIUDADANO
+                                     ================== -->
+
+                                <a sec:authorize="hasRole('CIUDADANO')"
+                                   th:if="${n.reporte != null}"
+                                   th:href="@{/reportes/{id}(
+                                       id=${n.reporte.id}
+                                   )}"
+                                   class="btn btn-primary btn-sm"
+                                   th:aria-label="|Ver detalle del reporte relacionado con la notificación ${n.id}|">
+
+                                    Ver reporte →
+
+                                </a>
+
+                                <!-- ==================
+                                     REPORTE MANTENIMIENTO
+                                     ================== -->
+
+                                <a sec:authorize="hasRole('MANTENIMIENTO')"
+                                   th:if="${n.reporte != null}"
+                                   th:href="@{/gestion/{id}(
+                                       id=${n.reporte.id}
+                                   )}"
+                                   class="btn btn-primary btn-sm"
+                                   th:aria-label="|Gestionar el reporte relacionado con la notificación ${n.id}|">
+
+                                    Ver reporte asignado →
+
+                                </a>
+
+                                <!-- ==================
+                                     PROPUESTA DE CATEGORÍA
+                                     ================== -->
+
+                                <a sec:authorize="hasRole('CIUDADANO')"
+                                   th:if="${n.reporte == null}"
+                                   th:href="@{/reportes/nuevo}"
+                                   class="btn btn-outline-primary btn-sm">
+
+                                    Ver categorías disponibles →
+
+                                </a>
+
+                                <!-- ==================
+                                     MARCAR COMO LEÍDA
+                                     ================== -->
+
+                                <form th:unless="${n.leida}"
+                                      th:action="@{/notificaciones/{id}/leida(
+                                          id=${n.id}
+                                      )}"
+                                      method="post">
+
+                                    <button type="submit"
+                                            class="btn btn-outline-primary btn-sm">
+
+                                        Marcar como leída
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+        <!-- ======================================
+             SIN COINCIDENCIAS EN FILTROS
+             ====================================== -->
+
+        <div id="sin-coincidencias"
+             class="card border-0 shadow-sm
+                    rounded-4 mt-4 d-none">
+
+            <div class="card-body text-center p-5">
+
+                <h3 class="h5 fw-bold">
+                    No encontramos notificaciones
+                </h3>
+
+                <p class="text-secondary mb-0">
+
+                    Prueba con otra búsqueda o cambia
+                    el filtro de lectura.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- ==========================================
+     FILTROS EN EL NAVEGADOR
+     ========================================== -->
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    'use strict';
+
+    // ======================================
+    // ELEMENTOS
+    // ======================================
+
+    const buscar = document.getElementById(
+        'buscar-notificacion'
+    );
+
+    const filtro = document.getElementById(
+        'filtro-notificaciones'
+    );
+
+    if (!buscar || !filtro) {
+        return;
+    }
+
+    const tarjetas = [
+        ...document.querySelectorAll('.pc8-notif-card')
+    ];
+
+    const contador = document.getElementById(
+        'resultado-notificaciones'
+    );
+
+    const sinCoincidencias = document.getElementById(
+        'sin-coincidencias'
+    );
+
+    // ======================================
+    // NORMALIZAR TEXTO
+    // ======================================
+
+    function normalizar(texto) {
+
+        return String(texto || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    // ======================================
+    // FILTRAR NOTIFICACIONES
+    // ======================================
+
+    function aplicarFiltros() {
+
+        const texto = normalizar(buscar.value);
+        const seleccion = filtro.value;
+
+        let visibles = 0;
+
+        tarjetas.forEach(tarjeta => {
+
+            const mensaje = normalizar(
+                tarjeta.dataset.mensaje
+            );
+
+            const leida =
+                tarjeta.dataset.leida === 'true';
+
+            const coincideBusqueda =
+                !texto || mensaje.includes(texto);
+
+            const coincideEstado =
+                seleccion === 'todas' ||
+                (seleccion === 'nuevas' && !leida) ||
+                (seleccion === 'leidas' && leida);
+
+            const mostrar =
+                coincideBusqueda && coincideEstado;
+
+            tarjeta.classList.toggle(
+                'd-none',
+                !mostrar
+            );
+
+            if (mostrar) {
+                visibles++;
+            }
+        });
+
+        contador.textContent =
+            visibles === 1
+                ? '1 resultado'
+                : `${visibles} resultados`;
+
+        sinCoincidencias.classList.toggle(
+            'd-none',
+            visibles > 0
+        );
+    }
+
+    // ======================================
+    // EVENTOS DE BÚSQUEDA
+    // ======================================
+
+    buscar.addEventListener(
+        'input',
+        aplicarFiltros
+    );
+
+    filtro.addEventListener(
+        'change',
+        aplicarFiltros
+    );
+
+    aplicarFiltros();
+
+});
+
+</script>
+
+<footer th:replace="~{fragments/base :: footer}">
+</footer>
+
+</body>
+</html>

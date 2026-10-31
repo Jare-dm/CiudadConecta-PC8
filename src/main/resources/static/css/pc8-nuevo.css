@@ -1,0 +1,62 @@
+/* CiudadConecta PC8: asistente de reportes. Estilos aislados al formulario. */
+.pc8-reporte-page { max-width: 1000px; }
+.pc8-reporte-intro { max-width: 790px; margin-bottom: 1.6rem; }
+.pc8-volver { color:#214e77; font-weight:650; text-underline-offset:.18rem; }
+.pc8-reporte-supra { color:#245786; font-size:.79rem; text-transform:uppercase; font-weight:800; letter-spacing:.07em; }
+.pc8-reporte-title { color:#112f4b; font-size:clamp(1.75rem,3vw,2.6rem); font-weight:810; letter-spacing:-.025em; line-height:1.15; }
+.pc8-reporte-lead { color:#52677b; font-size:1.06rem; line-height:1.65; }
+.pc8-pasos { background:#fff; border:1px solid #dce5ee; border-radius:1rem; padding:1.2rem 1.4rem; margin-bottom:1.4rem; }
+.pc8-progreso-texto { margin-bottom:.8rem; color:#1c4a74; font-size:.91rem; font-weight:750; }
+.pc8-pasos-lista { list-style:none; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin:0; padding:0; gap:.7rem; }
+.pc8-pasos-lista li { border-top:5px solid #dbe4ed; padding-top:.85rem; display:flex; align-items:center; gap:.55rem; color:#617285; font-size:.95rem; font-weight:650; }
+.pc8-pasos-lista li > span:first-child { flex:none; display:inline-grid; place-items:center; width:1.85rem; height:1.85rem; background:#e9eff5; color:#2c526f; border-radius:50%; font-weight:750; }
+.pc8-pasos-lista li[aria-current="step"] { border-color:#1566ac; color:#103b60; }
+.pc8-pasos-lista li[aria-current="step"] > span:first-child { background:#1566ac; color:#fff; }
+.pc8-pasos-lista li.pc8-paso-completado { border-color:#18765d; color:#135b48; }
+.pc8-pasos-lista li.pc8-paso-completado > span:first-child { background:#18765d; color:#fff; }
+.pc8-form-step[hidden], .pc8-pasos[hidden], .pc8-foto-previa[hidden], .pc8-form-mensaje[hidden], .pc8-categoria-alta[hidden] { display:none!important; }
+.pc8-reporte-panel { border:1px solid #d9e4ef; border-radius:1.15rem; background:white; overflow:hidden; box-shadow:0 7px 22px rgba(22,45,74,.045); }
+.pc8-panel-encabezado { background:#f2f6fa; padding:1.65rem 1.9rem; border-bottom:1px solid #dae5ee; }
+.pc8-paso-chapa { display:inline-block; border-radius:50rem; padding:.35rem .65rem; background:#e1ecf7; color:#17507d; font-size:.78rem; font-weight:800; letter-spacing:.04em; }
+.pc8-panel-encabezado h2 { font-size:clamp(1.4rem,2vw,1.85rem); letter-spacing:-.02em; font-weight:780; color:#173651; margin:.65rem 0 .35rem; }
+.pc8-panel-encabezado p { color:#566b7e; line-height:1.6; margin:0; }
+.pc8-panel-cuerpo { padding:1.8rem 1.9rem 2.1rem; }
+.pc8-panel-cuerpo .form-label { color:#213c53; font-size:1rem; }
+.pc8-panel-cuerpo :is(.form-control,.form-select) { min-height:3rem; border-color:#adbfce; border-radius:.6rem; }
+.pc8-panel-cuerpo textarea.form-control { min-height:10rem; resize:vertical; }
+.pc8-panel-cuerpo .form-text { color:#51677b; font-size:.9rem; }
+.pc8-categoria-alta { border:1px solid #bfd6e8; border-radius:.8rem; background:#f4f9fd; padding:1.2rem; }
+.pc8-seccion-titulo { color:#203f59; font-size:1.1rem; font-weight:750; margin-bottom:.8rem; }
+.pc8-reporte-page .mapa-pc8 { height:370px; width:100%; border:1px solid #b8c9d8; border-radius:.9rem; overflow:hidden; }
+.pc8-coordenadas { border:1px solid #d1dfeb; border-radius:.7rem; padding:1rem; background:#f8fbfe; }
+.pc8-coordenadas summary { cursor:pointer; color:#17588a; font-weight:650; }
+.pc8-navegacion-pasos { padding:1rem 0 .5rem; }
+.pc8-navegacion-pasos .btn { min-height:3rem; padding-inline:1.4rem; border-radius:.7rem; font-weight:700; }
+.pc8-navegacion-pasos .btn-primary { background:#125f9e; border-color:#125f9e; }
+.pc8-navegacion-pasos .btn-primary:hover { background:#0b4b81; border-color:#0b4b81; }
+.pc8-form-mensaje { color:#a02020; font-weight:650; padding:.8rem 1rem; border:1px solid #e5b2b2; border-radius:.6rem; background:#fff5f5; }
+.pc8-foto-previa { display:block; width:auto; max-width:100%; max-height:260px; border:1px solid #cadae7; border-radius:.6rem; margin-top:1rem; object-fit:contain; }
+.pc8-resumen { border:1px solid #d4e4ed; border-radius:.9rem; padding:1.3rem; background:#f7fafc; }
+.pc8-resumen h3 { color:#183c5a; font-weight:750; font-size:1.15rem; margin-bottom:1.1rem; }
+.pc8-resumen dl { margin:0; }
+.pc8-resumen dl > div { padding:.8rem 0; border-top:1px solid #dbe7ef; }
+.pc8-resumen dt { color:#466078; font-size:.88rem; margin-bottom:.25rem; }
+.pc8-resumen dd { color:#1f3347; margin:0; overflow-wrap:anywhere; white-space:pre-wrap; }
+.pc8-consentimiento { background:#f6f9fe; border-left:4px solid #15588e; padding:.85rem 1rem; color:#3f5972; border-radius:.2rem; }
+@media(max-width:767.98px) {
+ .pc8-reporte-page { padding-inline:1rem; }
+ .pc8-pasos { padding:1rem; }
+ .pc8-pasos-lista { gap:.35rem; }
+ .pc8-pasos-lista li { font-size:.78rem; gap:.3rem; flex-direction:column; align-items:flex-start; }
+ .pc8-pasos-lista li > span:first-child { width:1.55rem; height:1.55rem; }
+ .pc8-panel-encabezado,.pc8-panel-cuerpo { padding:1.15rem; }
+ .pc8-reporte-page .mapa-pc8 { height:300px; }
+ .pc8-navegacion-pasos .btn { flex:1 1 auto; }
+}
+@media(max-width:375px) { .pc8-pasos-lista li > span:last-child { font-size:.71rem; } }
+/* Respeta alto contraste y no depende del color para distinguir el paso activo. */
+.contraste-alto .pc8-reporte-panel,.contraste-alto .pc8-pasos,.contraste-alto .pc8-panel-encabezado,.contraste-alto .pc8-resumen,.contraste-alto .pc8-coordenadas,.contraste-alto .pc8-categoria-alta,.contraste-alto .pc8-consentimiento { background:#000!important; color:#fff!important; border-color:#fff!important; }
+.contraste-alto :is(.pc8-reporte-title,.pc8-reporte-supra,.pc8-reporte-lead,.pc8-panel-encabezado h2,.pc8-panel-encabezado p,.pc8-seccion-titulo,.pc8-resumen h3,.pc8-resumen dt,.pc8-resumen dd,.pc8-coordenadas summary,.pc8-panel-cuerpo .form-label,.pc8-consentimiento,.pc8-progreso-texto,.pc8-pasos-lista li,.pc8-volver) { color:#fff!important; }
+.contraste-alto .pc8-pasos-lista li[aria-current="step"] { border-color:#ffff66!important; }
+.contraste-alto .pc8-paso-chapa,.contraste-alto .pc8-pasos-lista li[aria-current="step"] > span:first-child { color:#000!important; background:#ffff66!important; }
+.contraste-alto .pc8-form-mensaje { color:#fff!important; background:#000!important; border-color:#ffff66!important; }

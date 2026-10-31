@@ -1,0 +1,60 @@
+# =====================================================
+# CiudadConecta PC8 - Git
+# Colocar en la misma carpeta que pom.xml
+# =====================================================
+
+# Maven y compilacion Java
+/target/
+/bin/
+*.class
+
+# Spring Tool Suite / Eclipse y otros editores
+/.settings/
+/.classpath
+/.project
+/.factorypath
+/.metadata/
+/.idea/
+/.vscode/
+*.iml
+
+# Credenciales y configuraciones privadas
+.env
+.env.*
+!.env.example
+application-local.properties
+application-secrets.properties
+application-private.properties
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# Fotos privadas y archivos temporales
+/uploads/
+/uploads-*/
+/tmp/
+/temp/
+
+# Datos de ejecucion: conservar solo la geometria PUBLICA de Chorrillos
+# usada por ChorrillosService como cache local.
+/data/*
+!/data/chorrillos.geojson
+
+# Logs, copias de seguridad, volcados y diagnosticos
+/logs/
+/backups/
+*.log
+*.sql.gz
+*.dump
+*.bak
+*.hprof
+hs_err_pid*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Scripts SQL locales: pueden contener credenciales
+/database/*.sql

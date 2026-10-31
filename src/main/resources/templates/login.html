@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      th:with="csrfToken=${_csrf.token}">
+
+<head th:replace="~{fragments/base :: head('Iniciar sesión')}">
+</head>
+
+<body>
+
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <nav th:replace="~{fragments/base :: nav}">
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main id="contenido"
+          class="container auth-wrap py-4 py-md-5">
+
+        <!-- FORMULARIO CENTRADO -->
+        <div class="mx-auto w-100"
+             style="max-width: 520px;">
+
+            <div class="card shadow-sm border-0 auth-card">
+
+                <div class="card-body p-4 p-md-5">
+
+                    <h1 class="h2 fw-bold mb-2">
+                        Iniciar sesión
+                    </h1>
+
+                    <p class="text-secondary mb-4">
+                        Ingresa para administrar tus reportes.
+                    </p>
+
+                    <!-- ERROR DE AUTENTICACIÓN -->
+                    <div th:if="${param.error}"
+                         class="alert alert-danger"
+                         role="alert">
+                        Correo o contraseña incorrectos.
+                    </div>
+
+                    <!-- REGISTRO EXITOSO -->
+                    <div th:if="${param.registrado}"
+                         class="alert alert-success"
+                         role="status">
+                        Cuenta creada. Ahora puedes ingresar.
+                    </div>
+
+                    <!-- FORMULARIO PROTEGIDO CON CSRF -->
+                    <form th:action="@{/login}"
+                          method="post">
+
+                        <!-- CORREO ELECTRÓNICO -->
+                        <div class="mb-3">
+
+                            <label for="usuario"
+                                   class="form-label">
+                                Correo electrónico
+                            </label>
+
+                            <input id="usuario"
+                                   name="username"
+                                   type="email"
+                                   autocomplete="username"
+                                   required
+                                   class="form-control form-control-lg"
+                                   placeholder="tu@correo.com">
+
+                        </div>
+
+                        <!-- CONTRASEÑA -->
+                        <div class="mb-4">
+
+                            <label for="clave"
+                                   class="form-label">
+                                Contraseña
+                            </label>
+
+                            <input id="clave"
+                                   name="password"
+                                   type="password"
+                                   autocomplete="current-password"
+                                   required
+                                   class="form-control form-control-lg">
+
+                        </div>
+
+                        <!-- BOTÓN INGRESAR -->
+                        <button type="submit"
+                                class="btn btn-primary w-100 py-2">
+                            Ingresar
+                        </button>
+
+                    </form>
+
+                    <!-- ENLACE DE REGISTRO -->
+                    <p class="text-center mt-4 mb-0">
+                        ¿Eres nuevo?
+                        <a th:href="@{/registro}">
+                            Regístrate aquí
+                        </a>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer th:replace="~{fragments/base :: footer}">
+    </footer>
+
+</body>
+</html>

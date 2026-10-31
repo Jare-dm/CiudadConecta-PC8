@@ -1,0 +1,999 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/base :: head('Transparencia ciudadana')}">
+</head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<style>
+    /* CiudadConecta PC8 - Transparencia pública */
+
+    .pc8-trans-card {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .pc8-trans-stat {
+        border: 1px solid #e5eaf0;
+        border-radius: 1rem;
+        height: 100%;
+        background: #fff;
+        box-shadow: 0 3px 12px rgba(16,43,70,.05);
+    }
+
+    .pc8-trans-number {
+        color: #173a61;
+        font-size: clamp(1.8rem,4vw,2.5rem);
+        font-weight: 750;
+        line-height: 1.15;
+    }
+
+    .pc8-trans-label {
+        font-size: .9rem;
+        color: #475569;
+        margin-top: .5rem;
+    }
+
+    .pc8-trans-icon {
+        font-size: 1.5rem;
+        margin-bottom: .7rem;
+    }
+
+    .pc8-trans-comparacion {
+        border: 1px solid #e1e7ef;
+        border-radius: .8rem;
+        padding: 1rem;
+        background: #f8fafc;
+        height: 100%;
+    }
+
+    .pc8-trans-grafico {
+        display: flex;
+        height: 22px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: #e2e8f0;
+    }
+
+    .pc8-trans-segmento {
+        width: 0;
+        height: 100%;
+    }
+
+    .pc8-trans-pendientes {
+        background: #125ba0;
+    }
+
+    .pc8-trans-atendidos {
+        background: #178054;
+    }
+
+    .pc8-trans-rechazados {
+        background: #b63742;
+    }
+
+    .pc8-trans-leyenda {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.3rem;
+    }
+
+    .pc8-trans-leyenda-item {
+        display: flex;
+        align-items: center;
+        gap: .55rem;
+        font-size: .9rem;
+    }
+
+    .pc8-trans-punto {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .pc8-trans-barra {
+        background: #e6edf4;
+        border-radius: 999px;
+        height: 12px;
+        overflow: hidden;
+        min-width: 100px;
+    }
+
+    .pc8-trans-barra-relleno {
+        height: 100%;
+        width: 0;
+        background: #087e8b;
+        border-radius: 999px;
+    }
+
+    .pc8-trans-porcentaje {
+        min-width: 46px;
+        text-align: right;
+        font-size: .82rem;
+        color: #475569;
+    }
+
+    .pc8-trans-privacidad {
+        background: #f0f9fa;
+        border-left: 4px solid #087e8b;
+        border-radius: .8rem;
+    }
+
+    @media (max-width: 575.98px) {
+        .pc8-trans-barra {
+            min-width: 75px;
+        }
+    }
+</style>
+
+<main id="contenido" class="container py-5">
+
+    <!-- ENCABEZADO -->
+
+    <header class="mb-4">
+
+        <p class="eyebrow-dark mb-1">
+            Información pública
+        </p>
+
+        <h1 class="h2 fw-bold mb-3">
+            Transparencia de reportes urbanos
+        </h1>
+
+        <p class="text-secondary mb-0">
+            Consulta estadísticas de las incidencias
+            registradas en CiudadConecta PC8
+            para el distrito de Chorrillos.
+        </p>
+
+    </header>
+
+    <!-- PRIVACIDAD -->
+
+    <div class="pc8-trans-privacidad p-3 p-md-4 mb-4">
+
+        <div class="d-flex gap-3 align-items-start">
+
+            <span class="fs-4" aria-hidden="true">
+                🔒
+            </span>
+
+            <div>
+
+                <h2 class="h6 fw-bold mb-2">
+                    Datos agregados y privacidad
+                </h2>
+
+                <p class="small mb-0">
+                    Esta página muestra cantidades
+                    generales de reportes.
+
+                    No publica nombres, DNI, correos,
+                    fotografías ni direcciones
+                    particulares.
+
+                    Las categorías personalizadas
+                    se agrupan para evitar la
+                    exposición accidental de
+                    información personal.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FILTROS POR PERÍODO -->
+
+    <section class="card border-0 shadow-sm
+                    pc8-trans-card mb-4"
+             aria-labelledby="titulo-filtros">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-filtros"
+                class="h5 fw-bold mb-3">
+                Consultar estadísticas por período
+            </h2>
+
+            <form method="get"
+                  th:action="@{/transparencia}">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-9">
+
+                        <label for="periodo"
+                               class="form-label fw-semibold">
+                            Selecciona un período
+                        </label>
+
+                        <select id="periodo"
+                                name="periodo"
+                                class="form-select">
+
+                            <option value="todo"
+                                    th:selected="${periodoSeleccionado == 'todo'}">
+                                Todo el historial
+                            </option>
+
+                            <option value="mes"
+                                    th:selected="${periodoSeleccionado == 'mes'}">
+                                Mes actual
+                            </option>
+
+                            <option value="7"
+                                    th:selected="${periodoSeleccionado == '7'}">
+                                Últimos 7 días
+                            </option>
+
+                            <option value="30"
+                                    th:selected="${periodoSeleccionado == '30'}">
+                                Últimos 30 días
+                            </option>
+
+                            <option value="90"
+                                    th:selected="${periodoSeleccionado == '90'}">
+                                Últimos 90 días
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Aplicar filtro
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+
+                    <a class="small"
+                       th:href="@{/transparencia}">
+                        Ver todo el historial
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <!-- PERÍODO ACTUALMENTE SELECCIONADO -->
+
+    <div class="d-flex flex-wrap
+                justify-content-between
+                align-items-center gap-2 mb-3">
+
+        <h2 class="h4 fw-bold mb-0">
+            Resumen de incidencias
+        </h2>
+
+        <span class="badge rounded-pill
+                     text-bg-primary px-3 py-2"
+              th:text="${periodoEtiqueta}">
+            Todo el historial
+        </span>
+
+    </div>
+
+    <!-- CUATRO INDICADORES -->
+
+    <section class="row g-3 mb-4"
+             aria-label="Indicadores públicos">
+
+        <!-- TOTAL -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="pc8-trans-stat">
+
+                <div class="p-3 p-md-4">
+
+                    <div class="pc8-trans-icon"
+                         aria-hidden="true">
+                        📋
+                    </div>
+
+                    <div id="valor-total"
+                         class="pc8-trans-number"
+                         th:text="${total}">
+                        0
+                    </div>
+
+                    <div class="pc8-trans-label">
+                        Reportes recibidos
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- EN PROCESO -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="pc8-trans-stat">
+
+                <div class="p-3 p-md-4">
+
+                    <div class="pc8-trans-icon"
+                         aria-hidden="true">
+                        ⏳
+                    </div>
+
+                    <div id="valor-pendientes"
+                         class="pc8-trans-number"
+                         th:text="${pendientes}">
+                        0
+                    </div>
+
+                    <div class="pc8-trans-label">
+                        En proceso
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ATENDIDOS -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="pc8-trans-stat">
+
+                <div class="p-3 p-md-4">
+
+                    <div class="pc8-trans-icon"
+                         aria-hidden="true">
+                        ✅
+                    </div>
+
+                    <div id="valor-atendidos"
+                         class="pc8-trans-number"
+                         th:text="${atendidos}">
+                        0
+                    </div>
+
+                    <div class="pc8-trans-label">
+                        Atendidos o cerrados
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RECHAZADOS -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="pc8-trans-stat">
+
+                <div class="p-3 p-md-4">
+
+                    <div class="pc8-trans-icon"
+                         aria-hidden="true">
+                        🚫
+                    </div>
+
+                    <div id="valor-rechazados"
+                         class="pc8-trans-number"
+                         th:text="${rechazados}">
+                        0
+                    </div>
+
+                    <div class="pc8-trans-label">
+                        Rechazados
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- COMPARACIÓN MENSUAL -->
+
+    <section class="card border-0 shadow-sm
+                    pc8-trans-card mb-4"
+             aria-labelledby="titulo-comparacion">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-comparacion"
+                class="h5 fw-bold mb-2">
+                Reportes registrados por mes
+            </h2>
+
+            <p class="small text-secondary mb-4">
+                Comparación del volumen de reportes
+                nuevos en el mes actual y el anterior.
+                Estas cifras no cambian al modificar
+                el filtro superior.
+            </p>
+
+            <div class="row g-3">
+
+                <!-- MES ACTUAL -->
+
+                <div class="col-md-6">
+
+                    <div class="pc8-trans-comparacion">
+
+                        <span class="small text-secondary"
+                              th:text="${mesActualNombre}">
+                            Mes actual
+                        </span>
+
+                        <div class="pc8-trans-number mt-2"
+                             th:text="${recibidosMesActual}">
+                            0
+                        </div>
+
+                        <p class="small mb-0">
+                            Reportes registrados
+                            en el mes actual
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- MES ANTERIOR -->
+
+                <div class="col-md-6">
+
+                    <div class="pc8-trans-comparacion">
+
+                        <span class="small text-secondary"
+                              th:text="${mesAnteriorNombre}">
+                            Mes anterior
+                        </span>
+
+                        <div class="pc8-trans-number mt-2"
+                             th:text="${recibidosMesAnterior}">
+                            0
+                        </div>
+
+                        <p class="small mb-0">
+                            Reportes registrados
+                            durante el mes anterior
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <p class="small text-secondary mt-3 mb-0">
+                El mes actual todavía puede estar
+                en curso. Por eso, esta comparación
+                es descriptiva y no representa
+                una variación de desempeño municipal.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- DISTRIBUCIÓN DE SITUACIONES -->
+
+    <section class="card border-0 shadow-sm
+                    pc8-trans-card mb-4"
+             aria-labelledby="titulo-situacion">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-situacion"
+                class="h5 fw-bold mb-2">
+                Situación actual de los reportes
+            </h2>
+
+            <p class="small text-secondary mb-4">
+                Estado actual de las incidencias
+                registradas durante el período
+                seleccionado.
+            </p>
+
+            <div id="grafico-situacion"
+                 class="pc8-trans-grafico"
+                 role="img"
+                 aria-label="Distribución de reportes según su situación">
+
+                <div id="segmento-pendientes"
+                     class="pc8-trans-segmento
+                            pc8-trans-pendientes">
+                </div>
+
+                <div id="segmento-atendidos"
+                     class="pc8-trans-segmento
+                            pc8-trans-atendidos">
+                </div>
+
+                <div id="segmento-rechazados"
+                     class="pc8-trans-segmento
+                            pc8-trans-rechazados">
+                </div>
+
+            </div>
+
+            <div class="pc8-trans-leyenda">
+
+                <div class="pc8-trans-leyenda-item">
+
+                    <span class="pc8-trans-punto
+                                 pc8-trans-pendientes"
+                          aria-hidden="true">
+                    </span>
+
+                    <span>
+                        En proceso:
+                        <strong id="porcentaje-pendientes">
+                            0%
+                        </strong>
+                    </span>
+
+                </div>
+
+                <div class="pc8-trans-leyenda-item">
+
+                    <span class="pc8-trans-punto
+                                 pc8-trans-atendidos"
+                          aria-hidden="true">
+                    </span>
+
+                    <span>
+                        Atendidos o cerrados:
+                        <strong id="porcentaje-atendidos">
+                            0%
+                        </strong>
+                    </span>
+
+                </div>
+
+                <div class="pc8-trans-leyenda-item">
+
+                    <span class="pc8-trans-punto
+                                 pc8-trans-rechazados"
+                          aria-hidden="true">
+                    </span>
+
+                    <span>
+                        Rechazados:
+                        <strong id="porcentaje-rechazados">
+                            0%
+                        </strong>
+                    </span>
+
+                </div>
+
+            </div>
+
+            <p th:if="${total == 0}"
+               class="small text-secondary mt-4 mb-0">
+                No hay reportes para el período seleccionado.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- CATEGORÍAS -->
+
+    <section class="card border-0 shadow-sm
+                    pc8-trans-card mb-4"
+             aria-labelledby="titulo-categorias">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-categorias"
+                class="h5 fw-bold mb-2">
+                Reportes por categoría
+            </h2>
+
+            <p class="small text-secondary mb-3">
+                Distribución de problemas urbanos
+                registrados en el período seleccionado.
+            </p>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover
+                              align-middle mb-0">
+
+                    <caption class="caption-top small">
+                        Cantidades y proporciones
+                        por categoría.
+                    </caption>
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th scope="col">
+                                Categoría
+                            </th>
+
+                            <th scope="col"
+                                class="text-end">
+                                Cantidad
+                            </th>
+
+                            <th scope="col"
+                                style="min-width: 150px;">
+                                Proporción
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="c : ${categorias}"
+                            class="pc8-fila-categoria"
+                            th:attr="data-cantidad=${c.cantidad}">
+
+                            <!-- NOMBRE -->
+
+                            <td class="fw-semibold"
+                                th:text="${c.etiqueta}">
+                                Categoría
+                            </td>
+
+                            <!-- CANTIDAD -->
+
+                            <td class="text-end"
+                                th:text="${c.cantidad}">
+                                0
+                            </td>
+
+                            <!-- PORCENTAJE -->
+
+                            <td>
+
+                                <div class="d-flex
+                                            align-items-center
+                                            gap-2">
+
+                                    <div class="pc8-trans-barra"
+                                         role="progressbar"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         th:attr="aria-label=${c.etiqueta}">
+
+                                        <div class="pc8-trans-barra-relleno">
+                                        </div>
+
+                                    </div>
+
+                                    <span class="pc8-trans-porcentaje">
+                                        0%
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(categorias)}">
+
+                            <td colspan="3"
+                                class="text-center
+                                       text-secondary py-5">
+                                No hay categorías con reportes
+                                en este período.
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- INTERPRETACIÓN -->
+
+    <section class="card border-0 shadow-sm
+                    pc8-trans-card mb-4"
+             aria-labelledby="titulo-interpretacion">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-interpretacion"
+                class="h5 fw-bold mb-3">
+                Cómo interpretar los resultados
+            </h2>
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <h3 class="h6 fw-bold">
+                        En proceso
+                    </h3>
+
+                    <p class="small text-secondary mb-0">
+                        Reportes registrados,
+                        en revisión, asignados
+                        o en atención.
+                    </p>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h3 class="h6 fw-bold">
+                        Atendidos o cerrados
+                    </h3>
+
+                    <p class="small text-secondary mb-0">
+                        Reportes con atención registrada
+                        o proceso finalizado.
+                        Atendido no significa
+                        necesariamente cerrado.
+                    </p>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <h3 class="h6 fw-bold">
+                        Rechazados
+                    </h3>
+
+                    <p class="small text-secondary mb-0">
+                        Reportes descartados durante
+                        la revisión municipal,
+                        con una justificación
+                        registrada en su historial.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ACLARACIÓN ACADÉMICA -->
+
+    <div class="alert alert-light border">
+
+        <h2 class="h6 fw-bold">
+            Acerca de estas estadísticas
+        </h2>
+
+        <p class="small mb-2">
+            Los valores proceden de los reportes
+            almacenados en MariaDB para esta
+            instancia de CiudadConecta PC8.
+        </p>
+
+        <p class="small mb-0">
+            Este es un prototipo académico.
+            Las cifras no representan estadísticas
+            oficiales de la Municipalidad de Chorrillos.
+
+            Los filtros utilizan la fecha de creación
+            del reporte; los estados corresponden
+            a su situación actual.
+
+            No se incluyen datos personales
+            ni indicadores de satisfacción ciudadana.
+        </p>
+
+    </div>
+
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    'use strict';
+
+    // =====================================
+    // LECTURA DE VALORES
+    // =====================================
+
+    function obtenerNumero(id) {
+
+        const elemento =
+            document.getElementById(id);
+
+        if (!elemento) {
+            return 0;
+        }
+
+        const valor = Number(
+            elemento.textContent.trim()
+        );
+
+        return Number.isFinite(valor)
+            ? Math.max(0, valor)
+            : 0;
+    }
+
+    const total =
+        obtenerNumero('valor-total');
+
+    const pendientes =
+        obtenerNumero('valor-pendientes');
+
+    const atendidos =
+        obtenerNumero('valor-atendidos');
+
+    const rechazados =
+        obtenerNumero('valor-rechazados');
+
+    // =====================================
+    // PORCENTAJES
+    // =====================================
+
+    function porcentaje(cantidad) {
+
+        if (total === 0) {
+            return 0;
+        }
+
+        return Math.max(
+            0,
+            Math.min(100, cantidad / total * 100)
+        );
+    }
+
+    function porcentajeTexto(cantidad) {
+        return porcentaje(cantidad).toFixed(1) + '%';
+    }
+
+    // =====================================
+    // GRÁFICO POR SITUACIÓN
+    // =====================================
+
+    const segmentos = [
+        {
+            barra: 'segmento-pendientes',
+            texto: 'porcentaje-pendientes',
+            cantidad: pendientes
+        },
+        {
+            barra: 'segmento-atendidos',
+            texto: 'porcentaje-atendidos',
+            cantidad: atendidos
+        },
+        {
+            barra: 'segmento-rechazados',
+            texto: 'porcentaje-rechazados',
+            cantidad: rechazados
+        }
+    ];
+
+    segmentos.forEach(item => {
+
+        const barra =
+            document.getElementById(item.barra);
+
+        const texto =
+            document.getElementById(item.texto);
+
+        if (barra) {
+            barra.style.width =
+                porcentaje(item.cantidad) + '%';
+        }
+
+        if (texto) {
+            texto.textContent =
+                porcentajeTexto(item.cantidad);
+        }
+    });
+
+    const grafico =
+        document.getElementById('grafico-situacion');
+
+    if (grafico) {
+
+        grafico.setAttribute(
+            'aria-label',
+            total === 0
+                ? 'No hay reportes en el período.'
+                : `De ${total} reportes: ` +
+                  `${pendientes} en proceso, ` +
+                  `${atendidos} atendidos o cerrados ` +
+                  `y ${rechazados} rechazados.`
+        );
+    }
+
+    // =====================================
+    // PROPORCIÓN POR CATEGORÍA
+    // =====================================
+
+    const filas = [
+        ...document.querySelectorAll(
+            '.pc8-fila-categoria'
+        )
+    ];
+
+    filas.forEach(fila => {
+
+        const valor =
+            Number(fila.dataset.cantidad);
+
+        const cantidad =
+            Number.isFinite(valor)
+                ? Math.max(0, valor)
+                : 0;
+
+        const porcentajeCategoria =
+            porcentaje(cantidad);
+
+        const relleno =
+            fila.querySelector(
+                '.pc8-trans-barra-relleno'
+            );
+
+        const texto =
+            fila.querySelector(
+                '.pc8-trans-porcentaje'
+            );
+
+        const barra =
+            fila.querySelector(
+                '[role="progressbar"]'
+            );
+
+        if (relleno) {
+            relleno.style.width =
+                porcentajeCategoria + '%';
+        }
+
+        if (texto) {
+            texto.textContent =
+                porcentajeCategoria.toFixed(1) + '%';
+        }
+
+        if (barra) {
+            barra.setAttribute(
+                'aria-valuenow',
+                porcentajeCategoria.toFixed(1)
+            );
+        }
+    });
+});
+</script>
+
+<footer th:replace="~{fragments/base :: footer}">
+</footer>
+
+</body>
+</html>

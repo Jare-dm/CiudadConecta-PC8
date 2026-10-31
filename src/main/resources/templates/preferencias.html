@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Preferencias de notificaciones')}"></head><body>
+<div th:replace="~{fragments/base :: nav}"></div>
+<main id="contenido" class="container py-4 py-md-5">
+ <a th:href="@{/notificaciones}" class="link-secondary small">← Volver a notificaciones</a>
+ <h1 class="h2 fw-bold mt-3">Mis preferencias de notificación</h1>
+ <p class="text-secondary">Decide si quieres recibir avisos por correo. Los avisos dentro de CiudadConecta siguen disponibles siempre.</p>
+ <div class="alert alert-success" role="status" th:if="${exito}" th:text="${exito}"></div>
+ <div class="alert alert-warning" th:unless="${correoConfigurado}" role="status">El administrador aún no ha habilitado el servidor de correo SMTP. Puedes guardar tu preferencia, pero los correos no se enviarán hasta configurarlo.</div>
+ <div class="card border-0 shadow-sm"><div class="card-body p-4">
+ <h2 class="h5">Canales de aviso</h2>
+ <p><strong>En la web:</strong> activo. Puedes leer y marcar notificaciones desde el menú superior.</p>
+ <form th:action="@{/preferencias}" method="post">
+  <div class="form-check form-switch py-3">
+   <input class="form-check-input" type="checkbox" role="switch" id="correoNotificaciones" name="correoNotificaciones" value="true" th:checked="${usuario.correoNotificaciones}">
+   <label class="form-check-label" for="correoNotificaciones">Recibir avisos por correo electrónico cuando cambie el estado de un reporte</label>
+  </div>
+  <p class="small text-secondary">Se utilizará únicamente el correo de tu cuenta. Los mensajes no incluirán tu DNI ni fotografías del reporte.</p>
+  <button class="btn btn-primary" type="submit">Guardar preferencias</button>
+ </form></div></div>
+</main><footer th:replace="~{fragments/base :: footer}"></footer></body></html>

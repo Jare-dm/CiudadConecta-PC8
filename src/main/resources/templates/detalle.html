@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Detalle de reporte')}">
+</head>
+<body>
+<nav th:replace="~{fragments/base :: nav}"></nav>
+<style>
+    /* CiudadConecta PC8 - Detalle del reporte */
+    .pc8-detalle-card {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+    .pc8-detalle-dato {
+        padding: .8rem 0;
+        border-bottom: 1px solid #edf0f4;
+    }
+    .pc8-detalle-dato:last-child {
+        border-bottom: 0;
+    }
+    .pc8-detalle-etiqueta {
+        color: #64748b;
+        font-size: .85rem;
+        margin-bottom: .3rem;
+    }
+    .pc8-detalle-valor {
+        color: #243247;
+        font-weight: 500;
+        overflow-wrap: anywhere;
+    }
+    .pc8-foto {
+        width: 100%;
+        max-height: 380px;
+        object-fit: contain;
+        background: #f8fafc;
+        border-radius: .75rem;
+    }
+    .pc8-timeline {
+        position: relative;
+        list-style: none;
+        margin: 0;
+        padding: 0 0 0 2rem;
+    }
+    .pc8-timeline::before {
+        content: "";
+        position: absolute;
+        left: .55rem;
+        top: .7rem;
+        bottom: .7rem;
+        width: 2px;
+        background: #d6e4f2;
+    }
+    .pc8-timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    .pc8-timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    .pc8-timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -1.93rem;
+        top: .25rem;
+        width: .9rem;
+        height: .9rem;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #1463a5;
+        z-index: 1;
+    }
+    .pc8-timeline-fecha {
+        font-size: .8rem;
+        color: #64748b;
+    }
+    .pc8-timeline-detalle {
+        font-size: .9rem;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+    #mapa-detalle {
+        width: 100%;
+        height: 300px;
+        min-height: 300px;
+        border-radius: .75rem;
+        overflow: hidden;
+    }
+    .pc8-confirmacion {
+        border: 1px solid #c7dcef;
+        border-radius: 1rem;
+    }
+    /* NUEVO: PRIVACIDAD */
+    .pc8-privacidad-info {
+        background: #f1f7fb;
+        border: 1px solid #d5e5f0;
+        border-radius: .8rem;
+        padding: 1rem;
+    }
+    .pc8-privacidad-distintivo {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: #e8eef5;
+        color: #263e58;
+        border-radius: .5rem;
+        padding: .4rem .7rem;
+        font-weight: 700;
+        font-size: .85rem;
+    }
+    @media (max-width: 575.98px) {
+        .pc8-detalle-card .card-body {
+            padding: 1.25rem !important;
+        }
+        #mapa-detalle {
+            height: 260px;
+            min-height: 260px;
+        }
+        .pc8-acciones-confirmar .btn {
+            width: 100%;
+        }
+    }
+</style>
+<main id="contenido" class="container py-5">
+    <!-- VOLVER -->
+    <a class="small link-secondary text-decoration-none"
+       th:href="${personal} ? @{/gestion} : @{/mis-reportes}">
+        ← Volver
+    </a>
+    <!-- MENSAJES -->
+    <div th:if="${exito}"
+         class="alert alert-success mt-3"
+         role="status"
+         th:text="${exito}">
+    </div>
+    <div th:if="${error}"
+         class="alert alert-danger mt-3"
+         role="alert"
+         th:text="${error}">
+    </div>
+    <!-- ===================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ===================================== -->
+    <header class="d-flex flex-wrap gap-3
+                   justify-content-between align-items-start
+                   mt-4 mb-4">
+        <div>
+            <p class="eyebrow-dark mb-1">
+                Seguimiento de incidencia
+            </p>
+            <h1 class="h2 fw-bold mb-2">
+                Reporte
+                <span th:text="${reporte.codigo}">
+                    PC8-00000000
+                </span>
+            </h1>
+            <p class="text-secondary small mb-0">
+                Registrado el
+                <time th:datetime="${reporte.creadoEn}"
+                      th:text="${#temporals.format(
+                          reporte.creadoEn,
+                          'dd/MM/yyyy HH:mm'
+                      )}">
+                </time>
+            </p>
+        </div>
+        <!-- ESTADO DESTACADO -->
+        <div th:switch="${reporte.estado.name()}">
+            <span th:case="'REGISTRADO'"
+                  class="badge rounded-pill text-bg-secondary
+                         px-3 py-2 fs-6">
+                Registrado
+            </span>
+            <span th:case="'EN_REVISION'"
+                  class="badge rounded-pill text-bg-info
+                         px-3 py-2 fs-6">
+                En revisión
+            </span>
+            <span th:case="'ASIGNADO'"
+                  class="badge rounded-pill text-bg-primary
+                         px-3 py-2 fs-6">
+                Asignado
+            </span>
+            <span th:case="'EN_ATENCION'"
+                  class="badge rounded-pill text-bg-warning
+                         px-3 py-2 fs-6">
+                En atención
+            </span>
+            <span th:case="'ATENDIDO'"
+                  class="badge rounded-pill text-bg-success
+                         px-3 py-2 fs-6">
+                Atendido
+            </span>
+            <span th:case="'CERRADO'"
+                  class="badge rounded-pill text-bg-success
+                         px-3 py-2 fs-6">
+                Cerrado
+            </span>
+            <span th:case="'RECHAZADO'"
+                  class="badge rounded-pill text-bg-danger
+                         px-3 py-2 fs-6">
+                Rechazado
+            </span>
+            <span th:case="*"
+                  class="badge rounded-pill text-bg-secondary
+                         px-3 py-2 fs-6"
+                  th:text="${reporte.estado.etiqueta}">
+            </span>
+        </div>
+    </header>
+    <div class="row g-4">
+        <!-- ===================================== -->
+        <!-- COLUMNA PRINCIPAL -->
+        <!-- ===================================== -->
+        <div class="col-lg-7">
+            <!-- INFORMACIÓN DEL PROBLEMA -->
+            <section class="card border-0 shadow-sm
+                            pc8-detalle-card mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-bold mb-3">
+                        Información del problema
+                    </h2>
+                    <!-- NUEVO: MODALIDAD DE PRIVACIDAD -->
+                    <div class="pc8-privacidad-info mb-3">
+                        <div class="small text-secondary mb-2">
+                            Privacidad del reporte
+                        </div>
+                        <!-- IDENTIDAD RESERVADA -->
+                        <div th:if="${reporte.identidadReservada}">
+                            <span class="pc8-privacidad-distintivo">
+                                🔒 Identidad reservada
+                            </span>
+                            <p class="small text-secondary mt-2 mb-0"
+                               th:if="${personal}">
+                                El denunciante solicitó que
+                                su identidad no se muestre
+                                durante la gestión municipal.
+                            </p>
+                            <p class="small text-secondary mt-2 mb-0"
+                               th:unless="${personal}">
+                                Elegiste mantener tu identidad
+                                reservada para este reporte.
+                                Tu cuenta sigue asociada al
+                                seguimiento de la incidencia.
+                            </p>
+                        </div>
+                        <!-- REPORTE IDENTIFICADO -->
+                        <div th:unless="${reporte.identidadReservada}">
+                            <span class="badge text-bg-primary">
+                                Reporte identificado
+                            </span>
+                            <p class="small text-secondary mt-2 mb-0">
+                                Este reporte fue registrado
+                                con modalidad identificada.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- CATEGORÍA -->
+                    <div class="pc8-detalle-dato">
+                        <div class="pc8-detalle-etiqueta">
+                            Categoría
+                        </div>
+                        <div class="pc8-detalle-valor"
+                             th:text="${reporte.categoriaEtiqueta}">
+                            Categoría
+                        </div>
+                    </div>
+                    <!-- SUBCATEGORÍA -->
+                    <div class="pc8-detalle-dato"
+                         th:if="${reporte.subcategoria != null}">
+                        <div class="pc8-detalle-etiqueta">
+                            Subcategoría
+                        </div>
+                        <div class="pc8-detalle-valor"
+                             th:text="${reporte.subcategoriaEtiqueta}">
+                            Subcategoría
+                        </div>
+                    </div>
+                    <!-- UBICACIÓN -->
+                    <div class="pc8-detalle-dato">
+                        <div class="pc8-detalle-etiqueta">
+                            Ubicación
+                        </div>
+                        <div class="pc8-detalle-valor"
+                             th:text="${reporte.ubicacion}">
+                            Ubicación
+                        </div>
+                    </div>
+                    <!-- ÁREA MUNICIPAL -->
+                    <div class="pc8-detalle-dato">
+                        <div class="pc8-detalle-etiqueta">
+                            Área municipal
+                        </div>
+                        <div class="pc8-detalle-valor"
+                             th:text="${reporte.area != null
+                                 ? reporte.area.etiqueta
+                                 : 'Pendiente de asignación'}">
+                            Pendiente de asignación
+                        </div>
+                    </div>
+                    <!-- RESPONSABLE -->
+                    <div class="pc8-detalle-dato">
+                        <div class="pc8-detalle-etiqueta">
+                            Responsable
+                        </div>
+                        <div class="pc8-detalle-valor"
+                             th:text="${reporte.responsable != null
+                                 ? reporte.responsable.nombre
+                                 : 'Aún no asignado'}">
+                            Aún no asignado
+                        </div>
+                    </div>
+                    <!-- DESCRIPCIÓN -->
+                    <div class="pc8-detalle-dato">
+                        <div class="pc8-detalle-etiqueta">
+                            Descripción del ciudadano
+                        </div>
+                        <div class="pc8-detalle-valor"
+                             style="white-space: pre-wrap"
+                             th:text="${reporte.descripcion}">
+                            Descripción del problema
+                        </div>
+                    </div>
+                    <!-- ÚLTIMA OBSERVACIÓN -->
+                    <div class="pc8-detalle-dato">
+                        <div class="pc8-detalle-etiqueta">
+                            Última observación
+                        </div>
+                        <div class="pc8-detalle-valor"
+                             style="white-space: pre-wrap"
+                             th:text="${#strings.isEmpty(reporte.observacion)
+                                 ? 'Sin observaciones'
+                                 : reporte.observacion}">
+                            Sin observaciones
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- ===================================== -->
+            <!-- EVIDENCIAS FOTOGRÁFICAS -->
+            <!-- ===================================== -->
+            <section class="card border-0 shadow-sm
+                            pc8-detalle-card mb-4"
+                     aria-labelledby="titulo-evidencias">
+                <div class="card-body p-4">
+                    <h2 id="titulo-evidencias"
+                        class="h5 fw-bold mb-2">
+                        Evidencia fotográfica
+                    </h2>
+                    <p class="text-secondary small mb-4">
+                        Consulta la fotografía original y,
+                        cuando esté disponible, la evidencia
+                        de la atención municipal.
+                    </p>
+                    <!-- FOTO ORIGINAL -->
+                    <div th:if="${reporte.archivoImagen != null}"
+                         class="mb-4">
+                        <h3 class="h6 fw-semibold mb-2">
+                            Antes: reporte ciudadano
+                        </h3>
+                        <img class="pc8-foto border"
+                             alt="Fotografía original del problema reportado"
+                             loading="lazy"
+                             th:src="@{/reportes/{id}/foto(
+                                 id=${reporte.id}
+                             )}">
+                    </div>
+                    <!-- FOTO DE ATENCIÓN -->
+                    <div th:if="${reporte.archivoAtencion != null}">
+                        <h3 class="h6 fw-semibold mb-2">
+                            Después: atención municipal
+                        </h3>
+                        <img class="pc8-foto border"
+                             alt="Fotografía de la intervención municipal"
+                             loading="lazy"
+                             th:src="@{/reportes/{id}/foto-atencion(
+                                 id=${reporte.id}
+                             )}">
+                    </div>
+                    <!-- SIN FOTOGRAFÍAS -->
+                    <div th:if="${reporte.archivoImagen == null
+                                 and reporte.archivoAtencion == null}"
+                         class="text-center text-secondary py-4">
+                        No hay fotografías disponibles
+                        para este reporte.
+                    </div>
+                    <!-- ATENCIÓN PENDIENTE -->
+                    <p th:if="${reporte.archivoAtencion == null
+                               and reporte.estado.name() != 'CERRADO'
+                               and reporte.estado.name() != 'RECHAZADO'}"
+                       class="text-secondary small mt-3 mb-0">
+                        La fotografía de la atención aparecerá
+                        aquí cuando el personal municipal
+                        registre su evidencia.
+                    </p>
+                </div>
+            </section>
+            <!-- ===================================== -->
+            <!-- MAPA -->
+            <!-- ===================================== -->
+            <section th:if="${reporte.latitud != null
+                              and reporte.longitud != null}"
+                     class="card border-0 shadow-sm
+                            pc8-detalle-card mb-4"
+                     aria-labelledby="titulo-mapa">
+                <div class="card-body p-4">
+                    <h2 id="titulo-mapa"
+                        class="h5 fw-bold mb-2">
+                        Ubicación del reporte
+                    </h2>
+                    <p class="text-secondary small mb-3">
+                        El marcador muestra la ubicación
+                        registrada para esta incidencia.
+                    </p>
+                    <div id="mapa-detalle"
+                         class="mapa-pc8"
+                         role="region"
+                         aria-label="Mapa de ubicación del reporte"
+                         th:attr="data-lat=${reporte.latitud},
+                                  data-lon=${reporte.longitud}">
+                    </div>
+                </div>
+            </section>
+            <!-- ===================================== -->
+            <!-- CONFIRMACIÓN CIUDADANA -->
+            <!-- ===================================== -->
+            <section th:if="${confirmacionPendiente}"
+                     class="card pc8-confirmacion mb-4"
+                     aria-labelledby="confirmar-titulo">
+                <div class="card-body p-4">
+                    <h2 id="confirmar-titulo"
+                        class="h5 fw-bold mb-3">
+                        ¿Se solucionó el problema?
+                    </h2>
+                    <p class="text-secondary">
+                        La municipalidad ha registrado
+                        una atención para este reporte.
+                        Revisa la información y las
+                        fotografías antes de decidir.
+                    </p>
+                    <form id="form-confirmar-solucion"
+                          th:action="@{/reportes/{id}/confirmar(
+                              id=${reporte.id}
+                          )}"
+                          method="post">
+                        <!-- MOTIVO DE REVISIÓN -->
+                        <div class="mb-3">
+                            <label for="motivo-revision"
+                                   class="form-label fw-semibold">
+                                Motivo para solicitar
+                                una nueva revisión
+                            </label>
+                            <textarea
+                                id="motivo-revision"
+                                name="motivo"
+                                class="form-control"
+                                rows="4"
+                                maxlength="700"
+                                placeholder="Explica qué parte del problema sigue pendiente">
+                            </textarea>
+                            <div class="form-text">
+                                Solo es obligatorio si
+                                solicitas una nueva revisión.
+                                Escribe al menos 10 caracteres.
+                            </div>
+                            <div id="motivo-error"
+                                 class="text-danger small mt-2"
+                                 role="alert"
+                                 hidden>
+                                Para solicitar una nueva revisión,
+                                describe el problema pendiente
+                                con al menos 10 caracteres.
+                            </div>
+                        </div>
+                        <!-- BOTONES -->
+                        <div class="d-flex flex-wrap gap-2
+                                    pc8-acciones-confirmar">
+                            <button type="submit"
+                                    name="decision"
+                                    value="confirmar"
+                                    class="btn btn-success">
+                                Sí, confirmar solución
+                            </button>
+                            <button type="submit"
+                                    name="decision"
+                                    value="revisar"
+                                    class="btn btn-outline-danger">
+                                No, solicitar revisión
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            <!-- GESTIÓN MUNICIPAL -->
+            <a th:if="${personal}"
+               class="btn btn-primary mb-4"
+               th:href="@{/gestion/{id}(id=${reporte.id})}">
+                Gestionar este reporte
+            </a>
+        </div>
+        <!-- ===================================== -->
+        <!-- COLUMNA DE HISTORIAL -->
+        <!-- ===================================== -->
+        <div class="col-lg-5">
+            <section class="card border-0 shadow-sm
+                            pc8-detalle-card"
+                     aria-labelledby="titulo-historial">
+                <div class="card-body p-4">
+                    <h2 id="titulo-historial"
+                        class="h5 fw-bold mb-2">
+                        Historial de seguimiento
+                    </h2>
+                    <p class="text-secondary small mb-4">
+                        Aquí aparecen los movimientos
+                        registrados durante la atención
+                        de esta incidencia.
+                    </p>
+                    <!-- HISTORIAL REAL -->
+                    <ol class="pc8-timeline"
+                        th:unless="${#lists.isEmpty(historial)}">
+                        <li th:each="h : ${historial}"
+                            class="pc8-timeline-item">
+                            <!-- ESTADO -->
+                            <h3 class="h6 fw-bold mb-1"
+                                th:text="${h.estado.etiqueta}">
+                                Estado
+                            </h3>
+                            <!-- FECHA -->
+                            <div class="pc8-timeline-fecha mb-2">
+                                <time th:datetime="${h.fecha}"
+                                      th:text="${#temporals.format(
+                                          h.fecha,
+                                          'dd/MM/yyyy HH:mm'
+                                      )}">
+                                </time>
+                            </div>
+                            <!-- =========================== -->
+                            <!-- AUTOR PROTEGIDO -->
+                            <!-- =========================== -->
+                            <!-- El autor solo es visible para personal municipal. -->
+                            <div th:if="${personal}"
+                                 class="small text-secondary mb-2">
+
+                                <!-- REPORTE CON IDENTIDAD RESERVADA -->
+                                <th:block th:if="${reporte.identidadReservada}">
+                                    <span th:if="${h.autor != null
+                                        and h.autor.equalsIgnoreCase(
+                                            reporte.ciudadano.correo
+                                        )}">
+                                        Actualizado por: Ciudadano (identidad reservada)
+                                    </span>
+                                    <span th:unless="${h.autor != null
+                                        and h.autor.equalsIgnoreCase(
+                                            reporte.ciudadano.correo
+                                        )}">
+                                        Actualizado por: Personal municipal o sistema
+                                    </span>
+                                </th:block>
+
+                                <!-- REPORTE CON IDENTIDAD IDENTIFICADA -->
+                                <th:block th:unless="${reporte.identidadReservada}">
+                                    <span th:if="${h.autor != null
+                                        and h.autor.equalsIgnoreCase(
+                                            reporte.ciudadano.correo
+                                        )}">
+                                        Actualizado por: Ciudadano
+                                    </span>
+                                    <span th:unless="${h.autor != null
+                                        and h.autor.equalsIgnoreCase(
+                                            reporte.ciudadano.correo
+                                        )}">
+                                        Actualizado por: Personal municipal o sistema
+                                    </span>
+                                </th:block>
+
+                            </div>
+                            <!-- DETALLE DEL MOVIMIENTO -->
+                            <p th:if="${not #strings.isEmpty(h.detalle)}"
+                               class="pc8-timeline-detalle mb-0"
+                               th:text="${h.detalle}">
+                            </p>
+                        </li>
+                    </ol>
+                    <!-- HISTORIAL VACÍO -->
+                    <div th:if="${#lists.isEmpty(historial)}"
+                         class="text-secondary small py-3">
+                        Todavía no hay movimientos
+                        registrados en el historial.
+                    </div>
+                </div>
+            </section>
+            <!-- EXPLICACIÓN -->
+            <div class="card border-0 shadow-sm
+                        pc8-detalle-card mt-4">
+                <div class="card-body p-4">
+                    <h2 class="h6 fw-bold mb-2">
+                        ¿Cómo funciona el seguimiento?
+                    </h2>
+                    <p class="small text-secondary mb-0">
+                        Los reportes pasan por revisión,
+                        asignación y atención municipal.
+                        Cuando se registra una solución,
+                        el ciudadano puede confirmarla
+                        o solicitar una nueva revisión,
+                        según el estado del reporte.
+                    </p>
+                </div>
+            </div>
+            <!-- PRIVACIDAD DEL HISTORIAL -->
+            <div th:if="${reporte.identidadReservada}"
+                 class="alert alert-light border mt-4 small">
+                <strong>
+                    🔒 Historial con identidad reservada
+                </strong>
+                <p class="mb-0 mt-2">
+                    Los movimientos siguen registrados
+                    para permitir el seguimiento.
+                    La vista municipal oculta los
+                    identificadores personales de los
+                    autores del historial de este reporte.
+                </p>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- LEAFLET -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    'use strict';
+    // ==========================================
+    // MAPA DEL REPORTE
+    // ==========================================
+    const contenedor =
+        document.getElementById('mapa-detalle');
+    if (contenedor && typeof L !== 'undefined') {
+        const latitud =
+            Number(contenedor.dataset.lat);
+        const longitud =
+            Number(contenedor.dataset.lon);
+        if (
+            Number.isFinite(latitud) &&
+            Number.isFinite(longitud)
+        ) {
+            const mapa = L.map(contenedor).setView(
+                [latitud, longitud],
+                16
+            );
+            L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap contributors'
+                }
+            ).addTo(mapa);
+            L.marker([
+                latitud,
+                longitud
+            ]).addTo(mapa);
+        }
+    }
+    // ==========================================
+    // VALIDACIÓN DE SOLICITUD DE REVISIÓN
+    // ==========================================
+    const formulario =
+        document.getElementById('form-confirmar-solucion');
+    if (formulario) {
+        const motivo =
+            document.getElementById('motivo-revision');
+        const aviso =
+            document.getElementById('motivo-error');
+        motivo.addEventListener('input', () => {
+            aviso.hidden = true;
+            motivo.removeAttribute('aria-invalid');
+        });
+        formulario.addEventListener('submit', evento => {
+            const decision =
+                evento.submitter
+                    ? evento.submitter.value
+                    : '';
+            if (
+                decision === 'revisar' &&
+                motivo.value.trim().length < 10
+            ) {
+                evento.preventDefault();
+                aviso.hidden = false;
+                motivo.setAttribute(
+                    'aria-invalid',
+                    'true'
+                );
+                motivo.focus();
+            }
+        });
+    }
+});
+</script>
+<footer th:replace="~{fragments/base :: footer}">
+</footer>
+</body>
+</html>

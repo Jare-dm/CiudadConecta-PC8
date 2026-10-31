@@ -1,0 +1,452 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/base :: head('Mis reportes')}">
+</head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<main id="contenido" class="container py-5">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex flex-wrap gap-3
+                justify-content-between align-items-center mb-4">
+
+        <div>
+            <p class="eyebrow-dark mb-1">
+                Portal ciudadano
+            </p>
+
+            <h1 class="fw-bold h2 mb-1">
+                Hola,
+                <span th:text="${usuario.nombre}">
+                    Ciudadano
+                </span>
+            </h1>
+
+            <p class="text-secondary mb-0">
+                Consulta tus incidencias y sigue
+                el avance de cada reporte.
+            </p>
+        </div>
+
+        <a class="btn btn-primary btn-lg"
+           th:href="@{/reportes/nuevo}">
+            + Nuevo reporte
+        </a>
+
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex align-items-center gap-3">
+
+                <div class="rounded-3 bg-primary bg-opacity-10
+                            text-primary p-3">
+                    <span class="fs-3" aria-hidden="true">
+                        📋
+                    </span>
+                </div>
+
+                <div>
+                    <p class="text-secondary small mb-1">
+                        Reportes registrados
+                    </p>
+
+                    <h2 class="h3 fw-bold mb-0"
+                        th:text="${#lists.size(reportes)}">
+                        0
+                    </h2>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SIN REPORTES -->
+    <div th:if="${#lists.isEmpty(reportes)}"
+         class="card border-0 shadow-sm">
+
+        <div class="card-body text-center p-5">
+
+            <div class="display-3 mb-3"
+                 aria-hidden="true">
+                📝
+            </div>
+
+            <h2 class="h5 fw-bold">
+                Todavía no tienes reportes
+            </h2>
+
+            <p class="text-secondary">
+                Puedes informar sobre problemas
+                en tu comunidad de Chorrillos.
+            </p>
+
+            <a class="btn btn-primary"
+               th:href="@{/reportes/nuevo}">
+                Registrar el primero
+            </a>
+
+        </div>
+    </div>
+
+    <!-- LISTADO DE REPORTES -->
+    <section th:unless="${#lists.isEmpty(reportes)}"
+             aria-labelledby="titulo-reportes">
+
+        <div class="d-flex flex-wrap gap-2
+                    justify-content-between align-items-center mb-3">
+
+            <h2 id="titulo-reportes"
+                class="h4 fw-bold mb-0">
+                Mis incidencias
+            </h2>
+
+            <span id="contador-resultados"
+                  class="text-secondary small"
+                  aria-live="polite">
+            </span>
+
+        </div>
+
+        <!-- BUSCADOR Y FILTROS -->
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body p-3">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-md-7">
+
+                        <label for="buscar-reporte"
+                               class="form-label fw-semibold">
+                            Buscar reporte
+                        </label>
+
+                        <input type="search"
+                               id="buscar-reporte"
+                               class="form-control"
+                               placeholder="Código, categoría o ubicación"
+                               autocomplete="off">
+
+                    </div>
+
+                    <div class="col-md-5">
+
+                        <label for="filtrar-estado"
+                               class="form-label fw-semibold">
+                            Filtrar por estado
+                        </label>
+
+                        <select id="filtrar-estado"
+                                class="form-select">
+
+                            <option value="">
+                                Todos los estados
+                            </option>
+
+                            <option value="REGISTRADO">
+                                Registrado
+                            </option>
+
+                            <option value="EN_REVISION">
+                                En revisión
+                            </option>
+
+                            <option value="ASIGNADO">
+                                Asignado
+                            </option>
+
+                            <option value="EN_ATENCION">
+                                En atención
+                            </option>
+
+                            <option value="ATENDIDO">
+                                Atendido
+                            </option>
+
+                            <option value="CERRADO">
+                                Cerrado
+                            </option>
+
+                            <option value="RECHAZADO">
+                                Rechazado
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TARJETAS -->
+        <div id="lista-reportes"
+             class="row g-4">
+
+            <div th:each="r : ${reportes}"
+                 class="col-12 col-md-6 col-xl-4 pc8-reporte-item"
+                 th:attr="data-estado=${r.estado.name()}">
+
+                <article class="card border-0 shadow-sm
+                                rounded-4 h-100 overflow-hidden">
+
+                    <!-- FOTO DE LA INCIDENCIA -->
+                    <img th:if="${r.archivoImagen != null}"
+                         th:src="@{/reportes/{id}/foto(id=${r.id})}"
+                         class="card-img-top"
+                         alt="Fotografía de la incidencia reportada"
+                         loading="lazy"
+                         style="height: 180px; object-fit: cover;">
+
+                    <div class="card-body p-4
+                                d-flex flex-column">
+
+                        <!-- CÓDIGO Y ESTADO -->
+                        <div class="d-flex flex-wrap gap-2
+                                    align-items-start
+                                    justify-content-between mb-3">
+
+                            <span class="fw-bold text-primary"
+                                  th:text="${r.codigo}">
+                                PC8-00000000
+                            </span>
+
+                            <span th:switch="${r.estado.name()}">
+
+                                <span th:case="'REGISTRADO'"
+                                      class="badge rounded-pill text-bg-secondary">
+                                    Registrado
+                                </span>
+
+                                <span th:case="'EN_REVISION'"
+                                      class="badge rounded-pill text-bg-info">
+                                    En revisión
+                                </span>
+
+                                <span th:case="'ASIGNADO'"
+                                      class="badge rounded-pill text-bg-primary">
+                                    Asignado
+                                </span>
+
+                                <span th:case="'EN_ATENCION'"
+                                      class="badge rounded-pill text-bg-warning">
+                                    En atención
+                                </span>
+
+                                <span th:case="'ATENDIDO'"
+                                      class="badge rounded-pill text-bg-success">
+                                    Atendido
+                                </span>
+
+                                <span th:case="'CERRADO'"
+                                      class="badge rounded-pill text-bg-success">
+                                    Cerrado
+                                </span>
+
+                                <span th:case="'RECHAZADO'"
+                                      class="badge rounded-pill text-bg-danger">
+                                    Rechazado
+                                </span>
+
+                                <span th:case="*"
+                                      class="badge rounded-pill text-bg-secondary"
+                                      th:text="${r.estado.etiqueta}">
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                        <!-- CATEGORÍA -->
+                        <h3 class="h5 fw-bold mb-3"
+                            th:text="${r.categoriaEtiqueta}">
+                            Categoría del problema
+                        </h3>
+
+                        <!-- DESCRIPCIÓN -->
+                        <p class="small text-secondary text-truncate mb-3"
+                           th:text="${r.descripcion}">
+                            Descripción de la incidencia
+                        </p>
+
+                        <!-- UBICACIÓN -->
+                        <div class="mb-3">
+
+                            <p class="small text-secondary mb-1">
+                                Ubicación
+                            </p>
+
+                            <p class="small fw-semibold mb-0"
+                               th:text="${r.ubicacion}">
+                                Chorrillos
+                            </p>
+
+                        </div>
+
+                        <!-- FECHA -->
+                        <div class="mb-4">
+
+                            <p class="small text-secondary mb-1">
+                                Fecha del reporte
+                            </p>
+
+                            <p class="small fw-semibold mb-0"
+                               th:text="${#temporals.format(
+                                   r.creadoEn,
+                                   'dd/MM/yyyy HH:mm'
+                               )}">
+                                30/10/2026
+                            </p>
+
+                        </div>
+
+                        <!-- BOTÓN VER DETALLE -->
+                        <div class="mt-auto">
+
+                            <a th:href="@{/reportes/{id}(id=${r.id})}"
+                               class="btn btn-outline-primary w-100"
+                               th:aria-label="|Ver detalle del reporte ${r.codigo}|">
+
+                                Ver detalle del reporte
+                                <span aria-hidden="true">→</span>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+        <!-- SIN RESULTADOS DE BÚSQUEDA -->
+        <div id="sin-resultados"
+             class="card border-0 shadow-sm mt-4"
+             hidden>
+
+            <div class="card-body text-center p-5">
+
+                <h3 class="h5 fw-bold">
+                    No encontramos reportes
+                </h3>
+
+                <p class="text-secondary mb-0">
+                    Prueba con otra palabra o cambia
+                    el filtro de estado.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+
+<!-- FILTRADO EN EL NAVEGADOR -->
+<script>
+(() => {
+    'use strict';
+
+    const buscar = document.getElementById('buscar-reporte');
+    const estado = document.getElementById('filtrar-estado');
+
+    // La pantalla también puede no tener reportes.
+    if (!buscar || !estado) return;
+
+    const tarjetas = [
+        ...document.querySelectorAll('.pc8-reporte-item')
+    ];
+
+    const sinResultados =
+        document.getElementById('sin-resultados');
+
+    const contador =
+        document.getElementById('contador-resultados');
+
+    function normalizar(texto) {
+        return String(texto || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function filtrarReportes() {
+
+        const texto = normalizar(buscar.value);
+        const estadoElegido = estado.value;
+
+        let visibles = 0;
+
+        tarjetas.forEach(tarjeta => {
+
+            const contenido = normalizar(
+                tarjeta.textContent
+            );
+
+            const estadoReporte =
+                tarjeta.dataset.estado || '';
+
+            const coincideTexto =
+                !texto || contenido.includes(texto);
+
+            const coincideEstado =
+                !estadoElegido ||
+                estadoReporte === estadoElegido;
+
+            const mostrar =
+                coincideTexto && coincideEstado;
+
+            tarjeta.classList.toggle(
+                'd-none',
+                !mostrar
+            );
+
+            if (mostrar) {
+                visibles++;
+            }
+        });
+
+        sinResultados.hidden = visibles !== 0;
+
+        contador.textContent =
+            visibles === 1
+                ? '1 reporte encontrado'
+                : `${visibles} reportes encontrados`;
+    }
+
+    buscar.addEventListener(
+        'input',
+        filtrarReportes
+    );
+
+    estado.addEventListener(
+        'change',
+        filtrarReportes
+    );
+
+    filtrarReportes();
+
+})();
+</script>
+
+</body>
+</html>

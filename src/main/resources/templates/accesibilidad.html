@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Ayuda de accesibilidad')}"></head><body>
+<div th:replace="~{fragments/base :: nav}"></div>
+<main id="contenido" class="container py-4 py-md-5">
+ <h1 class="h2 fw-bold">Opciones de accesibilidad</h1>
+ <p class="lead">CiudadConecta busca facilitar la participación de ciudadanos con distintas necesidades.</p>
+ <section class="card card-body border-0 shadow-sm my-3"><h2 class="h4">Controles de visualización</h2>
+ <p>Puedes usar los botones A+ y A− para cambiar el tamaño del texto, activar alto contraste y restablecer los valores. La preferencia se conserva en este navegador.</p></section>
+ <section class="card card-body border-0 shadow-sm my-3"><h2 class="h4">Teclado y lectores de pantalla</h2>
+ <p>Usa Tab y Shift + Tab para desplazarte, Enter o Espacio para activar botones y el enlace «Saltar al contenido principal» para evitar repetir la navegación. Los campos importantes tienen etiquetas visibles.</p></section>
+ <section class="card card-body border-0 shadow-sm my-3"><h2 class="h4">Ubicación en los reportes</h2>
+ <p>El mapa es opcional: también puedes describir la dirección escribiéndola manualmente. Si utilizas el celular, no es obligatorio compartir tu posición GPS.</p></section>
+ <div class="alert alert-info" role="note">Estas herramientas no certifican por sí solas conformidad WCAG. El sistema requiere pruebas con teclado, lectores de pantalla y usuarios reales.</div>
+</main><footer th:replace="~{fragments/base :: footer}"></footer></body></html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+
+<html lang="es"
+
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/base :: head('Gestionar reporte')}">
+
+</head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<style>
+
+    /* PRIVACIDAD DEL REPORTE */
+
+    .pc8-identidad-panel {
+
+        border: 1px solid #dbe4ed;
+
+        border-radius: .8rem;
+
+        padding: 1rem;
+
+        background: #f8fafc;
+
+    }
+
+    .pc8-identidad-reservada {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: .4rem;
+
+        border-radius: .5rem;
+
+        padding: .4rem .7rem;
+
+        background: #e9eff5;
+
+        color: #273f58;
+
+        font-weight: 700;
+
+        font-size: .9rem;
+
+    }
+
+    .pc8-gestion-descripcion {
+
+        white-space: pre-wrap;
+
+        overflow-wrap: anywhere;
+
+    }
+
+    .pc8-foto-evidencia {
+
+        max-height: 420px;
+
+        object-fit: contain;
+
+        width: 100%;
+
+        background: #f3f5f7;
+
+    }
+
+</style>
+
+<main id="contenido" class="container py-5">
+
+    <!-- VOLVER -->
+
+    <a class="small link-secondary"
+
+       th:href="@{/gestion}">
+
+        ← Bandeja municipal
+
+    </a>
+
+    <!-- TÍTULO -->
+
+    <h1 class="h2 fw-bold mt-3 mb-4">
+
+        Gestionar
+
+        <span th:text="${reporte.codigo}">
+
+            PC8-XXXXXXXX
+
+        </span>
+
+    </h1>
+
+    <!-- MENSAJES -->
+
+    <div th:if="${exito}"
+
+         class="alert alert-success"
+
+         role="status"
+
+         th:text="${exito}">
+
+    </div>
+
+    <div th:if="${error}"
+
+         class="alert alert-danger"
+
+         role="alert"
+
+         th:text="${error}">
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- ================================= -->
+
+        <!-- INFORMACIÓN DEL REPORTE -->
+
+        <!-- ================================= -->
+
+        <div class="col-lg-5">
+
+            <section class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h2 class="h5 fw-bold mb-3">
+
+                        Información recibida
+
+                    </h2>
+
+                    <!-- PRIVACIDAD DEL REPORTE -->
+
+                    <div class="pc8-identidad-panel mb-4">
+
+                        <div class="small text-secondary mb-2">
+
+                            Solicitado por:
+
+                        </div>
+
+                        <!-- REPORTE RESERVADO -->
+
+                        <div th:if="${reporte.identidadReservada}">
+
+                            <span class="pc8-identidad-reservada">
+
+                                🔒 Identidad reservada
+
+                            </span>
+
+                            <p class="small text-secondary mt-2 mb-0">
+
+                                El ciudadano solicitó mantener
+
+                                su identidad reservada durante
+
+                                la gestión de esta incidencia.
+
+                            </p>
+
+                        </div>
+
+                        <!-- REPORTE IDENTIFICADO -->
+
+                        <div th:unless="${reporte.identidadReservada}">
+
+                            <strong th:text="${reporte.ciudadano.nombre}">
+
+                                Nombre del ciudadano
+
+                            </strong>
+
+                            <p class="small text-secondary mt-2 mb-0">
+
+                                Reporte presentado de forma identificada.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- CATEGORÍA -->
+
+                    <p>
+
+                        <strong>Categoría:</strong>
+
+                        <span th:text="${reporte.categoriaEtiqueta}">
+
+                            Categoría
+
+                        </span>
+
+                    </p>
+
+                    <!-- SUBCATEGORÍA -->
+
+                    <p th:if="${reporte.subcategoria != null}">
+                        <strong>Subcategoría:</strong>
+                        <span th:text="${reporte.subcategoriaEtiqueta}">
+                            Subcategoría
+                        </span>
+                    </p>
+
+                    <!-- UBICACIÓN -->
+
+                    <p>
+
+                        <strong>Ubicación:</strong>
+
+                        <span th:text="${reporte.ubicacion}">
+
+                            Ubicación
+
+                        </span>
+
+                    </p>
+
+                    <!-- DESCRIPCIÓN -->
+
+                    <div class="mb-3">
+
+                        <strong>Descripción:</strong>
+
+                        <p class="pc8-gestion-descripcion mt-2"
+
+                           th:text="${reporte.descripcion}">
+
+                            Descripción del reporte.
+
+                        </p>
+
+                    </div>
+
+                    <!-- ESTADO ACTUAL -->
+
+                    <div class="mb-3">
+
+                        <strong>Estado actual:</strong>
+
+                        <span class="badge-status"
+
+                              th:text="${reporte.estado.etiqueta}">
+
+                            Registrado
+
+                        </span>
+
+                    </div>
+
+                    <!-- FOTOGRAFÍA DEL CIUDADANO -->
+
+                    <div th:if="${reporte.archivoImagen != null}"
+
+                         class="mb-3">
+
+                        <h3 class="h6 fw-semibold mb-2">
+
+                            Fotografía de evidencia
+
+                        </h3>
+
+                        <img class="img-fluid rounded
+
+                                    pc8-foto-evidencia"
+
+                             alt="Evidencia enviada por el ciudadano"
+
+                             th:src="@{/reportes/{id}/foto(id=${reporte.id})}">
+
+                    </div>
+
+                    <!-- ================================= -->
+
+                    <!-- CORREGIDO: HISTORIAL COMPLETO -->
+
+                    <!-- ================================= -->
+
+                    <!--
+
+                        Este enlace aparece tanto para
+
+                        reportes identificados como para
+
+                        reportes con identidad reservada.
+
+                        Los permisos de acceso se comprueban
+
+                        en ReporteController.
+
+                    -->
+
+                    <a class="btn btn-outline-primary"
+
+                       th:href="@{/reportes/{id}(id=${reporte.id})}">
+
+                        📋 Ver historial completo
+
+                    </a>
+
+                    <p class="small text-secondary mt-2 mb-0">
+
+                        Consulta los movimientos registrados
+
+                        y el mapa de ubicación de la incidencia.
+
+                    </p>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- ================================= -->
+
+        <!-- FORMULARIO DE GESTIÓN -->
+
+        <!-- ================================= -->
+
+        <div class="col-lg-7">
+
+            <section class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h2 class="h5 fw-bold">
+
+                        Actualizar seguimiento
+
+                    </h2>
+
+                    <p class="text-secondary small">
+
+                        Flujo normal:
+
+                        Registrado → En revisión →
+
+                        Asignado → En atención →
+
+                        Atendido → Cerrado.
+
+                    </p>
+
+                    <!-- CONTROL DE ESTADOS -->
+
+                    <div class="alert alert-info"
+
+                         role="status">
+
+                        <strong>
+
+                            Control de estados
+
+                        </strong>
+
+                        <p class="mb-0 mt-1 small">
+
+                            El sistema muestra únicamente
+
+                            los estados disponibles para tu rol
+
+                            y la etapa actual del reporte.
+
+                        </p>
+
+                    </div>
+
+                    <!-- FORMULARIO -->
+
+                    <form th:action="@{/gestion/{id}(id=${reporte.id})}"
+
+                          th:object="${form}"
+
+                          method="post"
+
+                          enctype="multipart/form-data">
+
+                        <!-- ESTADO -->
+
+                        <div class="mb-3">
+
+                            <label for="estado"
+
+                                   class="form-label fw-semibold">
+
+                                Nuevo estado *
+
+                            </label>
+
+                            <select id="estado"
+
+                                    class="form-select"
+
+                                    th:field="*{estado}"
+
+                                    required>
+
+                                <!--
+
+                                    La lista de estados se
+
+                                    filtra en GestionController.
+
+                                -->
+
+                                <option th:each="e : ${estados}"
+
+                                        th:value="${e}"
+
+                                        th:text="${e.etiqueta}">
+
+                                </option>
+
+                            </select>
+
+                            <div class="form-text">
+
+                                Si no necesitas avanzar el estado,
+
+                                puedes conservar el estado actual.
+
+                            </div>
+
+                            <div class="text-danger small"
+
+                                 th:errors="*{estado}">
+
+                            </div>
+
+                            <!-- SIN ESTADOS ADICIONALES -->
+
+                            <div class="alert alert-secondary mt-3 mb-0"
+
+                                 th:if="${#lists.size(estados) == 1
+
+                                     and reporte.estado.name() != 'CERRADO'
+
+                                     and reporte.estado.name() != 'RECHAZADO'}">
+
+                                No hay otro estado disponible
+
+                                para tu rol en esta etapa.
+
+                            </div>
+
+                        </div>
+
+                        <!-- ALERTA DE PLAZO -->
+
+                        <div class="alert alert-warning"
+
+                             th:if="${reporte.vencido}"
+
+                             role="alert">
+
+                            Este caso está fuera del
+
+                            plazo previsto de atención.
+
+                        </div>
+
+                        <!-- RESPONSABLE PARA PERSONAL MUNICIPAL -->
+
+                        <div class="mb-3"
+
+                             th:if="${not mantenimiento}">
+
+                            <label for="responsableId"
+
+                                   class="form-label">
+
+                                Funcionario o mantenimiento responsable
+
+                            </label>
+
+                            <select id="responsableId"
+
+                                    class="form-select"
+
+                                    th:field="*{responsableId}">
+
+                                <option value="">
+
+                                    Sin asignar
+
+                                </option>
+
+                                <option th:each="u : ${responsables}"
+
+                                        th:value="${u.id}"
+
+                                        th:text="${u.nombre + ' · ' + u.rol}">
+
+                                </option>
+
+                            </select>
+
+                            <div class="form-text">
+
+                                Obligatorio al asignar el reporte.
+
+                                El plazo de atención se calcula
+
+                                automáticamente.
+
+                            </div>
+
+                        </div>
+
+                        <!-- RESPONSABLE PARA MANTENIMIENTO -->
+
+                        <div class="mb-3"
+
+                             th:if="${mantenimiento}">
+
+                            <p class="small">
+
+                                Responsable:
+
+                                <strong th:text="${reporte.responsable != null
+
+                                    ? reporte.responsable.nombre
+
+                                    : 'Sin asignar'}">
+
+                                    Sin asignar
+
+                                </strong>
+
+                            </p>
+
+                        </div>
+
+                        <!-- ÁREA MUNICIPAL -->
+
+                        <div class="mb-3"
+
+                             th:if="${not mantenimiento}">
+
+                            <label for="area"
+
+                                   class="form-label">
+
+                                Área municipal responsable
+
+                            </label>
+
+                            <select id="area"
+
+                                    class="form-select"
+
+                                    th:field="*{area}">
+
+                                <option value="">
+
+                                    Sin asignar
+
+                                </option>
+
+                                <option th:each="a : ${areas}"
+
+                                        th:value="${a}"
+
+                                        th:text="${a.etiqueta}">
+
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- OBSERVACIÓN -->
+
+                        <div class="mb-4">
+
+                            <label for="observacion"
+
+                                   class="form-label fw-semibold">
+
+                                Comentario o motivo de rechazo
+
+                            </label>
+
+                            <textarea id="observacion"
+
+                                      class="form-control"
+
+                                      rows="4"
+
+                                      th:field="*{observacion}"
+
+                                      maxlength="700">
+
+                            </textarea>
+
+                            <div class="form-text">
+
+                                Es obligatorio justificar
+
+                                los reportes rechazados.
+
+                                Para marcar un reporte como
+
+                                Atendido, describe el trabajo realizado.
+
+                            </div>
+
+                            <div class="text-danger small"
+
+                                 th:errors="*{observacion}">
+
+                            </div>
+
+                        </div>
+
+                        <!-- FECHA LÍMITE -->
+
+                        <div class="small text-secondary mb-3"
+
+                             th:if="${reporte.fechaLimite != null}">
+
+                            Plazo previsto:
+
+                            <span th:text="${#temporals.format(
+
+                                reporte.fechaLimite,
+
+                                'dd/MM/yyyy HH:mm'
+
+                            )}">
+
+                            </span>
+
+                        </div>
+
+                        <!-- FOTO DE ATENCIÓN -->
+
+                        <div class="mb-3">
+
+                            <label for="fotoAtencion"
+
+                                   class="form-label">
+
+                                Foto de la atención municipal
+
+                                (opcional para otras etapas)
+
+                            </label>
+
+                            <input id="fotoAtencion"
+
+                                   th:field="*{fotoAtencion}"
+
+                                   type="file"
+
+                                   accept="image/png,image/jpeg"
+
+                                   class="form-control">
+
+                            <div class="form-text">
+
+                                JPG o PNG, máximo 3 MB.
+
+                                Para pasar a «Atendido»,
+
+                                debes adjuntar evidencia fotográfica
+
+                                y describir el trabajo realizado.
+
+                            </div>
+
+                        </div>
+
+                        <!-- BOTÓN GUARDAR -->
+
+                        <button type="submit"
+
+                                class="btn btn-primary w-100 py-2"
+
+                                th:disabled="${reporte.estado.name() == 'CERRADO'
+
+                                    or reporte.estado.name() == 'RECHAZADO'}">
+
+                            Guardar actualización
+
+                        </button>
+
+                        <!-- REPORTE FINALIZADO -->
+
+                        <div class="alert alert-secondary mt-3"
+
+                             th:if="${reporte.estado.name() == 'CERRADO'
+
+                                 or reporte.estado.name() == 'RECHAZADO'}">
+
+                            Este reporte está finalizado.
+
+                            No se permiten modificaciones
+
+                            ordinarias de su estado.
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/base :: footer}">
+
+</footer>
+
+</body>
+
+</html>

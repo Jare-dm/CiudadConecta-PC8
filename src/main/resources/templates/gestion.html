@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+
+<html lang="es"
+
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/base :: head('Panel municipal')}">
+
+</head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<style>
+
+    .pc8-gestion-stat {
+
+        height: 100%;
+
+        border-radius: 1rem;
+
+    }
+
+    .pc8-alertas-panel {
+
+        border-radius: 1rem;
+
+    }
+
+    .pc8-alertas-filtros {
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: .6rem;
+
+    }
+
+    .pc8-alertas-filtros .btn {
+
+        border-radius: 999px;
+
+    }
+
+    .pc8-alertas-filtros .btn[aria-pressed="true"] {
+
+        font-weight: 700;
+
+    }
+
+    .pc8-gestion-codigo {
+
+        font-weight: 700;
+
+        white-space: nowrap;
+
+    }
+
+    .pc8-gestion-plazo {
+
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: .4rem;
+
+    }
+
+    .pc8-contador-plazo {
+
+        border-radius: .8rem;
+
+        height: 100%;
+
+    }
+
+    .pc8-gestion-tabla td {
+
+        vertical-align: middle;
+
+    }
+
+    /* NUEVO: IDENTIDAD RESERVADA */
+
+    .pc8-identidad-reservada {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: .35rem;
+
+        font-size: .8rem;
+
+        font-weight: 600;
+
+        white-space: nowrap;
+
+    }
+
+    .pc8-identidad-identificada {
+
+        font-weight: 500;
+
+    }
+
+    @media (max-width: 575.98px) {
+
+        .pc8-alertas-filtros .btn {
+
+            flex: 1 1 auto;
+
+        }
+
+    }
+
+
+    /* ==========================================
+       BANDEJA DE INCIDENCIAS RESPONSIVA
+       Evita columnas estrechas y botones cortados.
+       ========================================== */
+
+    .pc8-bandeja-lista {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .pc8-incidencia-card {
+        min-width: 0;
+        border: 1px solid #e0e7ef;
+        border-radius: .9rem;
+        padding: 1.15rem 1.25rem;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(17, 46, 74, .035);
+    }
+
+    .pc8-incidencia-card.pc8-incidencia-urgente {
+        border-left: 4px solid #dc3545;
+        background-color: #fffafa;
+    }
+
+    .pc8-incidencia-card.pc8-incidencia-aviso {
+        border-left: 4px solid #e5a400;
+        background-color: #fffdf5;
+    }
+
+    .pc8-incidencia-cabecera {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .9rem 1.5rem;
+    }
+
+    .pc8-incidencia-titulo {
+        flex: 1 1 250px;
+        min-width: 0;
+    }
+
+    .pc8-incidencia-categoria {
+        color: #173a61;
+        font-weight: 650;
+        overflow-wrap: anywhere;
+    }
+
+    .pc8-incidencia-subcategoria {
+        color: #475569;
+        font-size: .87rem;
+        margin-top: .35rem;
+        overflow-wrap: anywhere;
+    }
+
+    .pc8-incidencia-acciones {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .6rem;
+    }
+
+    .pc8-incidencia-acciones .btn {
+        white-space: nowrap;
+    }
+
+    .pc8-incidencia-datos {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem 1.5rem;
+        border-top: 1px solid #e9eef4;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+
+    .pc8-incidencia-campo {
+        min-width: 0;
+    }
+
+    .pc8-incidencia-etiqueta {
+        display: block;
+        color: #64748b;
+        font-size: .78rem;
+        margin-bottom: .25rem;
+    }
+
+    .pc8-incidencia-valor {
+        color: #273449;
+        font-size: .93rem;
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 767.98px) {
+        .pc8-incidencia-datos {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .pc8-incidencia-card {
+            padding: 1rem;
+        }
+
+        .pc8-incidencia-datos {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .pc8-incidencia-acciones {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .pc8-incidencia-acciones .btn {
+            flex: 1 1 auto;
+        }
+    }
+
+</style>
+
+<main id="contenido" class="container py-5">
+
+    <!-- =================================== -->
+
+    <!-- ENCABEZADO -->
+
+    <!-- =================================== -->
+
+    <header class="mb-4">
+
+        <p class="eyebrow-dark mb-1">
+
+            Gestión y seguimiento
+
+        </p>
+
+        <h1 class="h2 fw-bold mb-2">
+
+            Panel municipal
+
+        </h1>
+
+        <p class="text-secondary mb-0">
+
+            Revisa las incidencias, asigna responsables
+
+            y supervisa sus plazos de atención.
+
+        </p>
+
+    </header>
+
+    <!-- =================================== -->
+
+    <!-- RESUMEN MUNICIPAL -->
+
+    <!-- =================================== -->
+
+    <section class="row g-3 mb-4"
+
+             aria-label="Resumen de reportes">
+
+        <!-- TOTAL -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat pc8-gestion-stat">
+
+                <div class="stat-number"
+
+                     th:text="${total}">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+
+                    Total de reportes
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- EN PROCESO -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat pc8-gestion-stat">
+
+                <div class="stat-number"
+
+                     th:text="${pendientes}">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+
+                    En proceso
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ATENDIDOS -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat pc8-gestion-stat">
+
+                <div class="stat-number"
+
+                     th:text="${atendidos}">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+
+                    Atendidos y cerrados
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RECHAZADOS -->
+
+        <div class="col-6 col-lg-3">
+
+            <div class="stat pc8-gestion-stat">
+
+                <div class="stat-number"
+
+                     th:text="${rechazados}">
+
+                    0
+
+                </div>
+
+                <div class="stat-label">
+
+                    Rechazados
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- =================================== -->
+
+    <!-- ALERTA DE PLAZO VENCIDO -->
+
+    <!-- =================================== -->
+
+    <div class="alert alert-danger border-danger"
+
+         th:if="${vencidos > 0}"
+
+         role="status">
+
+        <strong>⚠ Atención:</strong>
+
+        <strong th:text="${vencidos}">
+
+            0
+
+        </strong>
+
+        reportes superaron su plazo de atención.
+
+        Revisa los casos destacados en la bandeja.
+
+    </div>
+
+    <!-- =================================== -->
+
+    <!-- ALERTA DE ASIGNACIÓN ATRASADA -->
+
+    <!-- =================================== -->
+
+    <div id="alerta-asignacion-atrasada"
+
+         class="alert alert-warning border-warning d-none"
+
+         role="status">
+
+        <strong>
+
+            ⚠ Hay incidencias sin asignar.
+
+        </strong>
+
+        <p class="mb-0 mt-1">
+
+            <strong id="texto-asignacion-atrasada">
+
+                0
+
+            </strong>
+
+            reportes llevan al menos 48 horas
+
+            registrados sin una persona responsable.
+
+            Revisa la bandeja y prioriza su asignación.
+
+        </p>
+
+    </div>
+
+    <!-- =================================== -->
+
+    <!-- ACCESO A ESTADÍSTICAS -->
+
+    <!-- =================================== -->
+
+    <div class="d-flex justify-content-end mb-3">
+
+        <a class="btn btn-outline-primary"
+
+           th:href="@{/gestion/estadisticas}">
+
+            Ver gráficos y estadísticas →
+
+        </a>
+
+    </div>
+
+    <!-- =================================== -->
+
+    <!-- FILTROS MUNICIPALES -->
+
+    <!-- =================================== -->
+
+    <form method="get"
+
+          th:action="@{/gestion}"
+
+          class="card card-body border-0 shadow-sm mb-4"
+
+          aria-label="Filtros de incidencias">
+
+        <h2 class="h5 fw-bold mb-3">
+
+            Buscar incidencias
+
+        </h2>
+
+        <div class="row g-3 align-items-end">
+
+            <!-- CÓDIGO O UBICACIÓN -->
+
+            <div class="col-md-4">
+
+                <label for="buscar"
+
+                       class="form-label">
+
+                    Código o ubicación
+
+                </label>
+
+                <input id="buscar"
+
+                       name="buscar"
+
+                       class="form-control"
+
+                       placeholder="Ej. PC8- o una avenida"
+
+                       th:value="${buscar}">
+
+            </div>
+
+            <!-- ESTADO -->
+
+            <div class="col-md-3">
+
+                <label for="estado"
+
+                       class="form-label">
+
+                    Estado
+
+                </label>
+
+                <select id="estado"
+
+                        name="estado"
+
+                        class="form-select">
+
+                    <option value="">
+
+                        Todos los estados
+
+                    </option>
+
+                    <option th:each="e : ${estados}"
+
+                            th:value="${e.name()}"
+
+                            th:text="${e.etiqueta}"
+
+                            th:selected="${e == estadoSeleccionado}">
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- CATEGORÍA -->
+
+            <div class="col-md-3">
+
+                <label for="categoria"
+
+                       class="form-label">
+
+                    Categoría
+
+                </label>
+
+                <select id="categoria"
+
+                        name="categoria"
+
+                        class="form-select">
+
+                    <option value="">
+
+                        Todas las categorías
+
+                    </option>
+
+                    <option th:each="c : ${categorias}"
+
+                            th:value="${'BASE:' + c.name()}"
+
+                            th:text="${c.etiqueta}"
+
+                            th:selected="${'BASE:' + c.name() == categoriaSeleccionada}">
+
+                    </option>
+
+                    <option th:each="c : ${categoriasPersonalizadas}"
+
+                            th:value="${'P:' + c.id}"
+
+                            th:text="${c.nombre}"
+
+                            th:selected="${'P:' + c.id == categoriaSeleccionada}">
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <!-- BOTÓN FILTRAR -->
+
+            <div class="col-md-2">
+
+                <button type="submit"
+
+                        class="btn btn-primary w-100">
+
+                    Filtrar
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+
+            <a class="small"
+
+               th:href="@{/gestion}">
+
+                Limpiar filtros
+
+            </a>
+
+        </div>
+
+    </form>
+
+    <!-- =================================== -->
+
+    <!-- SEGUIMIENTO DE PLAZOS -->
+
+    <!-- =================================== -->
+
+    <section class="card border-0 shadow-sm
+
+                    pc8-alertas-panel mb-4"
+
+             aria-labelledby="titulo-plazos">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-plazos"
+
+                class="h5 fw-bold mb-2">
+
+                Seguimiento de plazos
+
+            </h2>
+
+            <p class="small text-secondary mb-4">
+
+                Control de atención y asignación
+
+                de incidencias municipales.
+
+            </p>
+
+            <!-- CONTADORES -->
+
+            <div class="row g-2 mb-4">
+
+                <!-- TODOS -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="border p-3 text-center
+
+                                pc8-contador-plazo">
+
+                        <div id="cantidad-todos"
+
+                             class="h3 fw-bold mb-1">
+
+                            0
+
+                        </div>
+
+                        <div class="small text-secondary">
+
+                            En la bandeja
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- VENCIDOS -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="border border-danger
+
+                                p-3 text-center
+
+                                pc8-contador-plazo">
+
+                        <div id="cantidad-vencidos"
+
+                             class="h3 fw-bold text-danger mb-1">
+
+                            0
+
+                        </div>
+
+                        <div class="small text-secondary">
+
+                            Atención vencida
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- POR VENCER -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="border border-warning
+
+                                p-3 text-center
+
+                                pc8-contador-plazo">
+
+                        <div id="cantidad-por-vencer"
+
+                             class="h3 fw-bold mb-1">
+
+                            0
+
+                        </div>
+
+                        <div class="small text-secondary">
+
+                            Atención por vencer
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ASIGNACIÓN ATRASADA -->
+
+                <div class="col-6 col-lg-3">
+
+                    <div class="border border-danger
+
+                                p-3 text-center
+
+                                pc8-contador-plazo">
+
+                        <div id="cantidad-sin-asignar"
+
+                             class="h3 fw-bold text-danger mb-1">
+
+                            0
+
+                        </div>
+
+                        <div class="small text-secondary">
+
+                            Asignación atrasada
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FILTROS RÁPIDOS -->
+
+            <div class="pc8-alertas-filtros"
+
+                 role="group"
+
+                 aria-label="Filtrar incidencias por plazo">
+
+                <button type="button"
+
+                        class="btn btn-primary btn-sm"
+
+                        data-filtro-plazo="todos"
+
+                        aria-pressed="true">
+
+                    Todos
+
+                </button>
+
+                <button type="button"
+
+                        class="btn btn-outline-danger btn-sm"
+
+                        data-filtro-plazo="vencidos"
+
+                        aria-pressed="false">
+
+                    Atención vencida
+
+                </button>
+
+                <button type="button"
+
+                        class="btn btn-outline-warning btn-sm"
+
+                        data-filtro-plazo="por-vencer"
+
+                        aria-pressed="false">
+
+                    Atención por vencer
+
+                </button>
+
+                <button type="button"
+
+                        class="btn btn-outline-danger btn-sm"
+
+                        data-filtro-plazo="sin-asignar"
+
+                        aria-pressed="false">
+
+                    Sin asignar +48 h
+
+                </button>
+
+                <button type="button"
+
+                        class="btn btn-outline-warning btn-sm"
+
+                        data-filtro-plazo="asignar-pronto"
+
+                        aria-pressed="false">
+
+                    Asignar pronto
+
+                </button>
+
+                <button type="button"
+
+                        class="btn btn-outline-secondary btn-sm"
+
+                        data-filtro-plazo="sin-alerta"
+
+                        aria-pressed="false">
+
+                    Sin alerta
+
+                </button>
+
+            </div>
+
+            <p class="small text-secondary mb-0 mt-3">
+
+                Los filtros rápidos actúan sobre las
+
+                incidencias cargadas en la bandeja.
+
+                Los controles de búsqueda, categoría
+
+                y estado se mantienen.
+
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- =================================== -->
+
+    <!-- BANDEJA DE INCIDENCIAS -->
+
+    <!-- =================================== -->
+
+    <section class="card border-0 shadow-sm"
+             aria-labelledby="titulo-bandeja">
+
+        <div class="card-header bg-white py-3
+                    d-flex flex-wrap justify-content-between
+                    align-items-center gap-2">
+
+            <h2 id="titulo-bandeja" class="h5 fw-bold mb-0">
+                Bandeja de incidencias
+            </h2>
+
+            <span id="resultado-plazos"
+                  class="text-secondary small"
+                  aria-live="polite"></span>
+
+        </div>
+
+        <!-- Cada incidencia es una tarjeta: sin tabla recortada. -->
+        <div class="card-body p-3 p-md-4">
+
+            <div class="pc8-bandeja-lista">
+
+                <article th:each="r : ${reportes}"
+                         class="pc8-incidencia-card pc8-fila-reporte"
+                         th:classappend="${r.vencido or r.sinAsignarAtrasado
+                             ? 'pc8-incidencia-urgente'
+                             : (r.porVencer or r.sinAsignarPorVencer
+                                 ? 'pc8-incidencia-aviso'
+                                 : '')}"
+                         th:attr="data-vencido=${r.vencido},
+                                  data-por-vencer=${r.porVencer},
+                                  data-sin-asignar=${r.sinAsignarAtrasado},
+                                  data-asignar-pronto=${r.sinAsignarPorVencer}">
+
+                    <!-- ENCABEZADO: TIPO, ESTADO Y ACCIÓN -->
+                    <div class="pc8-incidencia-cabecera">
+
+                        <div class="pc8-incidencia-titulo">
+
+                            <h3 class="h6 fw-bold mb-2 pc8-gestion-codigo"
+                                th:text="${r.codigo}">
+                                PC8-XXXXXXXX
+                            </h3>
+
+                            <div class="pc8-incidencia-categoria"
+                                 th:text="${r.categoriaEtiqueta}">
+                                Categoría del problema
+                            </div>
+
+                            <div th:if="${r.subcategoria != null}"
+                                 class="pc8-incidencia-subcategoria">
+                                <strong>Subcategoría:</strong>
+                                <span th:text="${r.subcategoriaEtiqueta}">
+                                    Tipo específico
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div class="pc8-incidencia-acciones">
+
+                            <span class="badge-status"
+                                  th:text="${r.estado.etiqueta}">
+                                Registrado
+                            </span>
+
+                            <a class="btn btn-outline-primary btn-sm"
+                               th:href="@{/gestion/{id}(id=${r.id})}">
+                                Gestionar
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <!-- INFORMACIÓN DEL REPORTE -->
+                    <div class="pc8-incidencia-datos">
+
+                        <!-- Identidad reservada: no exponer el nombre. -->
+                        <div class="pc8-incidencia-campo">
+                            <span class="pc8-incidencia-etiqueta">
+                                Ciudadano
+                            </span>
+
+                            <div class="pc8-incidencia-valor">
+                                <span th:if="${r.identidadReservada}"
+                                      class="badge text-bg-secondary pc8-identidad-reservada">
+                                    🔒 Identidad reservada
+                                </span>
+
+                                <span th:unless="${r.identidadReservada}"
+                                      class="pc8-identidad-identificada"
+                                      th:text="${r.ciudadano.nombre}">
+                                    Ciudadano
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="pc8-incidencia-campo">
+                            <span class="pc8-incidencia-etiqueta">
+                                Ubicación
+                            </span>
+                            <div class="pc8-incidencia-valor"
+                                 th:text="${r.ubicacion}">
+                                Ubicación
+                            </div>
+                        </div>
+
+                        <div class="pc8-incidencia-campo">
+                            <span class="pc8-incidencia-etiqueta">
+                                Área municipal
+                            </span>
+                            <div class="pc8-incidencia-valor"
+                                 th:text="${r.area != null
+                                     ? r.area.etiqueta
+                                     : 'Sin asignar'}">
+                                Sin asignar
+                            </div>
+                        </div>
+
+                        <div class="pc8-incidencia-campo">
+                            <span class="pc8-incidencia-etiqueta">
+                                Responsable
+                            </span>
+                            <div class="pc8-incidencia-valor"
+                                 th:text="${r.responsable != null
+                                     ? r.responsable.nombre
+                                     : 'Sin asignar'}">
+                                Sin asignar
+                            </div>
+                        </div>
+
+                        <div class="pc8-incidencia-campo">
+                            <span class="pc8-incidencia-etiqueta">
+                                Plazo de atención
+                            </span>
+
+                            <div class="pc8-incidencia-valor pc8-gestion-plazo">
+                                <span th:if="${r.fechaLimite != null}"
+                                      th:text="${#temporals.format(
+                                          r.fechaLimite,
+                                          'dd/MM/yyyy HH:mm'
+                                      )}">
+                                    Fecha límite
+                                </span>
+
+                                <span th:if="${r.fechaLimite == null}"
+                                      class="text-secondary">
+                                    Sin plazo de atención
+                                </span>
+
+                                <span th:if="${r.vencido}"
+                                      class="badge text-bg-danger">
+                                    Atención vencida
+                                </span>
+
+                                <span th:if="${r.porVencer}"
+                                      class="badge text-bg-warning">
+                                    Atención por vencer
+                                </span>
+
+                                <span th:if="${r.sinAsignarAtrasado}"
+                                      class="badge text-bg-danger">
+                                    Sin asignar +48 h
+                                </span>
+
+                                <span th:if="${r.sinAsignarPorVencer}"
+                                      class="badge text-bg-warning">
+                                    Asignar pronto
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+            <div th:if="${#lists.isEmpty(reportes)}"
+                 class="text-center text-secondary py-5">
+                No hay incidencias que coincidan con los filtros.
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- =================================== -->
+
+    <!-- SIN RESULTADOS DE FILTROS RÁPIDOS -->
+
+    <!-- =================================== -->
+
+    <div id="sin-resultados-plazo"
+
+         class="card border-0 shadow-sm mt-3 d-none">
+
+        <div class="card-body text-center p-4">
+
+            <h3 class="h5 fw-bold">
+
+                No hay incidencias en este grupo
+
+            </h3>
+
+            <p class="text-secondary mb-0">
+
+                Selecciona otro filtro o limpia
+
+                los filtros de búsqueda.
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- =================================== -->
+
+    <!-- ACLARACIONES -->
+
+    <!-- =================================== -->
+
+    <div class="alert alert-light border mt-4 small">
+
+        <strong>Sobre los plazos:</strong>
+
+        El vencimiento de atención se calcula
+
+        mediante la fecha límite del reporte.
+
+        La alerta de asignación se calcula
+
+        mediante la fecha de registro y se aplica
+
+        a incidencias todavía sin responsable.
+
+        Los límites de 24 y 48 horas para
+
+        asignación son criterios definidos
+
+        para este prototipo académico.
+
+    </div>
+
+    <!-- NUEVO: ACLARACIÓN DE PRIVACIDAD -->
+
+    <div class="alert alert-light border mt-3 small">
+
+        <strong>Protección de identidad:</strong>
+
+        Los reportes marcados como reservados
+
+        no muestran el nombre del denunciante
+
+        en esta bandeja.
+
+        La reserva de identidad no impide
+
+        gestionar la incidencia ni consultar
+
+        la información necesaria para su atención.
+
+    </div>
+
+</main>
+
+<!-- =================================== -->
+
+<!-- FILTROS Y CONTADORES -->
+
+<!-- =================================== -->
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    'use strict';
+
+    const filas = [
+
+        ...document.querySelectorAll(
+
+            '.pc8-fila-reporte'
+
+        )
+
+    ];
+
+    const botones = [
+
+        ...document.querySelectorAll(
+
+            '[data-filtro-plazo]'
+
+        )
+
+    ];
+
+    const resultado =
+
+        document.getElementById('resultado-plazos');
+
+    const sinResultados =
+
+        document.getElementById('sin-resultados-plazo');
+
+    const alertaAsignacion =
+
+        document.getElementById(
+
+            'alerta-asignacion-atrasada'
+
+        );
+
+    // ======================================
+
+    // CONSULTAR ATRIBUTOS DE LA FILA
+
+    // ======================================
+
+    function tiene(fila, atributo) {
+
+        return fila.dataset[atributo] === 'true';
+
+    }
+
+    // ======================================
+
+    // CALCULAR CONTADORES
+
+    // ======================================
+
+    const total = filas.length;
+
+    const vencidos = filas.filter(fila =>
+
+        tiene(fila, 'vencido')
+
+    ).length;
+
+    const porVencer = filas.filter(fila =>
+
+        tiene(fila, 'porVencer')
+
+    ).length;
+
+    const sinAsignar = filas.filter(fila =>
+
+        tiene(fila, 'sinAsignar')
+
+    ).length;
+
+    // ======================================
+
+    // MOSTRAR CONTADORES
+
+    // ======================================
+
+    document.getElementById(
+
+        'cantidad-todos'
+
+    ).textContent = total;
+
+    document.getElementById(
+
+        'cantidad-vencidos'
+
+    ).textContent = vencidos;
+
+    document.getElementById(
+
+        'cantidad-por-vencer'
+
+    ).textContent = porVencer;
+
+    document.getElementById(
+
+        'cantidad-sin-asignar'
+
+    ).textContent = sinAsignar;
+
+    // ======================================
+
+    // ALERTA GENERAL DE ASIGNACIÓN
+
+    // ======================================
+
+    if (alertaAsignacion) {
+
+        alertaAsignacion.classList.toggle(
+
+            'd-none',
+
+            sinAsignar === 0
+
+        );
+
+        const texto =
+
+            document.getElementById(
+
+                'texto-asignacion-atrasada'
+
+            );
+
+        if (texto) {
+
+            texto.textContent = sinAsignar;
+
+        }
+
+    }
+
+    // ======================================
+
+    // APLICAR FILTROS RÁPIDOS
+
+    // ======================================
+
+    function aplicarFiltro(tipo) {
+
+        let visibles = 0;
+
+        filas.forEach(fila => {
+
+            const vencido =
+
+                tiene(fila, 'vencido');
+
+            const porVencer =
+
+                tiene(fila, 'porVencer');
+
+            const sinAsignar =
+
+                tiene(fila, 'sinAsignar');
+
+            const asignarPronto =
+
+                tiene(fila, 'asignarPronto');
+
+            let mostrar;
+
+            switch (tipo) {
+
+                case 'vencidos':
+
+                    mostrar = vencido;
+
+                    break;
+
+                case 'por-vencer':
+
+                    mostrar = porVencer;
+
+                    break;
+
+                case 'sin-asignar':
+
+                    mostrar = sinAsignar;
+
+                    break;
+
+                case 'asignar-pronto':
+
+                    mostrar = asignarPronto;
+
+                    break;
+
+                case 'sin-alerta':
+
+                    mostrar =
+
+                        !vencido &&
+
+                        !porVencer &&
+
+                        !sinAsignar &&
+
+                        !asignarPronto;
+
+                    break;
+
+                default:
+
+                    mostrar = true;
+
+            }
+
+            fila.classList.toggle(
+
+                'd-none',
+
+                !mostrar
+
+            );
+
+            if (mostrar) {
+
+                visibles++;
+
+            }
+
+        });
+
+        // ==================================
+
+        // ACTUALIZAR ASPECTO DE LOS BOTONES
+
+        // ==================================
+
+        const colores = {
+
+            'todos': 'primary',
+
+            'vencidos': 'danger',
+
+            'por-vencer': 'warning',
+
+            'sin-asignar': 'danger',
+
+            'asignar-pronto': 'warning',
+
+            'sin-alerta': 'secondary'
+
+        };
+
+        botones.forEach(boton => {
+
+            const valor =
+
+                boton.dataset.filtroPlazo;
+
+            const color =
+
+                colores[valor] || 'secondary';
+
+            const activo =
+
+                valor === tipo;
+
+            boton.setAttribute(
+
+                'aria-pressed',
+
+                String(activo)
+
+            );
+
+            Object.values(colores).forEach(c => {
+
+                boton.classList.remove(
+
+                    `btn-${c}`,
+
+                    `btn-outline-${c}`
+
+                );
+
+            });
+
+            boton.classList.add(
+
+                activo
+
+                    ? `btn-${color}`
+
+                    : `btn-outline-${color}`
+
+            );
+
+        });
+
+        // ==================================
+
+        // RESULTADOS VISIBLES
+
+        // ==================================
+
+        if (resultado) {
+
+            resultado.textContent =
+
+                visibles === 1
+
+                    ? '1 incidencia visible'
+
+                    : `${visibles} incidencias visibles`;
+
+        }
+
+        if (sinResultados) {
+
+            sinResultados.classList.toggle(
+
+                'd-none',
+
+                visibles > 0 || total === 0
+
+            );
+
+        }
+
+    }
+
+    // ======================================
+
+    // EVENTOS DE LOS BOTONES
+
+    // ======================================
+
+    botones.forEach(boton => {
+
+        boton.addEventListener('click', () => {
+
+            aplicarFiltro(
+
+                boton.dataset.filtroPlazo
+
+            );
+
+        });
+
+    });
+
+    // ======================================
+
+    // INICIAR FILTRO
+
+    // ======================================
+
+    aplicarFiltro('todos');
+
+});
+
+</script>
+
+<footer th:replace="~{fragments/base :: footer}">
+
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/base :: head('Estadísticas')}">
+</head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<style>
+    /* CiudadConecta PC8 - Panel de estadísticas */
+
+    .pc8-stats-card {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .pc8-stats-number {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 750;
+        line-height: 1.2;
+        color: #173a61;
+    }
+
+    .pc8-stats-label {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .pc8-stats-icon {
+        font-size: 1.4rem;
+    }
+
+    .pc8-stats-donut {
+        width: 210px;
+        height: 210px;
+        max-width: 100%;
+        margin: 0 auto;
+        border-radius: 50%;
+        background: #e2e8f0;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pc8-stats-donut::before {
+        content: "";
+        width: 66%;
+        height: 66%;
+        position: absolute;
+        border-radius: 50%;
+        background: #ffffff;
+    }
+
+    .pc8-stats-donut-centro {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .pc8-stats-donut-centro strong {
+        display: block;
+        font-size: 2rem;
+        color: #173a61;
+    }
+
+    .pc8-stats-donut-centro small {
+        color: #64748b;
+    }
+
+    .pc8-stats-leyenda {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .pc8-stats-leyenda li {
+        display: flex;
+        gap: 0.7rem;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .pc8-stats-leyenda li:last-child {
+        border-bottom: 0;
+    }
+
+    .pc8-stats-leyenda-nombre {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        min-width: 0;
+    }
+
+    .pc8-stats-punto {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #94a3b8;
+        flex-shrink: 0;
+    }
+
+    .pc8-stats-barra {
+        height: 13px;
+        background: #e9eff6;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .pc8-stats-barra-relleno {
+        height: 100%;
+        background: #1463a5;
+        border-radius: 999px;
+    }
+
+    .pc8-stats-categoria {
+        padding: 0.9rem 0;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .pc8-stats-categoria:last-child {
+        border-bottom: 0;
+    }
+
+    .pc8-stats-categoria .pc8-stats-barra-relleno {
+        background: #15a1a8;
+    }
+
+    @media (max-width: 575.98px) {
+        .pc8-stats-donut {
+            width: 190px;
+            height: 190px;
+        }
+
+        .pc8-stats-card .card-body {
+            padding: 1.25rem !important;
+        }
+    }
+</style>
+
+<main id="contenido" class="container py-5">
+
+    <!-- VOLVER AL PANEL -->
+    <a class="small link-secondary text-decoration-none"
+       th:href="@{/gestion}">
+        ← Panel municipal
+    </a>
+
+    <!-- ENCABEZADO -->
+    <header class="mt-4 mb-4">
+
+        <p class="eyebrow-dark mb-1">
+            Análisis y seguimiento
+        </p>
+
+        <h1 class="h2 fw-bold mb-2"
+            th:text="${vistaPersonal}
+                ? 'Estadísticas de mis reportes asignados'
+                : 'Estadísticas municipales'">
+            Estadísticas municipales
+        </h1>
+
+        <p class="text-secondary mb-0">
+            Analiza la distribución de incidencias
+            registradas en CiudadConecta PC8.
+        </p>
+
+    </header>
+
+    <!-- AVISO DE ALCANCE PARA MANTENIMIENTO -->
+    <div class="alert alert-info border-0"
+         th:if="${vistaPersonal}"
+         role="status">
+
+        <strong>Vista de mantenimiento.</strong>
+        Estas cifras incluyen únicamente los
+        reportes asignados a tu cuenta.
+
+    </div>
+
+    <!-- FILTROS -->
+    <section class="card border-0 shadow-sm pc8-stats-card mb-4"
+             aria-labelledby="titulo-filtros">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-filtros"
+                class="h5 fw-bold mb-3">
+                Filtrar estadísticas
+            </h2>
+
+            <form method="get"
+                  th:action="@{/gestion/estadisticas}">
+
+                <div class="row g-3 align-items-end">
+
+                    <!-- PERIODO -->
+                    <div class="col-md-5">
+
+                        <label for="periodo"
+                               class="form-label fw-semibold">
+                            Período
+                        </label>
+
+                        <select id="periodo"
+                                name="periodo"
+                                class="form-select">
+
+                            <option value="todo"
+                                    th:selected="${periodoSeleccionado == 'todo'}">
+                                Todo el historial
+                            </option>
+
+                            <option value="7"
+                                    th:selected="${periodoSeleccionado == '7'}">
+                                Últimos 7 días
+                            </option>
+
+                            <option value="30"
+                                    th:selected="${periodoSeleccionado == '30'}">
+                                Últimos 30 días
+                            </option>
+
+                            <option value="90"
+                                    th:selected="${periodoSeleccionado == '90'}">
+                                Últimos 90 días
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- CATEGORÍA -->
+                    <div class="col-md-5">
+
+                        <label for="categoria"
+                               class="form-label fw-semibold">
+                            Categoría
+                        </label>
+
+                        <select id="categoria"
+                                name="categoria"
+                                class="form-select">
+
+                            <option value=""
+                                    th:selected="${#strings.isEmpty(categoriaSeleccionada)}">
+                                Todas las categorías
+                            </option>
+
+                            <!-- CATEGORÍAS PREDEFINIDAS -->
+                            <option
+                                th:each="c : ${categorias}"
+                                th:value="${'BASE:' + c.name()}"
+                                th:text="${c.etiqueta}"
+                                th:selected="${('BASE:' + c.name()) == categoriaSeleccionada}">
+                            </option>
+
+                            <!-- CATEGORÍAS PERSONALIZADAS -->
+                            <option
+                                th:each="c : ${categoriasPersonalizadas}"
+                                th:value="${'P:' + c.id}"
+                                th:text="${c.nombre}"
+                                th:selected="${('P:' + c.id) == categoriaSeleccionada}">
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- APLICAR FILTROS -->
+                    <div class="col-md-2">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Filtrar
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+                    <a class="small"
+                       th:href="@{/gestion/estadisticas}">
+                        Limpiar filtros
+                    </a>
+                </div>
+
+                <p class="text-secondary small mb-0 mt-2">
+                    El período se calcula según la fecha
+                    de registro de cada incidencia.
+                </p>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <!-- TARJETAS DE RESUMEN -->
+    <section aria-labelledby="titulo-resumen"
+             class="mb-4">
+
+        <h2 id="titulo-resumen"
+            class="visually-hidden">
+            Resumen de estadísticas
+        </h2>
+
+        <div class="row g-3">
+
+            <!-- TOTAL -->
+            <div class="col-6 col-xl-3">
+                <div class="card border-0 shadow-sm
+                            pc8-stats-card h-100">
+                    <div class="card-body p-4">
+
+                        <span class="pc8-stats-icon"
+                              aria-hidden="true">
+                            📋
+                        </span>
+
+                        <div class="pc8-stats-number mt-2"
+                             th:text="${total}">
+                            0
+                        </div>
+
+                        <div class="pc8-stats-label">
+                            Total de reportes
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- PENDIENTES -->
+            <div class="col-6 col-xl-3">
+                <div class="card border-0 shadow-sm
+                            pc8-stats-card h-100">
+                    <div class="card-body p-4">
+
+                        <span class="pc8-stats-icon"
+                              aria-hidden="true">
+                            ⏳
+                        </span>
+
+                        <div class="pc8-stats-number mt-2"
+                             th:text="${pendientes}">
+                            0
+                        </div>
+
+                        <div class="pc8-stats-label">
+                            En proceso
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ATENDIDOS -->
+            <div class="col-6 col-xl-3">
+                <div class="card border-0 shadow-sm
+                            pc8-stats-card h-100">
+                    <div class="card-body p-4">
+
+                        <span class="pc8-stats-icon"
+                              aria-hidden="true">
+                            ✅
+                        </span>
+
+                        <div class="pc8-stats-number mt-2"
+                             th:text="${atendidos}">
+                            0
+                        </div>
+
+                        <div class="pc8-stats-label">
+                            Atendidos y cerrados
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECHAZADOS -->
+            <div class="col-6 col-xl-3">
+                <div class="card border-0 shadow-sm
+                            pc8-stats-card h-100">
+                    <div class="card-body p-4">
+
+                        <span class="pc8-stats-icon"
+                              aria-hidden="true">
+                            🚫
+                        </span>
+
+                        <div class="pc8-stats-number mt-2"
+                             th:text="${rechazados}">
+                            0
+                        </div>
+
+                        <div class="pc8-stats-label">
+                            Rechazados
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- GRÁFICOS -->
+    <div class="row g-4">
+
+        <!-- GRÁFICO CIRCULAR POR ESTADO -->
+        <section class="col-lg-6"
+                 aria-labelledby="titulo-estados">
+
+            <div class="card border-0 shadow-sm
+                        pc8-stats-card h-100">
+
+                <div class="card-body p-4">
+
+                    <h2 id="titulo-estados"
+                        class="h5 fw-bold mb-2">
+                        Distribución por estado
+                    </h2>
+
+                    <p class="text-secondary small mb-4">
+                        Proporción de incidencias en
+                        cada etapa del proceso.
+                    </p>
+
+                    <div class="pc8-stats-donut mb-4"
+                         id="grafico-estados"
+                         role="img"
+                         aria-label="Gráfico circular de distribución por estado">
+
+                        <div class="pc8-stats-donut-centro">
+
+                            <strong th:text="${total}">
+                                0
+                            </strong>
+
+                            <small>reportes</small>
+
+                        </div>
+
+                    </div>
+
+                    <!-- LEYENDA CON DATOS REALES -->
+                    <ul id="leyenda-estados"
+                        class="pc8-stats-leyenda">
+
+                        <li th:each="b : ${porEstado}"
+                            th:attr="data-cantidad=${b.cantidad}">
+
+                            <div class="pc8-stats-leyenda-nombre">
+
+                                <span class="pc8-stats-punto"
+                                      aria-hidden="true">
+                                </span>
+
+                                <span th:text="${b.etiqueta}">
+                                    Estado
+                                </span>
+
+                            </div>
+
+                            <div class="text-end">
+
+                                <strong th:text="${b.cantidad}">
+                                    0
+                                </strong>
+
+                                <span class="small text-secondary"
+                                      th:text="|(${b.porcentaje}%)|">
+                                    (0%)
+                                </span>
+
+                            </div>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- GRÁFICO DE BARRAS POR CATEGORÍA -->
+        <section class="col-lg-6"
+                 aria-labelledby="titulo-categorias">
+
+            <div class="card border-0 shadow-sm
+                        pc8-stats-card h-100">
+
+                <div class="card-body p-4">
+
+                    <h2 id="titulo-categorias"
+                        class="h5 fw-bold mb-2">
+                        Reportes por categoría
+                    </h2>
+
+                    <p class="text-secondary small mb-4">
+                        Tipos de problemas registrados
+                        en el período seleccionado.
+                    </p>
+
+                    <!-- BARRAS -->
+                    <div th:each="b : ${porCategoria}"
+                         class="pc8-stats-categoria">
+
+                        <div class="d-flex justify-content-between
+                                    align-items-center gap-3 mb-2">
+
+                            <span class="fw-semibold small"
+                                  th:text="${b.etiqueta}">
+                                Categoría
+                            </span>
+
+                            <span class="small text-secondary
+                                         text-nowrap">
+
+                                <strong th:text="${b.cantidad}">
+                                    0
+                                </strong>
+
+                                <span th:text="|(${b.porcentaje}%)|">
+                                    (0%)
+                                </span>
+
+                            </span>
+
+                        </div>
+
+                        <div class="pc8-stats-barra"
+                             role="progressbar"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             th:attr="aria-label=${b.etiqueta},
+                                      aria-valuenow=${b.porcentaje}">
+
+                            <div class="pc8-stats-barra-relleno"
+                                 th:style="'width:' + ${b.porcentaje} + '%'">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- VACÍO -->
+                    <p th:if="${#lists.isEmpty(porCategoria)}"
+                       class="text-secondary text-center py-5">
+
+                        No hay reportes para los filtros
+                        seleccionados.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <!-- NOTA METODOLÓGICA -->
+    <div class="alert alert-light border mt-4 small">
+
+        <strong>Acerca de estos datos:</strong>
+        Las estadísticas se calculan con los
+        reportes registrados en MariaDB.
+
+        Los filtros de fecha se basan en cuándo
+        se creó cada reporte.
+
+        Los gráficos muestran estados actuales
+        y categorías, no tiempos de atención
+        ni niveles de satisfacción ciudadana.
+
+    </div>
+
+</main>
+
+<!-- GRÁFICO CIRCULAR SIN LIBRERÍAS EXTERNAS -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    'use strict';
+
+    const grafico =
+        document.getElementById('grafico-estados');
+
+    const elementos = [
+        ...document.querySelectorAll(
+            '#leyenda-estados li'
+        )
+    ];
+
+    if (!grafico || elementos.length === 0) {
+        return;
+    }
+
+    const colores = [
+        '#64748b', // Registrado
+        '#0dcaf0', // En revisión
+        '#0d6efd', // Asignado
+        '#fd7e14', // En atención
+        '#198754', // Atendido
+        '#20c997', // Cerrado
+        '#dc3545'  // Rechazado
+    ];
+
+    const cantidades = elementos.map(elemento => {
+        const cantidad = Number(
+            elemento.dataset.cantidad
+        );
+
+        return Number.isFinite(cantidad)
+            ? Math.max(0, cantidad)
+            : 0;
+    });
+
+    const total = cantidades.reduce(
+        (suma, cantidad) => suma + cantidad,
+        0
+    );
+
+    // Colorear los indicadores de la leyenda.
+    elementos.forEach((elemento, indice) => {
+
+        const punto =
+            elemento.querySelector('.pc8-stats-punto');
+
+        if (punto) {
+            punto.style.backgroundColor =
+                colores[indice % colores.length];
+        }
+    });
+
+    // Si no hay datos, se conserva el círculo gris.
+    if (total === 0) {
+        grafico.setAttribute(
+            'aria-label',
+            'No hay reportes para los filtros seleccionados'
+        );
+        return;
+    }
+
+    let inicio = 0;
+    const segmentos = [];
+
+    cantidades.forEach((cantidad, indice) => {
+
+        if (cantidad === 0) {
+            return;
+        }
+
+        const fin =
+            inicio + cantidad / total * 100;
+
+        const color =
+            colores[indice % colores.length];
+
+        segmentos.push(
+            `${color} ${inicio}% ${fin}%`
+        );
+
+        inicio = fin;
+    });
+
+    grafico.style.background =
+        `conic-gradient(${segmentos.join(', ')})`;
+
+    grafico.setAttribute(
+        'aria-label',
+        `Distribución de ${total} reportes por estado. ` +
+        'Consulta la leyenda para conocer las cantidades.'
+    );
+});
+</script>
+
+<footer th:replace="~{fragments/base :: footer}">
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/base :: head('Registro de ciudadano')}"></head><body>
+<nav th:replace="~{fragments/base :: nav}"></nav><main id="contenido" class="container auth-wrap"><div class="card shadow-sm border-0 auth-card wide"><div class="card-body p-4 p-md-5">
+<h2 class="fw-bold">Crear cuenta ciudadana</h2><p class="text-secondary mb-4">Tus datos se usan para identificar y dar seguimiento a tus reportes.</p>
+<form th:action="@{/registro}" th:object="${form}" method="post" novalidate><div class="row g-3">
+ <div class="col-md-12"><label for="nombre" class="form-label">Nombre completo *</label><input id="nombre" th:field="*{nombre}" class="form-control" maxlength="110" required><div class="text-danger small" th:errors="*{nombre}"></div></div>
+ <div class="col-md-6"><label for="dni" class="form-label">DNI (8 dígitos) *</label><input id="dni" th:field="*{dni}" inputmode="numeric" maxlength="8" class="form-control" required><div class="text-danger small" th:errors="*{dni}"></div></div>
+ <div class="col-md-6"><label for="tel" class="form-label">Teléfono (opcional)</label><input id="tel" th:field="*{telefono}" class="form-control"><div class="text-danger small" th:errors="*{telefono}"></div></div>
+ <div class="col-md-12"><label for="correo" class="form-label">Correo *</label><input id="correo" th:field="*{correo}" type="email" class="form-control" required><div class="text-danger small" th:errors="*{correo}"></div></div>
+ <div class="col-md-12"><label for="pass" class="form-label">Contraseña (mínimo 8 caracteres) *</label><input id="pass" th:field="*{clave}" type="password" autocomplete="new-password" minlength="8" class="form-control" required><div class="text-danger small" th:errors="*{clave}"></div></div>
+ </div><button class="btn btn-primary w-100 mt-4 py-2" type="submit">Crear cuenta</button></form>
+<p class="text-center mt-4 mb-0">¿Ya tienes una cuenta? <a th:href="@{/login}">Inicia sesión</a></p>
+</div></div></main><footer th:replace="~{fragments/base :: footer}"></footer></body></html>

@@ -1,0 +1,66 @@
+/* CiudadConecta PC8 — Portada específica. No modifica los formularios ni los paneles internos. */
+.pc8-home { --home-navy:#153554; --home-ink:#1b3047; --home-accent:#ffca62; --home-muted:#526579; color:var(--home-ink); }
+.pc8-home-container { max-width:1180px; }
+.pc8-home-hero { background:linear-gradient(118deg,#122d4a 0%,#19446b 60%,#165d79 100%); color:#fff; }
+.pc8-home-eyebrow { display:flex; align-items:center; flex-wrap:wrap; gap:.65rem; color:#e6eff9; font-size:.83rem; font-weight:700; letter-spacing:.04em; margin-bottom:1.5rem; }
+.pc8-home-dot { width:.64rem; height:.64rem; background:var(--home-accent); border-radius:50%; flex:none; }
+.pc8-home-title { font-size:clamp(2.2rem,4.2vw,3.65rem); line-height:1.12; font-weight:800; letter-spacing:-.04em; margin-bottom:1.25rem; max-width:750px; }
+.pc8-home-title span { color:var(--home-accent); }
+.pc8-home-lead { max-width:650px; line-height:1.66; color:#e1ebf6; font-size:clamp(1rem,1.5vw,1.15rem); margin-bottom:1.6rem; }
+.pc8-home-actions { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
+.pc8-home-actions .btn { min-height:3rem; padding:.75rem 1.3rem; font-weight:750; display:inline-flex; justify-content:center; align-items:center; gap:.6rem; border-radius:.7rem; }
+.pc8-home-primary { background:var(--home-accent); color:#152d45; border:2px solid var(--home-accent); }
+.pc8-home-primary:hover,.pc8-home-primary:focus-visible { background:#ffe0a1; color:#152d45; border-color:#ffe0a1; }
+.pc8-home-secondary { background:transparent; color:#fff; border:2px solid #d8e7f5; }
+.pc8-home-secondary:hover,.pc8-home-secondary:focus-visible { background:#fff; color:#153554; border-color:#fff; }
+.pc8-home-location-note { margin:1.5rem 0 0; color:#e2edf8; font-size:.92rem; display:flex; align-items:flex-start; gap:.65rem; }
+.pc8-home-process { padding:clamp(1.5rem,3vw,2rem); border-radius:1.4rem; border:1px solid rgba(255,255,255,.35); background:rgba(255,255,255,.09); box-shadow:0 16px 40px rgba(0,0,0,.08); }
+.pc8-home-process-label { color:#ffe4a9; font-size:.8rem; text-transform:uppercase; font-weight:750; letter-spacing:.08em; }
+.pc8-home-process h2 { color:#fff; font-size:clamp(1.28rem,2vw,1.5rem); font-weight:750; margin:.65rem 0 1.35rem; }
+.pc8-home-steps { padding:0; margin:0; list-style:none; display:grid; gap:1.25rem; }
+.pc8-home-steps li { display:flex; gap:1rem; border-top:1px solid rgba(255,255,255,.25); padding-top:1rem; }
+.pc8-home-step-number { color:#ffd479; font-size:.9rem; font-weight:800; flex:0 0 2rem; }
+.pc8-home-steps strong { font-weight:720; color:#fff; }
+.pc8-home-steps p { color:#dfeaf4; margin:.25rem 0 0; font-size:.93rem; line-height:1.5; }
+.pc8-home-section-header { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; flex-wrap:wrap; margin-bottom:1.6rem; }
+.pc8-home-section-header h2 { font-weight:800; font-size:clamp(1.55rem,2.6vw,2.15rem); margin:.35rem 0; letter-spacing:-.025em; }
+.pc8-home-section-header p { color:var(--home-muted); margin:0; max-width:650px; }
+.pc8-home-kicker { display:block; font-weight:800; text-transform:uppercase; letter-spacing:.08em; font-size:.77rem; color:#185789; }
+.pc8-home-service-card { display:flex; flex-direction:column; gap:.65rem; height:100%; padding:1.65rem; background:#fff; border:1px solid #d5e2ed; border-radius:1.05rem; color:#1b3047; text-decoration:none; box-shadow:0 7px 24px rgba(16,47,75,.045); transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.pc8-home-service-card:hover,.pc8-home-service-card:focus-visible { border-color:#1768a2; box-shadow:0 9px 25px rgba(16,47,75,.12); transform:translateY(-2px); color:#152f4b; }
+.pc8-home-service-icon { display:grid; place-items:center; width:3rem; height:3rem; border-radius:.78rem; background:#e8f2fb; color:#134c7b; font-size:1.55rem; font-weight:750; margin-bottom:.25rem; }
+.pc8-home-service-card h3 { font-size:1.22rem; font-weight:770; margin:0; }
+.pc8-home-service-card p { color:#4e6278; margin:0 0 .65rem; line-height:1.57; flex:1; }
+.pc8-home-card-link { font-weight:760; color:#0b5288; margin-top:auto; }
+.pc8-home-impact { background:#eaf2f9; }
+.pc8-home-text-link { font-weight:750; color:#0b5288; }
+.pc8-home-stat { height:100%; padding:1.45rem; background:#fff; border:1px solid #d3e0ec; border-radius:1rem; display:flex; flex-direction:column; gap:.3rem; }
+.pc8-home-stat strong { font-size:clamp(1.9rem,4vw,2.6rem); letter-spacing:-.04em; font-weight:850; color:#164b78; line-height:1.15; font-variant-numeric:tabular-nums; }
+.pc8-home-stat span { font-weight:620; color:#415c72; line-height:1.45; }
+.pc8-home-disclaimer { color:#405d72; font-size:.88rem; line-height:1.6; }
+.pc8-home-example { height:100%; padding:1.65rem; border-radius:1rem; background:#fff; border:1px solid #d7e3ed; }
+.pc8-home-example-number { font-weight:800; color:#17629c; display:block; margin-bottom:1rem; }
+.pc8-home-example h3 { font-weight:760; font-size:1.15rem; margin-bottom:.5rem; }
+.pc8-home-example p { color:#526579; margin:0; line-height:1.6; }
+.pc8-home-assist { color:#4e6479; font-size:.95rem; }
+.pc8-home-assist a { font-weight:700; }
+/* El alto contraste también se aplica a los nuevos elementos exclusivos de la portada. */
+.contraste-alto .pc8-home { color:#fff!important; }
+.contraste-alto .pc8-home :is(.pc8-home-hero,.pc8-home-impact,.pc8-home-service-card,.pc8-home-stat,.pc8-home-example,.pc8-home-process) { background:#000!important; color:#fff!important; border:1px solid #fff!important; }
+.contraste-alto .pc8-home :is(.pc8-home-title span,.pc8-home-kicker,.pc8-home-eyebrow,.pc8-home-process-label,.pc8-home-step-number,.pc8-home-stat strong,.pc8-home-example-number) { color:#ffff66!important; }
+.contraste-alto .pc8-home :is(.pc8-home-lead,.pc8-home-location-note,.pc8-home-steps p,.pc8-home-service-card p,.pc8-home-section-header p,.pc8-home-stat span,.pc8-home-example p,.pc8-home-disclaimer,.pc8-home-assist) { color:#fff!important; opacity:1!important; }
+.contraste-alto .pc8-home .pc8-home-primary { background:#ffff66!important; color:#000!important; border-color:#ffff66!important; }
+.contraste-alto .pc8-home .pc8-home-secondary { background:#000!important; color:#ffff66!important; border-color:#ffff66!important; }
+.contraste-alto .pc8-home .pc8-home-service-icon { color:#000!important; background:#ffff66!important; }
+.contraste-alto .pc8-home .pc8-home-card-link { color:#ffff66!important; }
+@media(max-width:767.98px){
+ .pc8-home-hero .container { padding-top:2.2rem!important; padding-bottom:2.4rem!important; }
+ .pc8-home-title { letter-spacing:-.03em; }
+ .pc8-home-process { padding:1.3rem; }
+ .pc8-home-actions .btn { width:100%; }
+ .pc8-home-section .container { padding-top:2.4rem!important; padding-bottom:2.4rem!important; }
+ .pc8-home-stat { padding:1rem; }
+ .pc8-home-service-card,.pc8-home-example { padding:1.3rem; }
+}
+@media (prefers-reduced-motion:reduce) { .pc8-home-service-card { transition:none!important; transform:none!important; } }
+.pc8-motion-off .pc8-home-service-card { transition:none!important; transform:none!important; }

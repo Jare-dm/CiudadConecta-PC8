@@ -1,0 +1,1312 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/base :: head('Administrar usuarios')}">
+</head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<style>
+    /* ==========================================
+       CIUDADCONECTA PC8
+       ADMINISTRACIÓN DE USUARIOS
+       ========================================== */
+
+    .pc8-admin-card {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .pc8-admin-stat {
+        border-radius: 1rem;
+        height: 100%;
+    }
+
+    .pc8-admin-stat-number {
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        font-weight: 750;
+        line-height: 1.15;
+        color: #173a61;
+    }
+
+    .pc8-admin-stat-label {
+        font-size: 0.88rem;
+        color: #64748b;
+        margin-top: 0.45rem;
+    }
+
+    .pc8-admin-stat-icon {
+        font-size: 1.3rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .pc8-admin-table {
+        width: 100%;
+    }
+
+    .pc8-admin-table th {
+        white-space: nowrap;
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .pc8-admin-table td {
+        vertical-align: middle;
+    }
+
+    .pc8-admin-usuario {
+        font-weight: 650;
+        color: #173a61;
+        overflow-wrap: anywhere;
+    }
+
+    .pc8-admin-correo {
+        font-size: 0.88rem;
+        color: #475569;
+        overflow-wrap: anywhere;
+    }
+
+    .pc8-admin-form-editar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .pc8-admin-form-editar select {
+        min-width: 145px;
+        max-width: 190px;
+    }
+
+    .pc8-admin-form-editar .form-check {
+        margin-bottom: 0;
+    }
+
+    .pc8-admin-filtros .form-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .pc8-admin-info {
+        background-color: #f0f7ff;
+        border: 1px solid #cce1f5;
+        border-radius: 0.8rem;
+        padding: 1rem;
+        color: #264a69;
+    }
+
+    @media (max-width: 767.98px) {
+
+        .pc8-admin-table,
+        .pc8-admin-table tbody,
+        .pc8-admin-table tr,
+        .pc8-admin-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .pc8-admin-table thead {
+            display: none;
+        }
+
+        .pc8-admin-table tbody tr.pc8-usuario-fila {
+            background: #ffffff;
+            border: 1px solid #dce4ee;
+            border-radius: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 12px rgba(16, 43, 70, 0.05);
+        }
+
+        .pc8-admin-table tbody tr.pc8-usuario-fila td {
+            border: 0;
+            padding: 0.55rem 0.4rem;
+        }
+
+        .pc8-admin-table tbody tr.pc8-usuario-fila td::before {
+            content: attr(data-label);
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+        }
+
+        .pc8-admin-table .pc8-admin-form-editar {
+            align-items: stretch;
+        }
+
+        .pc8-admin-table .pc8-admin-form-editar select {
+            max-width: none;
+            width: 100%;
+        }
+
+        .pc8-admin-table .pc8-admin-form-editar button {
+            width: 100%;
+        }
+
+        .pc8-admin-table tbody tr.d-none {
+            display: none !important;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+        }
+    }
+</style>
+
+<main id="contenido" class="container py-5">
+
+    <!-- ==========================================
+         VOLVER AL PANEL MUNICIPAL
+         ========================================== -->
+
+    <a class="small link-secondary text-decoration-none"
+       th:href="@{/gestion}">
+        ← Panel municipal
+    </a>
+
+    <!-- ==========================================
+         ENCABEZADO
+         ========================================== -->
+
+
+<!-- ==========================================
+     ENCABEZADO
+     CON ACCESO DIRECTO A CATEGORÍAS
+     ========================================== -->
+
+<header class="mt-4 mb-4">
+
+    <p class="text-uppercase small fw-semibold
+              text-secondary mb-2">
+        Gestión administrativa
+    </p>
+
+    <h1 class="h2 fw-bold mb-2">
+        Administración de usuarios
+    </h1>
+
+    <p class="text-secondary mb-0">
+        Administra las cuentas de CiudadConecta PC8,
+        sus roles y sus permisos de acceso.
+    </p>
+
+    <!-- NUEVO: ACCESO DIRECTO A CATEGORÍAS -->
+
+    <div class="d-flex flex-wrap gap-2 mt-3">
+
+        <a th:href="@{/admin/categorias}"
+           class="btn btn-outline-primary">
+
+            Gestionar categorías
+
+        </a>
+
+    </div>
+
+</header>
+
+
+    <!-- ==========================================
+         MENSAJES DEL CONTROLADOR
+         ========================================== -->
+
+    <div th:if="${exito}"
+         class="alert alert-success"
+         role="status"
+         th:text="${exito}">
+    </div>
+
+    <div th:if="${error}"
+         class="alert alert-danger"
+         role="alert"
+         th:text="${error}">
+    </div>
+
+    <!-- ==========================================
+         RESUMEN DE USUARIOS
+         ========================================== -->
+
+    <section class="mb-4"
+             aria-labelledby="titulo-resumen">
+
+        <h2 id="titulo-resumen"
+            class="visually-hidden">
+            Resumen de cuentas
+        </h2>
+
+        <div class="row g-3">
+
+            <!-- TOTAL -->
+            <div class="col-6 col-xl-3">
+
+                <div class="card border-0 shadow-sm
+                            pc8-admin-stat">
+
+                    <div class="card-body p-4">
+
+                        <div class="pc8-admin-stat-icon"
+                             aria-hidden="true">
+                            👥
+                        </div>
+
+                        <div class="pc8-admin-stat-number"
+                             id="contador-total"
+                             th:text="${#lists.size(usuarios)}">
+                            0
+                        </div>
+
+                        <div class="pc8-admin-stat-label">
+                            Usuarios registrados
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIVOS -->
+            <div class="col-6 col-xl-3">
+
+                <div class="card border-0 shadow-sm
+                            pc8-admin-stat">
+
+                    <div class="card-body p-4">
+
+                        <div class="pc8-admin-stat-icon"
+                             aria-hidden="true">
+                            ✅
+                        </div>
+
+                        <div class="pc8-admin-stat-number"
+                             id="contador-activos">
+                            0
+                        </div>
+
+                        <div class="pc8-admin-stat-label">
+                            Cuentas activas
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- DESACTIVADOS -->
+            <div class="col-6 col-xl-3">
+
+                <div class="card border-0 shadow-sm
+                            pc8-admin-stat">
+
+                    <div class="card-body p-4">
+
+                        <div class="pc8-admin-stat-icon"
+                             aria-hidden="true">
+                            🔒
+                        </div>
+
+                        <div class="pc8-admin-stat-number"
+                             id="contador-inactivos">
+                            0
+                        </div>
+
+                        <div class="pc8-admin-stat-label">
+                            Cuentas desactivadas
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PERSONAL -->
+            <div class="col-6 col-xl-3">
+
+                <div class="card border-0 shadow-sm
+                            pc8-admin-stat">
+
+                    <div class="card-body p-4">
+
+                        <div class="pc8-admin-stat-icon"
+                             aria-hidden="true">
+                            🏛️
+                        </div>
+
+                        <div class="pc8-admin-stat-number"
+                             id="contador-personal">
+                            0
+                        </div>
+
+                        <div class="pc8-admin-stat-label">
+                            Personal municipal
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ==========================================
+         CREAR PERSONAL MUNICIPAL
+         ========================================== -->
+
+    <section class="card border-0 shadow-sm
+                    pc8-admin-card mb-4"
+             aria-labelledby="crear-personal">
+
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-wrap
+                        justify-content-between
+                        align-items-start gap-2 mb-3">
+
+                <div>
+
+                    <h2 id="crear-personal"
+                        class="h5 fw-bold mb-2">
+                        Crear cuenta de personal municipal
+                    </h2>
+
+                    <p class="text-secondary small mb-0">
+                        Registra funcionarios, trabajadores
+                        de mantenimiento y supervisores.
+                    </p>
+
+                </div>
+
+                <span class="badge text-bg-primary">
+                    Solo administrador
+                </span>
+
+            </div>
+
+            <div class="pc8-admin-info small mb-4">
+
+                <strong>Importante:</strong>
+                Para las pruebas del prototipo utiliza
+                datos ficticios. Entrega las credenciales
+                iniciales por un canal privado y no las
+                publiques en capturas de pantalla.
+
+            </div>
+
+            <!-- FORMULARIO ORIGINAL CONSERVADO -->
+
+            <form th:action="@{/admin/personal/nuevo}"
+                  th:object="${nuevoPersonalForm}"
+                  method="post"
+                  class="row g-3">
+
+                <!-- NOMBRE -->
+                <div class="col-md-6">
+
+                    <label for="pnombre"
+                           class="form-label fw-semibold">
+                        Nombre completo
+                    </label>
+
+                    <input id="pnombre"
+                           type="text"
+                           class="form-control"
+                           th:field="*{nombre}"
+                           maxlength="110"
+                           autocomplete="name"
+                           placeholder="Nombre del trabajador"
+                           required>
+
+                    <div class="text-danger small"
+                         th:errors="*{nombre}">
+                    </div>
+
+                </div>
+
+                <!-- DNI -->
+                <div class="col-md-6">
+
+                    <label for="pdni"
+                           class="form-label fw-semibold">
+                        DNI ficticio
+                    </label>
+
+                    <input id="pdni"
+                           type="text"
+                           class="form-control"
+                           th:field="*{dni}"
+                           inputmode="numeric"
+                           minlength="8"
+                           maxlength="8"
+                           pattern="[0-9]{8}"
+                           placeholder="8 dígitos"
+                           autocomplete="off"
+                           required>
+
+                    <div class="text-danger small"
+                         th:errors="*{dni}">
+                    </div>
+
+                </div>
+
+                <!-- CORREO -->
+                <div class="col-md-6">
+
+                    <label for="pcorreo"
+                           class="form-label fw-semibold">
+                        Correo electrónico
+                    </label>
+
+                    <input id="pcorreo"
+                           type="email"
+                           class="form-control"
+                           th:field="*{correo}"
+                           maxlength="254"
+                           autocomplete="off"
+                           placeholder="personal@ejemplo.local"
+                           required>
+
+                    <div class="text-danger small"
+                         th:errors="*{correo}">
+                    </div>
+
+                </div>
+
+                <!-- CONTRASEÑA -->
+                <div class="col-md-6">
+
+                    <label for="pclave"
+                           class="form-label fw-semibold">
+                        Contraseña inicial
+                    </label>
+
+                    <div class="input-group">
+
+                        <input id="pclave"
+                               type="password"
+                               class="form-control"
+                               name="clave"
+                               minlength="10"
+                               autocomplete="new-password"
+                               placeholder="Mínimo 10 caracteres"
+                               required>
+
+                        <button class="btn btn-outline-secondary"
+                                type="button"
+                                id="mostrar-clave"
+                                aria-label="Mostrar contraseña"
+                                aria-pressed="false">
+
+                            Mostrar
+
+                        </button>
+
+                    </div>
+
+                    <div class="text-danger small"
+                         th:errors="*{clave}">
+                    </div>
+
+                </div>
+
+                <!-- ROL -->
+                <div class="col-md-6">
+
+                    <label for="prol"
+                           class="form-label fw-semibold">
+                        Rol municipal
+                    </label>
+
+                    <select id="prol"
+                            class="form-select"
+                            th:field="*{rol}"
+                            required>
+
+                        <option value="">
+                            Seleccionar rol
+                        </option>
+
+                        <option th:each="r : ${rolesPersonal}"
+                                th:value="${r}"
+                                th:text="${r}">
+                        </option>
+
+                    </select>
+
+                    <div class="text-danger small"
+                         th:errors="*{rol}">
+                    </div>
+
+                </div>
+
+                <!-- BOTÓN -->
+                <div class="col-12 mt-4">
+
+                    <button class="btn btn-primary"
+                            type="submit">
+
+                        + Crear personal municipal
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <!-- ==========================================
+         BÚSQUEDA Y FILTROS
+         ========================================== -->
+
+    <section class="card border-0 shadow-sm
+                    pc8-admin-card mb-4"
+             aria-labelledby="titulo-filtros">
+
+        <div class="card-body p-4">
+
+            <h2 id="titulo-filtros"
+                class="h5 fw-bold mb-3">
+
+                Buscar usuarios
+
+            </h2>
+
+            <div class="row g-3 pc8-admin-filtros">
+
+                <!-- BUSCADOR -->
+                <div class="col-lg-5">
+
+                    <label for="buscar-usuario"
+                           class="form-label">
+                        Nombre o correo
+                    </label>
+
+                    <input id="buscar-usuario"
+                           type="search"
+                           class="form-control"
+                           placeholder="Buscar usuario..."
+                           autocomplete="off">
+
+                </div>
+
+                <!-- FILTRO POR ROL -->
+                <div class="col-md-6 col-lg-3">
+
+                    <label for="filtro-rol"
+                           class="form-label">
+                        Rol
+                    </label>
+
+                    <select id="filtro-rol"
+                            class="form-select">
+
+                        <option value="">
+                            Todos los roles
+                        </option>
+
+                        <option th:each="r : ${roles}"
+                                th:value="${r}"
+                                th:text="${r}">
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- FILTRO POR ESTADO -->
+                <div class="col-md-6 col-lg-2">
+
+                    <label for="filtro-estado"
+                           class="form-label">
+                        Estado
+                    </label>
+
+                    <select id="filtro-estado"
+                            class="form-select">
+
+                        <option value="">
+                            Todos
+                        </option>
+
+                        <option value="true">
+                            Activos
+                        </option>
+
+                        <option value="false">
+                            Desactivados
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- LIMPIAR FILTROS -->
+                <div class="col-lg-2 d-flex align-items-end">
+
+                    <button id="limpiar-filtros"
+                            type="button"
+                            class="btn btn-outline-secondary w-100">
+
+                        Limpiar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="d-flex flex-wrap
+                        justify-content-between
+                        align-items-center gap-2 mt-3">
+
+                <p class="small text-secondary mb-0">
+
+                    Los filtros funcionan sin recargar
+                    la página.
+
+                </p>
+
+                <span id="resultado-usuarios"
+                      class="small fw-semibold"
+                      role="status"
+                      aria-live="polite">
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ==========================================
+         TABLA DE USUARIOS
+         ========================================== -->
+
+    <section aria-labelledby="titulo-usuarios">
+
+        <div class="d-flex flex-wrap
+                    justify-content-between
+                    align-items-center gap-3 mb-3">
+
+            <h2 id="titulo-usuarios"
+                class="h5 fw-bold mb-0">
+
+                Usuarios registrados
+
+            </h2>
+
+            <span class="small text-secondary">
+
+                Modifica el rol o estado y pulsa
+                Guardar cambios.
+
+            </span>
+
+        </div>
+
+        <div class="card border-0 shadow-sm
+                    pc8-admin-card">
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover
+                                  align-middle mb-0
+                                  pc8-admin-table">
+
+                        <caption class="caption-top
+                                        px-3 pt-3 small">
+
+                            Cuentas registradas
+                            en CiudadConecta PC8
+
+                        </caption>
+
+                        <!-- CABECERA -->
+                        <thead class="table-light">
+
+                            <tr>
+                                <th scope="col"
+                                    class="ps-3">
+                                    Nombre
+                                </th>
+
+                                <th scope="col">
+                                    Correo
+                                </th>
+
+                                <th scope="col">
+                                    Rol actual
+                                </th>
+
+                                <th scope="col">
+                                    Estado
+                                </th>
+
+                                <th scope="col">
+                                    Modificar
+                                </th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <!-- UNA FILA POR USUARIO -->
+                            <tr th:each="u : ${usuarios}"
+                                class="pc8-usuario-fila"
+                                th:attr="
+                                  data-nombre=${u.nombre},
+                                  data-correo=${u.correo},
+                                  data-rol=${u.rol},
+                                  data-activo=${u.activo}">
+
+                                <!-- NOMBRE -->
+                                <td data-label="Nombre"
+                                    class="ps-3">
+
+                                    <div class="pc8-admin-usuario"
+                                         th:text="${u.nombre}">
+
+                                        Nombre
+
+                                    </div>
+
+                                </td>
+
+                                <!-- CORREO -->
+                                <td data-label="Correo">
+
+                                    <span class="pc8-admin-correo"
+                                          th:text="${u.correo}">
+
+                                        usuario@ejemplo.local
+
+                                    </span>
+
+                                </td>
+
+                                <!-- ROL -->
+                                <td data-label="Rol actual">
+
+                                    <span class="badge
+                                                 text-bg-light
+                                                 border
+                                                 text-dark"
+                                          th:text="${u.rol}">
+
+                                        CIUDADANO
+
+                                    </span>
+
+                                </td>
+
+                                <!-- ESTADO -->
+                                <td data-label="Estado">
+
+                                    <span class="badge"
+                                          th:classappend="${u.activo}
+                                              ? 'text-bg-success'
+                                              : 'text-bg-secondary'"
+                                          th:text="${u.activo}
+                                              ? 'Activo'
+                                              : 'Desactivado'">
+
+                                        Activo
+
+                                    </span>
+
+                                </td>
+
+                                <!-- FORMULARIO DE EDICIÓN -->
+                                <td data-label="Modificar">
+
+                                    <form method="post"
+                                          class="pc8-admin-form-editar"
+                                          th:action="@{/admin/usuarios/{id}(id=${u.id})}"
+                                          th:attr="
+                                            data-rol-original=${u.rol},
+                                            data-activo-original=${u.activo}">
+
+                                        <!-- CAMBIAR ROL -->
+                                        <label class="visually-hidden"
+                                               th:for="${'rol-' + u.id}">
+
+                                            Modificar rol
+
+                                        </label>
+
+                                        <select class="form-select
+                                                       form-select-sm"
+                                                name="rol"
+                                                th:id="${'rol-' + u.id}">
+
+                                            <option
+                                                th:each="r : ${roles}"
+                                                th:value="${r}"
+                                                th:text="${r}"
+                                                th:selected="${r == u.rol}">
+                                            </option>
+
+                                        </select>
+
+                                        <!-- ACTIVAR/DESACTIVAR -->
+                                        <div class="form-check">
+
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                name="activo"
+                                                value="true"
+                                                th:id="${'activo-' + u.id}"
+                                                th:checked="${u.activo}">
+
+                                            <label class="form-check-label small"
+                                                   th:for="${'activo-' + u.id}">
+
+                                                Activo
+
+                                            </label>
+
+                                        </div>
+
+                                        <!-- GUARDAR -->
+                                        <button
+                                            class="btn btn-outline-primary btn-sm"
+                                            type="submit">
+
+                                            Guardar cambios
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                            <!-- SIN USUARIOS -->
+                            <tr th:if="${#lists.isEmpty(usuarios)}">
+
+                                <td colspan="5"
+                                    class="text-center
+                                           text-secondary py-5">
+
+                                    No hay usuarios registrados.
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- SIN RESULTADOS AL FILTRAR -->
+        <div id="sin-usuarios-filtrados"
+             class="card border-0 shadow-sm
+                    pc8-admin-card mt-3 d-none">
+
+            <div class="card-body text-center p-5">
+
+                <div class="fs-1 mb-3"
+                     aria-hidden="true">
+                    🔎
+                </div>
+
+                <h3 class="h5 fw-bold">
+                    No encontramos usuarios
+                </h3>
+
+                <p class="text-secondary mb-0">
+
+                    Prueba con otro nombre,
+                    correo, rol o estado.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ==========================================
+         AVISO DE SEGURIDAD
+         ========================================== -->
+
+    <div class="alert alert-warning border-0 mt-4">
+
+        <strong>Seguridad de las cuentas:</strong>
+
+        Cambiar el rol de un usuario modifica sus
+        permisos. Desactivar una cuenta impedirá
+        nuevos inicios de sesión.
+
+        Los usuarios que ya tienen una sesión abierta
+        podrían conservar temporalmente sus
+        permisos hasta que se vuelva a evaluar
+        su autenticación.
+
+    </div>
+
+</main>
+
+<!-- ==========================================
+     FUNCIONALIDADES JAVASCRIPT
+     ========================================== -->
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    'use strict';
+
+    // =====================================
+    // ELEMENTOS
+    // =====================================
+
+    const buscar = document.getElementById(
+        'buscar-usuario'
+    );
+
+    const filtroRol = document.getElementById(
+        'filtro-rol'
+    );
+
+    const filtroEstado = document.getElementById(
+        'filtro-estado'
+    );
+
+    const limpiar = document.getElementById(
+        'limpiar-filtros'
+    );
+
+    const resultado = document.getElementById(
+        'resultado-usuarios'
+    );
+
+    const sinResultados = document.getElementById(
+        'sin-usuarios-filtrados'
+    );
+
+    const filas = [
+        ...document.querySelectorAll(
+            '.pc8-usuario-fila'
+        )
+    ];
+
+    // =====================================
+    // NORMALIZAR TEXTO PARA BÚSQUEDA
+    // =====================================
+
+    function normalizar(valor) {
+
+        return String(valor || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    // =====================================
+    // CALCULAR TARJETAS DE RESUMEN
+    // =====================================
+
+    function actualizarResumen() {
+
+        const total = filas.length;
+
+        const activos = filas.filter(fila =>
+            fila.dataset.activo === 'true'
+        ).length;
+
+        const inactivos = total - activos;
+
+        const personal = filas.filter(fila =>
+            [
+                'FUNCIONARIO',
+                'MANTENIMIENTO',
+                'SUPERVISOR',
+                'ADMIN'
+            ].includes(fila.dataset.rol)
+        ).length;
+
+        document.getElementById(
+            'contador-total'
+        ).textContent = total;
+
+        document.getElementById(
+            'contador-activos'
+        ).textContent = activos;
+
+        document.getElementById(
+            'contador-inactivos'
+        ).textContent = inactivos;
+
+        document.getElementById(
+            'contador-personal'
+        ).textContent = personal;
+    }
+
+    // =====================================
+    // FILTRAR USUARIOS
+    // =====================================
+
+    function aplicarFiltros() {
+
+        const texto = normalizar(buscar.value);
+        const rol = filtroRol.value;
+        const estado = filtroEstado.value;
+
+        let visibles = 0;
+
+        filas.forEach(fila => {
+
+            const nombre = normalizar(
+                fila.dataset.nombre
+            );
+
+            const correo = normalizar(
+                fila.dataset.correo
+            );
+
+            const rolUsuario =
+                fila.dataset.rol;
+
+            const activoUsuario =
+                fila.dataset.activo;
+
+            const coincideBusqueda =
+                texto === '' ||
+                nombre.includes(texto) ||
+                correo.includes(texto);
+
+            const coincideRol =
+                rol === '' ||
+                rolUsuario === rol;
+
+            const coincideEstado =
+                estado === '' ||
+                activoUsuario === estado;
+
+            const mostrar =
+                coincideBusqueda &&
+                coincideRol &&
+                coincideEstado;
+
+            fila.classList.toggle(
+                'd-none',
+                !mostrar
+            );
+
+            if (mostrar) {
+                visibles++;
+            }
+        });
+
+        if (resultado) {
+
+            resultado.textContent =
+                visibles === 1
+                    ? '1 usuario encontrado'
+                    : `${visibles} usuarios encontrados`;
+        }
+
+        if (sinResultados) {
+
+            sinResultados.classList.toggle(
+                'd-none',
+                visibles > 0 || filas.length === 0
+            );
+        }
+    }
+
+    // =====================================
+    // EVENTOS DE BÚSQUEDA
+    // =====================================
+
+    if (buscar && filtroRol &&
+        filtroEstado && limpiar) {
+
+        buscar.addEventListener(
+            'input',
+            aplicarFiltros
+        );
+
+        filtroRol.addEventListener(
+            'change',
+            aplicarFiltros
+        );
+
+        filtroEstado.addEventListener(
+            'change',
+            aplicarFiltros
+        );
+
+        limpiar.addEventListener('click', () => {
+
+            buscar.value = '';
+            filtroRol.value = '';
+            filtroEstado.value = '';
+
+            aplicarFiltros();
+
+            buscar.focus();
+        });
+
+        aplicarFiltros();
+    }
+
+    actualizarResumen();
+
+    // =====================================
+    // MOSTRAR / OCULTAR CONTRASEÑA
+    // =====================================
+
+    const botonClave = document.getElementById(
+        'mostrar-clave'
+    );
+
+    const campoClave = document.getElementById(
+        'pclave'
+    );
+
+    if (botonClave && campoClave) {
+
+        botonClave.addEventListener('click', () => {
+
+            const visible =
+                campoClave.type === 'password';
+
+            campoClave.type =
+                visible ? 'text' : 'password';
+
+            botonClave.textContent =
+                visible ? 'Ocultar' : 'Mostrar';
+
+            botonClave.setAttribute(
+                'aria-pressed',
+                String(visible)
+            );
+
+            botonClave.setAttribute(
+                'aria-label',
+                visible
+                    ? 'Ocultar contraseña'
+                    : 'Mostrar contraseña'
+            );
+        });
+    }
+
+    // =====================================
+    // CONFIRMAR CAMBIOS DE ROL O ESTADO
+    // =====================================
+
+    const formularios = [
+        ...document.querySelectorAll(
+            '.pc8-admin-form-editar'
+        )
+    ];
+
+    formularios.forEach(formulario => {
+
+        formulario.addEventListener(
+            'submit',
+            evento => {
+
+                const rolOriginal =
+                    formulario.dataset.rolOriginal;
+
+                const activoOriginal =
+                    formulario.dataset.activoOriginal === 'true';
+
+                const campoRol =
+                    formulario.querySelector(
+                        'select[name="rol"]'
+                    );
+
+                const campoActivo =
+                    formulario.querySelector(
+                        'input[name="activo"]'
+                    );
+
+                if (!campoRol || !campoActivo) {
+                    return;
+                }
+
+                const rolNuevo =
+                    campoRol.value;
+
+                const activoNuevo =
+                    campoActivo.checked;
+
+                const cambioRol =
+                    rolOriginal !== rolNuevo;
+
+                const cambioEstado =
+                    activoOriginal !== activoNuevo;
+
+                if (!cambioRol && !cambioEstado) {
+                    return;
+                }
+
+                let mensaje =
+                    '¿Confirmas los cambios en esta cuenta?';
+
+                if (cambioRol) {
+                    mensaje +=
+                        '\n\nNuevo rol: ' + rolNuevo;
+                }
+
+                if (cambioEstado) {
+                    mensaje +=
+                        '\nNuevo estado: ' +
+                        (activoNuevo
+                            ? 'Activo'
+                            : 'Desactivado');
+                }
+
+                mensaje +=
+                    '\n\nLos permisos del usuario pueden cambiar.';
+
+                if (!window.confirm(mensaje)) {
+                    evento.preventDefault();
+                }
+            }
+        );
+    });
+});
+</script>
+
+<footer th:replace="~{fragments/base :: footer}">
+</footer>
+
+</body>
+</html>

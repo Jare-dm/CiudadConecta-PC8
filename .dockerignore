@@ -1,0 +1,55 @@
+# =====================================================
+# CiudadConecta PC8 - Docker
+# Colocar en la misma carpeta que pom.xml
+# =====================================================
+
+# Repositorio y herramientas del desarrollador
+.git
+.gitignore
+.dockerignore
+.settings
+.classpath
+.project
+.factorypath
+.metadata
+.idea
+.vscode
+
+# Maven compilado / duplicados generados
+/target
+/bin
+
+# Credenciales y configuraciones privadas
+.env
+.env.*
+application-local.properties
+application-secrets.properties
+application-private.properties
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+
+# Archivos locales de usuarios y temporales
+/uploads
+/uploads-*
+/tmp
+/temp
+
+# Conservar solamente el GeoJSON publico usado por ChorrillosService.
+/data/*
+!/data/chorrillos.geojson
+
+# Registros, copias y volcados
+/logs
+/backups
+*.log
+*.sql.gz
+*.dump
+*.bak
+*.hprof
+hs_err_pid*
+
+# Scripts SQL de desarrollo local
+/database/*.sql
