@@ -1,12 +1,218 @@
-<!DOCTYPE html><html lang="es" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments/base :: head('Registro de ciudadano')}"></head><body>
-<nav th:replace="~{fragments/base :: nav}"></nav><main id="contenido" class="container auth-wrap"><div class="card shadow-sm border-0 auth-card wide"><div class="card-body p-4 p-md-5">
-<h2 class="fw-bold">Crear cuenta ciudadana</h2><p class="text-secondary mb-4">Tus datos se usan para identificar y dar seguimiento a tus reportes.</p>
-<form th:action="@{/registro}" th:object="${form}" method="post" novalidate><div class="row g-3">
- <div class="col-md-12"><label for="nombre" class="form-label">Nombre completo *</label><input id="nombre" th:field="*{nombre}" class="form-control" maxlength="110" required><div class="text-danger small" th:errors="*{nombre}"></div></div>
- <div class="col-md-6"><label for="dni" class="form-label">DNI (8 dígitos) *</label><input id="dni" th:field="*{dni}" inputmode="numeric" maxlength="8" class="form-control" required><div class="text-danger small" th:errors="*{dni}"></div></div>
- <div class="col-md-6"><label for="tel" class="form-label">Teléfono (opcional)</label><input id="tel" th:field="*{telefono}" class="form-control"><div class="text-danger small" th:errors="*{telefono}"></div></div>
- <div class="col-md-12"><label for="correo" class="form-label">Correo *</label><input id="correo" th:field="*{correo}" type="email" class="form-control" required><div class="text-danger small" th:errors="*{correo}"></div></div>
- <div class="col-md-12"><label for="pass" class="form-label">Contraseña (mínimo 8 caracteres) *</label><input id="pass" th:field="*{clave}" type="password" autocomplete="new-password" minlength="8" class="form-control" required><div class="text-danger small" th:errors="*{clave}"></div></div>
- </div><button class="btn btn-primary w-100 mt-4 py-2" type="submit">Crear cuenta</button></form>
-<p class="text-center mt-4 mb-0">¿Ya tienes una cuenta? <a th:href="@{/login}">Inicia sesión</a></p>
-</div></div></main><footer th:replace="~{fragments/base :: footer}"></footer></body></html>
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/base :: head('Registro de ciudadano')}"></head>
+
+<body>
+
+<nav th:replace="~{fragments/base :: nav}"></nav>
+
+<main id="contenido" class="container auth-wrap">
+
+    <div class="card shadow-sm border-0 auth-card wide">
+        <div class="card-body p-4 p-md-5">
+
+            <h1 class="h2 fw-bold">Crear cuenta ciudadana</h1>
+
+            <p class="text-secondary mb-4">
+                Tus datos se utilizan para identificarte y dar seguimiento
+                a tus reportes.
+            </p>
+
+            <form th:action="@{/registro}"
+                  th:object="${form}"
+                  method="post">
+
+                <!-- RESUMEN DE ERRORES -->
+
+                <div th:if="${#fields.hasAnyErrors()}"
+                     class="alert alert-danger"
+                     role="alert">
+
+                    Hay errores en el formulario.
+                    Revisa los campos señalados antes de continuar.
+
+                </div>
+
+                <div class="row g-3">
+
+                    <!-- NOMBRE -->
+
+                    <div class="col-md-12">
+
+                        <label for="nombre" class="form-label">
+                            Nombre completo
+                            <span aria-hidden="true">*</span>
+                            <span class="visually-hidden">(obligatorio)</span>
+                        </label>
+
+                        <input id="nombre"
+                               th:field="*{nombre}"
+                               type="text"
+                               autocomplete="name"
+                               maxlength="110"
+                               required
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('nombre')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('nombre')}, aria-describedby='nombre-ayuda nombre-error'">
+
+                        <div id="nombre-ayuda" class="form-text">
+                            Escribe tus nombres y apellidos.
+                        </div>
+
+                        <div id="nombre-error"
+                             class="invalid-feedback"
+                             th:classappend="${#fields.hasErrors('nombre')} ? ' d-block' : ''"
+                             th:errors="*{nombre}">
+                        </div>
+
+                    </div>
+
+                    <!-- DNI -->
+
+                    <div class="col-md-6">
+
+                        <label for="dni" class="form-label">
+                            DNI (8 dígitos)
+                            <span aria-hidden="true">*</span>
+                            <span class="visually-hidden">(obligatorio)</span>
+                        </label>
+
+                        <input id="dni"
+                               th:field="*{dni}"
+                               type="text"
+                               inputmode="numeric"
+                               pattern="[0-9]{8}"
+                               maxlength="8"
+                               autocomplete="off"
+                               required
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('dni')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('dni')}, aria-describedby='dni-ayuda dni-error'">
+
+                        <div id="dni-ayuda" class="form-text">
+                            Introduce los ocho números de tu documento.
+                        </div>
+
+                        <div id="dni-error"
+                             class="invalid-feedback"
+                             th:classappend="${#fields.hasErrors('dni')} ? ' d-block' : ''"
+                             th:errors="*{dni}">
+                        </div>
+
+                    </div>
+
+                    <!-- TELÉFONO -->
+
+                    <div class="col-md-6">
+
+                        <label for="tel" class="form-label">
+                            Teléfono (opcional)
+                        </label>
+
+                        <input id="tel"
+                               th:field="*{telefono}"
+                               type="tel"
+                               autocomplete="tel"
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('telefono')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('telefono')}, aria-describedby='tel-error'">
+
+                        <div id="tel-error"
+                             class="invalid-feedback"
+                             th:classappend="${#fields.hasErrors('telefono')} ? ' d-block' : ''"
+                             th:errors="*{telefono}">
+                        </div>
+
+                    </div>
+
+                    <!-- CORREO -->
+
+                    <div class="col-md-12">
+
+                        <label for="correo" class="form-label">
+                            Correo electrónico
+                            <span aria-hidden="true">*</span>
+                            <span class="visually-hidden">(obligatorio)</span>
+                        </label>
+
+                        <input id="correo"
+                               th:field="*{correo}"
+                               type="email"
+                               autocomplete="email"
+                               required
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('correo')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('correo')}, aria-describedby='correo-ayuda correo-error'">
+
+                        <div id="correo-ayuda" class="form-text">
+                            Utiliza un correo electrónico al que tengas acceso.
+                        </div>
+
+                        <div id="correo-error"
+                             class="invalid-feedback"
+                             th:classappend="${#fields.hasErrors('correo')} ? ' d-block' : ''"
+                             th:errors="*{correo}">
+                        </div>
+
+                    </div>
+
+                    <!-- CONTRASEÑA -->
+
+                    <div class="col-md-12">
+
+                        <label for="pass" class="form-label">
+                            Contraseña
+                            <span aria-hidden="true">*</span>
+                            <span class="visually-hidden">(obligatorio)</span>
+                        </label>
+
+                        <input id="pass"
+                               th:field="*{clave}"
+                               type="password"
+                               autocomplete="new-password"
+                               minlength="8"
+                               required
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('clave')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('clave')}, aria-describedby='pass-ayuda pass-error'">
+
+                        <div id="pass-ayuda" class="form-text">
+                            La contraseña debe tener al menos ocho caracteres.
+                        </div>
+
+                        <div id="pass-error"
+                             class="invalid-feedback"
+                             th:classappend="${#fields.hasErrors('clave')} ? ' d-block' : ''"
+                             th:errors="*{clave}">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ENVIAR -->
+
+                <button class="btn btn-primary w-100 mt-4 py-3"
+                        type="submit">
+                    Crear cuenta
+                </button>
+
+            </form>
+
+            <p class="text-center mt-4 mb-0">
+                ¿Ya tienes una cuenta?
+                <a th:href="@{/login}">
+                    Inicia sesión
+                </a>
+            </p>
+
+        </div>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/base :: footer}"></footer>
+
+</body>
+</html>

@@ -1,0 +1,274 @@
+
+/* ==========================================
+   CIUDADCONECTA PC8
+   LECTOR DE VOZ ACCESIBLE
+   PC - TABLET - CELULAR
+   ========================================== */
+
+
+
+
+.pc8-lector {
+    width: 100%;
+    background: #f3f7fb;
+    border-bottom: 1px solid #d5e1eb;
+    padding: 18px 0;
+    color: #17334d;
+}
+
+.pc8-lector-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+/* ==========================================
+   ENCABEZADO
+   ========================================== */
+
+.pc8-lector-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.pc8-lector-icon {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: #dcecff;
+    border-radius: 12px;
+    font-size: 23px;
+}
+
+.pc8-lector-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0;
+    color: #173b5a;
+}
+
+.pc8-lector-description {
+    font-size: .88rem;
+    margin: 3px 0 0;
+    color: #435b70;
+}
+
+/* ==========================================
+   BOTONES
+   ========================================== */
+
+.pc8-lector-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.pc8-lector-btn {
+    min-height: 46px;
+    padding: 10px 16px;
+    border: 2px solid #244d70;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #173b5a;
+    font-size: .93rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+
+.pc8-lector-primary {
+    background: #164d78;
+    color: #ffffff;
+    border-color: #164d78;
+}
+
+.pc8-lector-stop {
+    border-color: #a52e36;
+    color: #a52e36;
+}
+
+.pc8-lector-btn:hover:not(:disabled) {
+    background: #dcecff;
+    color: #102b46;
+}
+
+.pc8-lector-primary:hover:not(:disabled) {
+    background: #103957;
+    color: #ffffff;
+}
+
+.pc8-lector-btn:disabled {
+    opacity: .48;
+    cursor: not-allowed;
+}
+
+.pc8-lector-btn:focus-visible {
+    outline: 3px solid #e1a900;
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   CONFIGURACIÓN DE VOZ
+   ========================================== */
+
+.pc8-lector-settings {
+    display: grid;
+    grid-template-columns:
+        minmax(190px, 1.2fr)
+        minmax(160px, 1fr)
+        minmax(160px, 1fr);
+    gap: 16px;
+    align-items: end;
+}
+
+.pc8-lector-setting {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.pc8-lector-setting label {
+    color: #173b5a;
+    font-weight: 700;
+    font-size: .9rem;
+}
+
+.pc8-lector-select {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 2px solid #7892a8;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #17334d;
+    font-size: .9rem;
+}
+
+.pc8-lector-range {
+    width: 100%;
+    min-height: 30px;
+    accent-color: #164d78;
+    cursor: pointer;
+}
+
+.pc8-lector-select:focus-visible,
+.pc8-lector-range:focus-visible {
+    outline: 3px solid #e1a900;
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   TABLETS
+   ========================================== */
+
+@media (max-width: 900px) {
+
+    .pc8-lector-settings {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pc8-lector-setting:first-child {
+        grid-column: 1 / -1;
+    }
+
+}
+
+/* ==========================================
+   CELULARES
+   ========================================== */
+
+@media (max-width: 576px) {
+
+    .pc8-lector {
+        padding: 16px 0;
+    }
+
+    .pc8-lector-inner {
+        gap: 13px;
+    }
+
+    .pc8-lector-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .pc8-lector-btn {
+        width: 100%;
+        min-height: 50px;
+        padding: 10px 7px;
+        font-size: .85rem;
+    }
+
+    .pc8-lector-settings {
+        grid-template-columns: 1fr;
+        gap: 13px;
+    }
+
+    .pc8-lector-setting:first-child {
+        grid-column: auto;
+    }
+
+    .pc8-lector-title {
+        font-size: 1rem;
+    }
+
+    .pc8-lector-description {
+        font-size: .82rem;
+    }
+
+}
+
+/* ==========================================
+   ALTO CONTRASTE
+   ========================================== */
+
+html.contraste-alto .pc8-lector {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto .pc8-lector-title,
+html.contraste-alto .pc8-lector-description,
+html.contraste-alto .pc8-lector-setting label {
+    color: #ffffff !important;
+}
+
+html.contraste-alto .pc8-lector-icon {
+    background: #000000 !important;
+    border: 1px solid #ffffff;
+}
+
+html.contraste-alto .pc8-lector-btn,
+html.contraste-alto .pc8-lector-select {
+    background: #000000 !important;
+    color: #ffff66 !important;
+    border: 2px solid #ffff66 !important;
+}
+
+html.contraste-alto .pc8-lector-primary {
+    background: #ffff66 !important;
+    color: #000000 !important;
+}
+
+html.contraste-alto .pc8-lector-stop {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto .pc8-lector-range {
+    accent-color: #ffff66;
+}
+
+/* ==========================================
+   MOVIMIENTO REDUCIDO
+   ========================================== */
+
+html.pc8-motion-off .pc8-lector-btn {
+    transition: none !important;
+}
