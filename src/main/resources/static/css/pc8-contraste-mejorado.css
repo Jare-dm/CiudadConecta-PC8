@@ -1,0 +1,653 @@
+
+/*
+ * CIUDADCONECTA PC8
+ * Refuerzo del modo de alto contraste.
+ *
+ * Se activa únicamente cuando accesibilidad.js
+ * añade "contraste-alto" al elemento HTML.
+ *
+ * No modifica la apariencia normal del sitio.
+ */
+
+/* ==========================================
+   COLORES BASE
+   ========================================== */
+
+html.contraste-alto {
+    color-scheme: dark;
+
+    --pc8-hc-fondo: #000000;
+    --pc8-hc-texto: #ffffff;
+    --pc8-hc-acento: #ffff66;
+    --pc8-hc-borde: #ffffff;
+}
+
+html.contraste-alto body {
+    background: var(--pc8-hc-fondo) !important;
+    color: var(--pc8-hc-texto) !important;
+}
+
+/* ==========================================
+   TITULOS Y TEXTO
+   ========================================== */
+
+html.contraste-alto :is(
+    h1, h2, h3, h4, h5, h6,
+    legend, label,
+    .card-title,
+    .card-text,
+    .modal-title,
+    .dropdown-header
+) {
+    color: #ffffff !important;
+}
+
+html.contraste-alto :is(
+    .text-dark,
+    .text-body,
+    .text-primary,
+    .text-secondary,
+    .text-muted,
+    .text-info,
+    .text-success,
+    .text-danger
+):not(.btn):not(.badge) {
+    color: #ffffff !important;
+}
+
+/* ==========================================
+   ENLACES
+   ========================================== */
+
+html.contraste-alto a:not(.btn) {
+    color: #ffff66 !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+html.contraste-alto a:not(.btn):hover {
+    color: #ffffff !important;
+    text-decoration-thickness: 2px;
+}
+
+/* ==========================================
+   BOTONES
+   ========================================== */
+
+html.contraste-alto :is(
+    .btn-primary,
+    .btn-success,
+    .btn-danger,
+    .btn-warning,
+    .btn-info,
+    .btn-secondary
+) {
+    background-color: #ffff66 !important;
+    color: #000000 !important;
+    border: 2px solid #ffff66 !important;
+    font-weight: 700;
+}
+
+html.contraste-alto :is(
+    .btn-outline-primary,
+    .btn-outline-secondary,
+    .btn-outline-success,
+    .btn-outline-danger,
+    .btn-outline-warning,
+    .btn-outline-light
+) {
+    background-color: #000000 !important;
+    color: #ffff66 !important;
+    border: 2px solid #ffff66 !important;
+}
+
+html.contraste-alto .btn:disabled,
+html.contraste-alto .btn.disabled {
+    background-color: #444444 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* ==========================================
+   FORMULARIOS
+   ========================================== */
+
+html.contraste-alto :is(
+    .form-control,
+    .form-select,
+    input:not([type="hidden"]),
+    textarea,
+    select
+) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto :is(
+    input,
+    textarea
+)::placeholder {
+    color: #dddddd !important;
+    opacity: 1 !important;
+}
+
+html.contraste-alto .form-select {
+    appearance: auto !important;
+    background-image: none !important;
+}
+
+html.contraste-alto .form-check-input {
+    appearance: auto !important;
+    accent-color: #ffff66;
+}
+
+html.contraste-alto :is(
+    .is-invalid,
+    [aria-invalid="true"]
+) {
+    border: 3px solid #ff8888 !important;
+}
+
+html.contraste-alto :is(
+    .invalid-feedback,
+    .valid-feedback,
+    .form-text
+) {
+    color: #ffffff !important;
+}
+
+/* ==========================================
+   TARJETAS Y VENTANAS EMERGENTES
+   ========================================== */
+
+html.contraste-alto :is(
+    .modal-content,
+    .modal-header,
+    .modal-body,
+    .modal-footer,
+    .dropdown-menu,
+    .offcanvas,
+    .toast,
+    .accordion-item,
+    .accordion-button,
+    .list-group-item
+) {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto :is(
+    .modal-content,
+    .dropdown-menu,
+    .toast,
+    .accordion-item
+) {
+    border: 2px solid #ffffff !important;
+}
+
+html.contraste-alto .dropdown-item {
+    color: #ffff66 !important;
+    background: #000000 !important;
+}
+
+html.contraste-alto .dropdown-item:hover,
+html.contraste-alto .dropdown-item:focus {
+    background: #ffff66 !important;
+    color: #000000 !important;
+}
+
+/* ==========================================
+   TABLAS
+   ========================================== */
+
+html.contraste-alto .table {
+    --bs-table-bg: #000000;
+    --bs-table-color: #ffffff;
+    --bs-table-border-color: #ffffff;
+    --bs-table-striped-bg: #151515;
+    --bs-table-striped-color: #ffffff;
+    --bs-table-hover-bg: #222222;
+    --bs-table-hover-color: #ffffff;
+
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto
+.table > :not(caption) > * > * {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto .table thead th {
+    background: #000000 !important;
+    color: #ffff66 !important;
+    border-bottom: 2px solid #ffffff !important;
+}
+
+/* ==========================================
+   ALERTAS Y ESTADOS
+   ========================================== */
+
+html.contraste-alto .alert {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+html.contraste-alto .alert-danger {
+    border-left: 6px solid #ff8888 !important;
+}
+
+html.contraste-alto .alert-success {
+    border-left: 6px solid #ffff66 !important;
+}
+
+html.contraste-alto .alert-warning {
+    border-left: 6px solid #ffffff !important;
+}
+
+html.contraste-alto .badge:not(.badge-status) {
+    border: 1px solid #ffff66 !important;
+    background: #000000 !important;
+    color: #ffff66 !important;
+}
+
+/* ==========================================
+   FOCO DEL TECLADO
+   ========================================== */
+
+html.contraste-alto :is(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [tabindex]
+):focus-visible {
+    outline: 3px solid #ffff66 !important;
+    outline-offset: 3px !important;
+    box-shadow:
+        0 0 0 2px #000000,
+        0 0 0 5px #ffff66 !important;
+}
+
+/* ==========================================
+   BOTÓN DE ALTO CONTRASTE ACTIVADO
+   ========================================== */
+
+html.contraste-alto
+#contraste-btn[aria-pressed="true"] {
+    background: #ffff66 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    font-weight: 800;
+}
+
+/* ==========================================
+   MOVIMIENTO REDUCIDO DEL SISTEMA
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================
+   MAPA LEAFLET - ALTO CONTRASTE
+   ========================================== */
+
+html.contraste-alto #mapa-reporte {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
+/* Controles de zoom */
+
+html.contraste-alto #mapa-reporte .leaflet-bar a {
+    background: #000000 !important;
+    color: #ffff66 !important;
+    border-color: #ffffff !important;
+}
+
+/* Interacción con controles */
+
+html.contraste-alto #mapa-reporte .leaflet-bar a:hover,
+html.contraste-alto #mapa-reporte .leaflet-bar a:focus-visible {
+    background: #ffff66 !important;
+    color: #000000 !important;
+}
+
+/* Atribución del mapa */
+
+html.contraste-alto #mapa-reporte
+.leaflet-control-attribution {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* Enlaces de atribución */
+
+html.contraste-alto #mapa-reporte
+.leaflet-control-attribution a {
+    color: #ffff66 !important;
+}
+
+/* Ventanas emergentes */
+
+html.contraste-alto #mapa-reporte
+.leaflet-popup-content-wrapper,
+html.contraste-alto #mapa-reporte
+.leaflet-popup-tip {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+}
+
+/* Herramientas de capas */
+
+html.contraste-alto #mapa-reporte:focus-visible {
+    outline: 3px solid #ffff66 !important;
+    outline-offset: 3px !important;
+}
+
+/* Indicador de foco */
+
+html.contraste-alto #mapa-reporte
+.leaflet-container:focus-visible {
+    outline: 3px solid #ffff66 !important;
+    outline-offset: 3px !important;
+}
+/* ==========================================
+   REDUCCIÓN DE MOVIMIENTO MANUAL
+   CIUDADCONECTA PC8
+   ========================================== */
+
+html.pc8-motion-off {
+    scroll-behavior: auto !important;
+}
+
+html.pc8-motion-off *,
+html.pc8-motion-off *::before,
+html.pc8-motion-off *::after {
+
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+
+    scroll-behavior: auto !important;
+}
+
+/* ==========================================
+   TARJETAS Y PANELES
+   ALTO CONTRASTE
+   ========================================== */
+
+html.contraste-alto :is(
+    .card,
+    .card-header,
+    .card-body,
+    .card-footer,
+    .pc8-reporte-panel,
+    .pc8-panel-encabezado,
+    .pc8-panel-cuerpo,
+    .pc8-resumen,
+    .pc8-privacidad-panel,
+    .pc8-privacidad-opcion,
+    .pc8-privacidad-aviso,
+    .pc8-coordenadas,
+    .pc8-categoria-alta,
+    .pc8-navbar,
+    .pc8-footer,
+    .pc8-a11y-toolbar
+) {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* Botones personalizados de navegación */
+
+html.contraste-alto :is(
+    .pc8-nav-cta,
+    .pc8-nav-login,
+    .pc8-nav-register,
+    .pc8-nav-logout
+) {
+    background: #ffff66 !important;
+    color: #000000 !important;
+    border: 2px solid #ffff66 !important;
+    font-weight: 700;
+}
+/* ==========================================
+   SUPERFICIES BOOTSTRAP
+   ALTO CONTRASTE CIUDADCONECTA
+   ========================================== */
+
+html.contraste-alto {
+    --bs-card-bg: #000000;
+    --bs-card-color: #ffffff;
+    --bs-card-cap-bg: #000000;
+
+    --bs-alert-bg: #000000;
+    --bs-alert-color: #ffffff;
+    --bs-alert-border-color: #ffffff;
+
+    --bs-list-group-bg: #000000;
+    --bs-list-group-color: #ffffff;
+    --bs-list-group-border-color: #ffffff;
+}
+
+/* TARJETAS */
+
+html.contraste-alto :is(
+    .card,
+    .card-header,
+    .card-body,
+    .card-footer
+) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* AVISOS */
+
+html.contraste-alto :is(
+    .alert,
+    .alert-info,
+    .alert-primary,
+    .alert-secondary,
+    .alert-light
+) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* FONDOS CLAROS DE BOOTSTRAP */
+
+html.contraste-alto :is(
+    .bg-white,
+    .bg-light,
+    .text-bg-light,
+    .bg-info-subtle,
+    .bg-primary-subtle
+) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* LISTAS Y PANELES */
+
+html.contraste-alto .list-group-item {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+/* BARRAS DE PROGRESO */
+
+html.contraste-alto .progress {
+    background-color: #222222 !important;
+    border: 1px solid #ffffff !important;
+}
+
+html.contraste-alto .progress-bar {
+    background-color: #ffff66 !important;
+    color: #000000 !important;
+}
+
+/* TEXTOS SECUNDARIOS */
+
+html.contraste-alto :is(
+    .text-muted,
+    .text-secondary,
+    .small,
+    small
+) {
+    color: #ffffff !important;
+}
+
+/* ==========================================
+   CORRECCIONES ESPECÍFICAS DE CONTRASTE
+   CIUDADCONECTA PC8
+   ========================================== */
+
+/* ------------------------------------------
+   1. TRANSPARENCIA CIUDADANA
+   ------------------------------------------ */
+
+/* Tarjetas de indicadores, comparación y privacidad */
+
+html.contraste-alto :is(
+    .pc8-trans-stat,
+    .pc8-trans-comparacion,
+    .pc8-trans-privacidad
+) {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* Panel de privacidad */
+
+html.contraste-alto .pc8-trans-privacidad {
+    border-left: 6px solid #ffff66 !important;
+}
+
+/* Números estadísticos */
+
+html.contraste-alto .pc8-trans-number {
+    color: #ffff66 !important;
+}
+
+/* Descripciones y etiquetas */
+
+html.contraste-alto :is(
+    .pc8-trans-label,
+    .pc8-trans-porcentaje,
+    .pc8-trans-leyenda-item
+) {
+    color: #ffffff !important;
+}
+
+/* Barras de proporción */
+
+html.contraste-alto .pc8-trans-barra {
+    background: #222222 !important;
+    border: 1px solid #ffffff !important;
+}
+
+html.contraste-alto .pc8-trans-barra-relleno {
+    background: #ffff66 !important;
+}
+
+/* Gráfico de distribución */
+
+html.contraste-alto .pc8-trans-grafico {
+    background: #222222 !important;
+    border: 1px solid #ffffff !important;
+}
+
+/* ------------------------------------------
+   2. DETALLE DEL REPORTE
+   ------------------------------------------ */
+
+/* Tarjetas principales */
+
+html.contraste-alto .pc8-detalle-card {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+}
+
+html.contraste-alto .pc8-detalle-card .card-body {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* Separadores de información */
+
+html.contraste-alto .pc8-detalle-dato {
+    border-color: #ffffff !important;
+}
+
+/* Etiquetas y valores */
+
+html.contraste-alto :is(
+    .pc8-detalle-etiqueta,
+    .pc8-detalle-valor
+) {
+    color: #ffffff !important;
+}
+
+/* Panel de privacidad */
+
+html.contraste-alto .pc8-privacidad-info {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Distintivo de identidad */
+
+html.contraste-alto .pc8-privacidad-distintivo {
+    background: #000000 !important;
+    color: #ffff66 !important;
+    border: 2px solid #ffff66 !important;
+}
+
+/* Distintivo de reporte identificado */
+
+html.contraste-alto .pc8-privacidad-info .badge {
+    background: #ffff66 !important;
+    color: #000000 !important;
+    border: 1px solid #ffff66 !important;
+}
+
+/* Fotografías: mantener su imagen original */
+
+html.contraste-alto .pc8-foto {
+    background: #000000 !important;
+    border-color: #ffffff !important;
+}

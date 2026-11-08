@@ -1,0 +1,320 @@
+
+/* ==========================================
+   CIUDADCONECTA PC8
+   LECTOR DESPLEGABLE RESPONSIVE
+   ========================================== */
+
+.pc8-lector {
+    background: #f3f7fb;
+    border-bottom: 1px solid #d5e1eb;
+    padding: 9px 0;
+    color: #17334d;
+}
+
+.pc8-lector-disclosure {
+    width: 100%;
+}
+
+/* BARRA PRINCIPAL */
+
+.pc8-lector-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 58px;
+    padding: 9px 14px;
+    background: #ffffff;
+    border: 1px solid #cbd9e5;
+    border-radius: 10px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.pc8-lector-summary::-webkit-details-marker {
+    display: none;
+}
+
+.pc8-lector-summary::after {
+    content: "⌄";
+    font-size: 23px;
+    color: #164d78;
+    transition: transform .2s;
+}
+
+.pc8-lector-disclosure[open]
+.pc8-lector-summary::after {
+    transform: rotate(180deg);
+}
+
+.pc8-lector-summary:focus-visible {
+    outline: 3px solid #e1a900;
+    outline-offset: 3px;
+}
+
+.pc8-lector-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: #dcecff;
+    font-size: 21px;
+}
+
+.pc8-lector-summary-copy {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.pc8-lector-title {
+    font-size: .95rem;
+    font-weight: 800;
+    color: #173b5a;
+}
+
+.pc8-lector-description {
+    font-size: .8rem;
+    color: #52677b;
+}
+
+.pc8-lector-summary-hint {
+    font-size: .8rem;
+    font-weight: 700;
+    color: #164d78;
+}
+
+/* PANEL DESPLEGABLE */
+
+.pc8-lector-panel {
+    margin-top: 8px;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #cbd9e5;
+    border-radius: 10px;
+}
+
+/* BOTONES */
+
+.pc8-lector-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 16px;
+}
+
+.pc8-lector-btn {
+    min-height: 44px;
+    padding: 9px 14px;
+    border: 2px solid #244d70;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #173b5a;
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.pc8-lector-primary {
+    background: #164d78;
+    color: #ffffff;
+    border-color: #164d78;
+}
+
+.pc8-lector-stop {
+    color: #a52e36;
+    border-color: #a52e36;
+}
+
+.pc8-lector-btn:hover:not(:disabled) {
+    background: #dcecff;
+    color: #102b46;
+}
+
+.pc8-lector-primary:hover:not(:disabled) {
+    background: #103957;
+    color: #ffffff;
+}
+
+.pc8-lector-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.pc8-lector-btn:focus-visible {
+    outline: 3px solid #e1a900;
+    outline-offset: 3px;
+}
+
+/* CONFIGURACIÓN */
+
+.pc8-lector-settings {
+    display: grid;
+    grid-template-columns:
+        minmax(190px, 1.2fr)
+        minmax(150px, 1fr)
+        minmax(150px, 1fr);
+    gap: 16px;
+}
+
+.pc8-lector-setting {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.pc8-lector-setting label {
+    font-size: .88rem;
+    font-weight: 700;
+    color: #173b5a;
+}
+
+.pc8-lector-select {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px;
+    border: 2px solid #7892a8;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #17334d;
+}
+
+.pc8-lector-range {
+    width: 100%;
+    min-height: 30px;
+    accent-color: #164d78;
+}
+
+.pc8-lector-select:focus-visible,
+.pc8-lector-range:focus-visible {
+    outline: 3px solid #e1a900;
+    outline-offset: 3px;
+}
+
+/* ESTADO */
+
+.pc8-lector-status {
+    margin: 14px 0 0;
+    padding: 9px 12px;
+    background: #edf3f9;
+    border-radius: 7px;
+    color: #173b5a;
+    font-size: .83rem;
+}
+
+/* TABLETS */
+
+@media (max-width: 900px) {
+    .pc8-lector-settings {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .pc8-lector-setting:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* CELULARES */
+
+@media (max-width: 576px) {
+    .pc8-lector {
+        padding: 7px 0;
+    }
+
+    .pc8-lector-summary {
+        min-height: 55px;
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .pc8-lector-description {
+        font-size: .73rem;
+    }
+
+    .pc8-lector-summary-hint {
+        display: none;
+    }
+
+    .pc8-lector-panel {
+        padding: 11px;
+    }
+
+    .pc8-lector-controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .pc8-lector-btn {
+        width: 100%;
+        min-height: 48px;
+        padding: 8px 5px;
+        font-size: .8rem;
+    }
+
+    .pc8-lector-settings {
+        grid-template-columns: 1fr;
+        gap: 13px;
+    }
+
+    .pc8-lector-setting:first-child {
+        grid-column: auto;
+    }
+}
+
+/* ALTO CONTRASTE */
+
+html.contraste-alto .pc8-lector,
+html.contraste-alto .pc8-lector-summary,
+html.contraste-alto .pc8-lector-panel {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto .pc8-lector-title,
+html.contraste-alto .pc8-lector-description,
+html.contraste-alto .pc8-lector-summary-hint,
+html.contraste-alto .pc8-lector-setting label,
+html.contraste-alto .pc8-lector-status {
+    color: #ffffff !important;
+}
+
+html.contraste-alto .pc8-lector-icon,
+html.contraste-alto .pc8-lector-status {
+    background: #000000 !important;
+    border: 1px solid #ffffff;
+}
+
+html.contraste-alto .pc8-lector-btn,
+html.contraste-alto .pc8-lector-select {
+    background: #000000 !important;
+    color: #ffff66 !important;
+    border: 2px solid #ffff66 !important;
+}
+
+html.contraste-alto .pc8-lector-primary {
+    background: #ffff66 !important;
+    color: #000000 !important;
+}
+
+html.contraste-alto .pc8-lector-stop {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+html.contraste-alto .pc8-lector-range {
+    accent-color: #ffff66;
+}
+
+/* MOVIMIENTO REDUCIDO */
+
+html.pc8-motion-off .pc8-lector *,
+html.pc8-motion-off .pc8-lector *::before,
+html.pc8-motion-off .pc8-lector *::after {
+    transition: none !important;
+    animation: none !important;
+}
