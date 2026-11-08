@@ -1,8 +1,13 @@
 
 package pe.edu.pc8.controller;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -13,30 +18,29 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import pe.edu.pc8.model.Categoria;
 import pe.edu.pc8.model.Estado;
+import pe.edu.pc8.model.HistorialReporte;
 import pe.edu.pc8.model.Reporte;
+import pe.edu.pc8.repository.HistorialRepository;
 import pe.edu.pc8.repository.ReporteRepository;
 
-/**
- * Estadísticas públicas de CiudadConecta PC8.
- *
- * Solo se envían cantidades agregadas.
- * No se publican identidades, fotografías,
- * correos ni ubicaciones individuales.
- */
 @Controller
 public class TransparenciaController {
 
     private final ReporteRepository reportes;
+    private final HistorialRepository historial;
 
     public TransparenciaController(
-            ReporteRepository reportes) {
+            ReporteRepository reportes,
+            HistorialRepository historial) {
 
         this.reportes = reportes;
+        this.historial = historial;
     }
 
     // ==========================================
-    // DATOS DE CATEGORÍAS
+    // OBJETO PARA LOS GRÁFICOS
     // ==========================================
 
     public static class Dato {
@@ -44,10 +48,7 @@ public class TransparenciaController {
         private final String etiqueta;
         private final long cantidad;
 
-        public Dato(
-                String etiqueta,
-                long cantidad) {
-
+        public Dato(String etiqueta, long cantidad) {
             this.etiqueta = etiqueta;
             this.cantidad = cantidad;
         }
@@ -62,9 +63,30 @@ public class TransparenciaController {
     }
 
     // ==========================================
-    // COMPROBAR SI UNA FECHA ESTÁ EN UN PERÍODO
-    //
-    // Inicio incluido, fin excluido.
+    // OPCIONES DEL FILTRO DE CATEGORÍAS
+    // ==========================================
+
+    public static class OpcionCategoria {
+
+        private final String valor;
+        private final String etiqueta;
+
+        public OpcionCategoria(String valor, String etiqueta) {
+            this.valor = valor;
+            this.etiqueta = etiqueta;
+        }
+
+        public String getValor() {
+            return valor;
+        }
+
+        public String getEtiqueta() {
+            return etiqueta;
+        }
+    }
+
+    // ==========================================
+    // COMPROBAR SI UNA FECHA ESTÁ EN EL PERÍODO
     // ==========================================
 
     private boolean dentroDePeriodo(
@@ -72,284 +94,397 @@ public class TransparenciaController {
             LocalDateTime inicio,
             LocalDateTime fin) {
 
-        LocalDateTime fecha =
-            reporte.getCreadoEn();
+        LocalDateTime fecha = reporte.getCreadoEn();
 
         return fecha != null
-            && !fecha.isBefore(inicio)
-            && fecha.isBefore(fin);
+                && !fecha.isBefore(inicio)
+                && !fecha.isAfter(fin);
     }
 
     // ==========================================
-    // ESTADÍSTICAS PÚBLICAS
+    // FILTRAR POR CATEGORÍA
+    // ==========================================
+
+    private boolean coincideCategoria(
+            Reporte reporte,
+            String categoria) {
+
+        if ("todas".equals(categoria)) {
+            return true;
+        }
+
+        if ("PERSONALIZADAS".equals(categoria)) {
+            return reporte.getCategoriaPersonalizada() != null;
+        }
+
+        if (reporte.getCategoriaPersonalizada() != null) {
+            return false;
+        }
+
+        return reporte.getCategoria() != null
+                && reporte.getCategoria().name().equals(categoria);
+    }
+
+    // ==========================================
+    // DASHBOARD DE TRANSPARENCIA
     // ==========================================
 
     @GetMapping("/transparencia")
     public String dashboard(
+
             @RequestParam(
-                name = "periodo",
-                defaultValue = "todo"
+                    name = "periodo",
+                    defaultValue = "todo"
             ) String periodo,
+
+            @RequestParam(
+                    name = "categoria",
+                    defaultValue = "todas"
+            ) String categoria,
+
             Model model) {
 
+        LocalDateTime ahora = LocalDateTime.now();
+
         // ======================================
-        // VALIDAR FILTRO
+        // VALIDAR PERÍODO
         // ======================================
 
         String periodoValido = switch (periodo) {
-
-            case "mes", "7", "30", "90", "todo" ->
-                periodo;
-
-            default ->
-                "todo";
+            case "mes", "7", "30", "90", "todo" -> periodo;
+            default -> "todo";
         };
 
-        LocalDateTime ahora =
-            LocalDateTime.now();
+        // ======================================
+        // VALIDAR CATEGORÍA
+        // ======================================
+
+        boolean categoriaValida =
+                "todas".equals(categoria)
+                || "PERSONALIZADAS".equals(categoria);
+
+        if (!categoriaValida) {
+            try {
+                Categoria.valueOf(categoria);
+                categoriaValida = true;
+            } catch (IllegalArgumentException ex) {
+                categoriaValida = false;
+            }
+        }
+
+        String categoriaValidaFinal =
+                categoriaValida ? categoria : "todas";
+
+        // ======================================
+        // DETERMINAR PERÍODO
+        // ======================================
 
         LocalDateTime inicioMesActual =
-            ahora.toLocalDate()
-                .withDayOfMonth(1)
-                .atStartOfDay();
+                ahora.toLocalDate()
+                        .withDayOfMonth(1)
+                        .atStartOfDay();
 
-        LocalDateTime inicioMesAnterior =
-            inicioMesActual.minusMonths(1);
+        LocalDateTime desde = switch (periodoValido) {
 
-        // ======================================
-        // CONSULTAR DATOS DE MARIA DB
-        // ======================================
+            case "mes" -> inicioMesActual;
 
-        List<Reporte> todos =
-            reportes.findAll();
+            case "7" -> ahora.minusDays(7);
 
-        // ======================================
-        // RESUMEN MENSUAL INDEPENDIENTE DEL
-        // FILTRO SELECCIONADO
-        // ======================================
+            case "30" -> ahora.minusDays(30);
 
-        long recibidosMesActual = todos.stream()
-            .filter(r -> {
-                LocalDateTime fecha =
-                    r.getCreadoEn();
+            case "90" -> ahora.minusDays(90);
 
-                return fecha != null
-                    && !fecha.isBefore(inicioMesActual)
-                    && !fecha.isAfter(ahora);
-            })
-            .count();
+            default -> null;
+        };
 
-        long recibidosMesAnterior = todos.stream()
-            .filter(r ->
-                dentroDePeriodo(
-                    r,
-                    inicioMesAnterior,
-                    inicioMesActual
-                )
-            )
-            .count();
+        String periodoEtiqueta = switch (periodoValido) {
+
+            case "mes" -> "Mes actual";
+
+            case "7" -> "Últimos 7 días";
+
+            case "30" -> "Últimos 30 días";
+
+            case "90" -> "Últimos 90 días";
+
+            default -> "Todo el historial";
+        };
 
         // ======================================
-        // DETERMINAR INICIO DEL PERÍODO
+        // CONSULTAR REPORTES
         // ======================================
 
-        LocalDateTime desde =
-            switch (periodoValido) {
+        // CiudadConecta trabaja exclusivamente
+        // con reportes del distrito de Chorrillos.
 
-                case "mes" ->
-                    inicioMesActual;
-
-                case "7" ->
-                    ahora.minusDays(7);
-
-                case "30" ->
-                    ahora.minusDays(30);
-
-                case "90" ->
-                    ahora.minusDays(90);
-
-                default ->
-                    null;
-            };
-
-        String periodoEtiqueta =
-            switch (periodoValido) {
-
-                case "mes" ->
-                    "Mes actual";
-
-                case "7" ->
-                    "Últimos 7 días";
-
-                case "30" ->
-                    "Últimos 30 días";
-
-                case "90" ->
-                    "Últimos 90 días";
-
-                default ->
-                    "Todo el historial";
-            };
+        List<Reporte> todos = reportes.findAll();
 
         // ======================================
-        // FILTRAR SEGÚN FECHA DE REGISTRO
+        // APLICAR FILTROS
         // ======================================
 
         List<Reporte> registros = todos.stream()
-            .filter(r -> {
+                .filter(r -> {
 
-                if (desde == null) {
-                    return true;
-                }
+                    if (desde != null
+                            && !dentroDePeriodo(r, desde, ahora)) {
+                        return false;
+                    }
 
-                LocalDateTime fecha =
-                    r.getCreadoEn();
-
-                return fecha != null
-                    && !fecha.isBefore(desde)
-                    && !fecha.isAfter(ahora);
-            })
-            .toList();
+                    return coincideCategoria(
+                            r,
+                            categoriaValidaFinal
+                    );
+                })
+                .toList();
 
         // ======================================
-        // CONTAR ESTADOS
+        // KPI 1: TOTAL DE REPORTES
         // ======================================
 
         long total = registros.size();
 
-        long cerrados = registros.stream()
-            .filter(r ->
-                r.getEstado() == Estado.CERRADO
-            )
-            .count();
+        // ======================================
+        // KPI 2: REPORTES ATENDIDOS
+        // ======================================
 
         long atendidos = registros.stream()
-            .filter(r ->
-                r.getEstado() == Estado.ATENDIDO
-            )
-            .count();
+                .filter(r ->
+                        r.getEstado() == Estado.ATENDIDO
+                        || r.getEstado() == Estado.CERRADO
+                )
+                .count();
 
-        long rechazados = registros.stream()
-            .filter(r ->
-                r.getEstado() == Estado.RECHAZADO
-            )
-            .count();
+        // ======================================
+        // KPI 3: REPORTES PENDIENTES
+        // ======================================
 
         long pendientes = registros.stream()
-            .filter(Reporte::enProceso)
-            .count();
+                .filter(Reporte::enProceso)
+                .count();
 
         // ======================================
-        // CATEGORÍAS AGREGADAS
+        // INDICADOR COMPLEMENTARIO: RECHAZADOS
         // ======================================
 
-        Map<String, Long> conteoCategorias =
-            new TreeMap<>();
+        long rechazados = registros.stream()
+                .filter(r -> r.getEstado() == Estado.RECHAZADO)
+                .count();
+
+        // ======================================
+        // KPI 4: TIEMPO PROMEDIO HASTA ATENCIÓN
+        // ======================================
+
+        Map<Long, LocalDateTime> primeraAtencion =
+                new HashMap<>();
+
+        historial.findByEstado(Estado.ATENDIDO)
+                .stream()
+                .filter(h -> h.getFecha() != null)
+                .sorted(Comparator.comparing(
+                        HistorialReporte::getFecha
+                ))
+                .forEach(h -> {
+
+                    Reporte reporte = h.getReporte();
+
+                    if (reporte != null && reporte.getId() != null) {
+
+                        primeraAtencion.putIfAbsent(
+                                reporte.getId(),
+                                h.getFecha()
+                        );
+                    }
+                });
+
+        double sumaDias = 0;
+        long reportesConTiempo = 0;
 
         for (Reporte r : registros) {
 
-            // Las categorías personalizadas pueden
-            // contener texto proporcionado por
-            // ciudadanos. En la vista pública
-            // se agrupan para evitar publicar
-            // accidentalmente datos personales.
+            if (r.getId() == null || r.getCreadoEn() == null) {
+                continue;
+            }
+
+            LocalDateTime fechaAtencion =
+                    primeraAtencion.get(r.getId());
+
+            if (fechaAtencion == null) {
+                continue;
+            }
+
+            long segundos = Duration.between(
+                    r.getCreadoEn(),
+                    fechaAtencion
+            ).getSeconds();
+
+            if (segundos >= 0) {
+
+                sumaDias += segundos / 86400.0;
+                reportesConTiempo++;
+            }
+        }
+
+        double promedioDias = reportesConTiempo > 0
+                ? sumaDias / reportesConTiempo
+                : 0.0;
+
+        promedioDias = Math.round(promedioDias * 10.0) / 10.0;
+
+        String promedioTexto = reportesConTiempo > 0
+                ? promedioDias + " días"
+                : "Sin datos";
+
+        // ======================================
+        // GRÁFICO 1: REPORTES POR CATEGORÍA
+        // ======================================
+
+        Map<String, Long> conteoCategorias =
+                new TreeMap<>();
+
+        for (Reporte r : registros) {
+
             String etiqueta =
-                r.getCategoriaPersonalizada() != null
+                    r.getCategoriaPersonalizada() != null
                     ? "Categorías personalizadas"
                     : r.getCategoriaEtiqueta();
 
             conteoCategorias.merge(
-                etiqueta,
-                1L,
-                Long::sum
+                    etiqueta,
+                    1L,
+                    Long::sum
             );
         }
 
-        List<Dato> categorias =
-            conteoCategorias.entrySet()
+        List<Dato> categorias = conteoCategorias.entrySet()
                 .stream()
-                .map(e ->
-                    new Dato(
-                        e.getKey(),
-                        e.getValue()
-                    )
-                )
+                .map(e -> new Dato(e.getKey(), e.getValue()))
                 .toList();
 
         // ======================================
-        // ETIQUETAS DE LOS MESES
+        // GRÁFICO 2: DISTRIBUCIÓN POR ESTADO
         // ======================================
+
+        List<Dato> estados = new ArrayList<>();
+
+        estados.add(new Dato("En proceso", pendientes));
+        estados.add(new Dato("Atendidos o cerrados", atendidos));
+        estados.add(new Dato("Rechazados", rechazados));
+
+        // ======================================
+        // GRÁFICO 3: EVOLUCIÓN MENSUAL
+        // ÚLTIMOS SEIS MESES
+        // ======================================
+
+        Map<YearMonth, Long> conteoMensual =
+                new TreeMap<>();
+
+        YearMonth mesActual =
+                YearMonth.from(ahora);
+
+        // Inicializar seis meses con cero.
+
+        for (int i = 5; i >= 0; i--) {
+
+            YearMonth mes =
+                    mesActual.minusMonths(i);
+
+            conteoMensual.put(mes, 0L);
+        }
+
+        // Contabilizar reportes según los filtros.
+
+        for (Reporte r : registros) {
+
+            if (r.getCreadoEn() == null) {
+                continue;
+            }
+
+            YearMonth mes =
+                    YearMonth.from(r.getCreadoEn());
+
+            if (conteoMensual.containsKey(mes)) {
+
+                conteoMensual.merge(
+                        mes,
+                        1L,
+                        Long::sum
+                );
+            }
+        }
 
         DateTimeFormatter formatoMes =
-            DateTimeFormatter.ofPattern(
-                "MMMM yyyy",
-                Locale.forLanguageTag("es-PE")
+                DateTimeFormatter.ofPattern(
+                        "MMM yyyy",
+                        Locale.forLanguageTag("es-PE")
+                );
+
+        List<Dato> evolucionMensual =
+                conteoMensual.entrySet()
+                        .stream()
+                        .map(e -> new Dato(
+                                e.getKey().format(formatoMes),
+                                e.getValue()
+                        ))
+                        .toList();
+
+        // ======================================
+        // OPCIONES DEL FILTRO DE CATEGORÍA
+        // ======================================
+
+        List<OpcionCategoria> opcionesCategorias =
+                new ArrayList<>();
+
+        opcionesCategorias.add(
+                new OpcionCategoria(
+                        "todas",
+                        "Todas las categorías"
+                )
+        );
+
+        for (Categoria c : Categoria.values()) {
+
+            opcionesCategorias.add(
+                    new OpcionCategoria(
+                            c.name(),
+                            c.getEtiqueta()
+                    )
             );
+        }
 
-        String mesActualNombre =
-            inicioMesActual.format(formatoMes);
-
-        String mesAnteriorNombre =
-            inicioMesAnterior.format(formatoMes);
+        opcionesCategorias.add(
+                new OpcionCategoria(
+                        "PERSONALIZADAS",
+                        "Categorías personalizadas"
+                )
+        );
 
         // ======================================
-        // ENTREGAR DATOS A THYMELEAF
+        // ENTREGAR INFORMACIÓN A THYMELEAF
         // ======================================
 
-        model.addAttribute(
-            "total",
-            total
-        );
+        model.addAttribute("total", total);
+        model.addAttribute("atendidos", atendidos);
+        model.addAttribute("pendientes", pendientes);
+        model.addAttribute("rechazados", rechazados);
 
-        model.addAttribute(
-            "pendientes",
-            pendientes
-        );
+        model.addAttribute("promedioDias", promedioDias);
+        model.addAttribute("promedioTexto", promedioTexto);
+        model.addAttribute("reportesConTiempo", reportesConTiempo);
 
-        model.addAttribute(
-            "atendidos",
-            atendidos + cerrados
-        );
+        model.addAttribute("categorias", categorias);
+        model.addAttribute("estados", estados);
+        model.addAttribute("evolucionMensual", evolucionMensual);
 
-        model.addAttribute(
-            "rechazados",
-            rechazados
-        );
+        model.addAttribute("opcionesCategorias", opcionesCategorias);
 
-        model.addAttribute(
-            "categorias",
-            categorias
-        );
+        model.addAttribute("periodoSeleccionado", periodoValido);
+        model.addAttribute("categoriaSeleccionada", categoriaValidaFinal);
+        model.addAttribute("periodoEtiqueta", periodoEtiqueta);
 
-        model.addAttribute(
-            "periodoSeleccionado",
-            periodoValido
-        );
+        model.addAttribute("totalFiltrado", registros.size());
 
-        model.addAttribute(
-            "periodoEtiqueta",
-            periodoEtiqueta
-        );
-
-        model.addAttribute(
-            "recibidosMesActual",
-            recibidosMesActual
-        );
-
-        model.addAttribute(
-            "recibidosMesAnterior",
-            recibidosMesAnterior
-        );
-
-        model.addAttribute(
-            "mesActualNombre",
-            mesActualNombre
-        );
-
-        model.addAttribute(
-            "mesAnteriorNombre",
-            mesAnteriorNombre
-        );
+        model.addAttribute("distrito", "Chorrillos");
 
         return "transparencia";
     }

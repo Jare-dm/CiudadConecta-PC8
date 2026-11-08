@@ -1,999 +1,365 @@
-
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments/base :: head('Transparencia ciudadana')}">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dashboard de seguimiento urbano de CiudadConecta en Chorrillos.">
+  <title>Dashboard de Transparencia | CiudadConecta</title>
+  <style>
+    :root {
+      --navy:#123c66; --navy-dark:#092e53; --blue:#087bd0; --cyan:#1ea6e2;
+      --page:#eef4fa; --ink:#193955; --muted:#536b80; --line:#d7e4f0;
+      --white:#fff; --green:#147d54; --amber:#9a5b09; --red:#b63846;
+      --shadow:0 5px 18px rgba(21,57,94,.085);
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--page); font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); }
+    [hidden] { display:none!important; }
+    a { color:inherit; }
+    button,select { font:inherit; }
+    :focus-visible { outline:3px solid #edaa22; outline-offset:3px; }
+    .skip { position:absolute; z-index:300; top:-100px; left:12px; background:#fff; padding:12px; }
+    .skip:focus { top:12px; }
+    .topbar { min-height:68px; background:linear-gradient(105deg,var(--navy-dark),#165584); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:11px clamp(16px,3vw,35px); gap:14px; }
+    .brand { display:flex; align-items:center; gap:11px; text-decoration:none; }
+    .brand-icon { width:40px; height:40px; background:#ffc44e; color:#123554; border-radius:11px; display:grid; place-items:center; font-size:27px; }
+    .brand-name { display:block; font-size:19px; font-weight:800; line-height:1.15; }
+    .brand-sub { display:block; font-size:9px; font-weight:700; letter-spacing:1.2px; }
+    .toplinks { display:flex; gap:7px; }
+    .toplinks a { padding:9px 13px; border-radius:8px; font-size:13px; text-decoration:none; font-weight:650; }
+    .toplinks a:hover,.toplinks a[aria-current] { background:#ffffff25; }
+    .shell { display:block; min-height:calc(100vh - 68px); }
+    .content { width:min(1400px,calc(100% - 48px)); min-width:0; margin:25px auto 35px; }
+    .eyebrow { font-size:11px; font-weight:800; letter-spacing:1.3px; color:#0865ad; text-transform:uppercase; }
+    .pagehead { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:17px; }
+    h1 { font-size:clamp(24px,3vw,33px); line-height:1.15; margin:5px 0 6px; color:#163d65; }
+    .description { margin:0; color:var(--muted); font-size:14px; }
+    .place { background:#dceefa; border-radius:40px; font-weight:750; font-size:13px; padding:10px 16px; white-space:nowrap; color:#124f83; }
+    .privacy { padding:14px 18px; margin:0 0 17px; border-left:4px solid #1391a6; border-radius:11px; background:#e2f6fa; display:flex; gap:12px; align-items:flex-start; }
+    .privacy strong { font-size:14px; } .privacy p { margin:2px 0 0; color:#385870; font-size:12px; }
+    .lock { font-size:23px; }
+    .card { min-width:0; background:white; border:1px solid var(--line); border-radius:13px; box-shadow:var(--shadow); padding:19px; }
+    .filters { margin-bottom:23px; }
+    .filters-grid { display:grid; grid-template-columns:minmax(160px,1fr) minmax(160px,1fr) auto; gap:14px; align-items:end; }
+    .field label { display:block; font-size:12px; font-weight:750; margin-bottom:6px; }
+    select { min-height:44px; width:100%; padding:9px 11px; border-radius:8px; border:1px solid #a8bdcf; background:#fff; color:#203b55; }
+    .btn { border:0; color:white; background:#086fbd; padding:10px 19px; min-height:44px; border-radius:8px; font-weight:750; cursor:pointer; }
+    .btn:hover { background:#075b9c; }
+    .filters-bottom { margin-top:12px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; font-size:12px; color:var(--muted); }
+    .reset { color:#075a9d; font-weight:700; }
+    .section-head { margin:0 0 12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .section-head h2 { font-size:19px; margin:0; }
+    .pill { border-radius:40px; color:#fff; background:#106cbb; font-size:11px; font-weight:700; padding:6px 12px; }
+    .kpis { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:13px; }
+    .kpi { padding:17px; border-radius:12px; border:1px solid var(--line); background:#fff; box-shadow:var(--shadow); min-width:0; border-top:4px solid #0d83cc; }
+    .kpi:nth-child(2) { border-top-color:#d49728; }.kpi:nth-child(3) { border-top-color:#19865b; }
+    .kpi:nth-child(4) { border-top-color:#bb4450; }.kpi:nth-child(5) { border-top-color:#1398ae; }
+    .kpi.featured { border-color:#0989d4; background:linear-gradient(135deg,#078ddc,#066ab7); color:white; }
+    .kpi.featured .metric,.kpi.featured .kpi-label { color:#fff; }
+    .kpi-top { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+    .kpi-icon { font-size:24px; line-height:1; }
+    .metric { font-size:clamp(24px,2.5vw,34px); font-weight:850; line-height:1.2; color:#17496e; margin-top:12px; overflow-wrap:anywhere; }
+    .kpi:last-child .metric { font-size:clamp(18px,2vw,26px); }
+    .kpi-label { margin-top:7px; color:#50677d; font-size:12px; font-weight:700; }
+    .metric-note { font-size:11px; margin-top:8px; color:var(--muted); }
+    .explain { margin:11px 0 0; color:var(--muted); font-size:12px; }
+    .charts { margin-top:18px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; align-items:stretch; }
+    .chart h2,.table-card h2,.methodology h2 { font-size:16px; margin:0 0 4px; color:#163d65; }
+    .chart .subtext,.table-card .subtext { margin:0 0 15px; font-size:12px; color:var(--muted); }
+    .chart { min-width:0; }
+    .plot { height:230px; width:100%; }
+    canvas { display:block; width:100%; height:230px; }
+    .category-bars { display:flex; flex-direction:column; justify-content:center; gap:14px; min-height:200px; }
+    .bar-row { display:grid; grid-template-columns:minmax(75px,35%) minmax(40px,1fr) 30px; align-items:center; gap:8px; font-size:12px; }
+    .bar-label { overflow-wrap:anywhere; line-height:1.25; }
+    .bar-track,.percentage-bar { height:12px; background:#e7eff7; border-radius:20px; overflow:hidden; }
+    .bar-fill,.percentage-fill { display:block; background:linear-gradient(90deg,#0d74c7,#20ade8); height:100%; width:0; border-radius:20px; }
+    .bar-number { text-align:right; font-weight:750; }
+    .legend { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+    .legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:#3a5168; }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex:none; }
+    .data-bottom { display:grid; grid-template-columns:minmax(0,2fr) minmax(250px,1fr); gap:15px; margin-top:15px; }
+    .table-wrap { overflow-x:auto; }
+    table { border-collapse:collapse; width:100%; font-size:12px; }
+    th,td { padding:11px 10px; text-align:left; border-bottom:1px solid #e6edf5; }
+    th { color:#164974; background:#e9f3fb; }
+    tbody tr:hover { background:#f4f9fd; }
+    .percentage-bar { min-width:75px; height:10px; }
+    .methodology { background:linear-gradient(130deg,#e7f2fc,#f4f9fd); }
+    .methodology p { font-size:12px; color:#415b72; line-height:1.7; }
+    .methodology a { color:#075f9e; font-weight:750; }
+    .empty { padding:25px 10px; text-align:center; font-size:12px; color:var(--muted); }
+    .footer { background:#0d3357; color:#e5f3ff; text-align:center; font-size:12px; padding:17px; }
+    .footer p { margin:3px; }
+    @media (max-width:1150px) {
+      .kpis { grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .charts { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .charts .chart:last-child { grid-column:1/-1; }
+    }
+    @media (max-width:750px) {
+      .content { width:calc(100% - 24px); margin:20px auto; }
+      .pagehead { align-items:start; }
+      .place { display:none; }
+      .filters-grid { grid-template-columns:1fr; }
+      .btn { width:100%; }
+      .kpis { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .charts,.data-bottom { grid-template-columns:1fr; }
+      .charts .chart:last-child { grid-column:auto; }
+    }
+    @media (max-width:440px) {
+      .topbar { padding:9px; }
+      .brand-name { font-size:15px; }
+      .brand-sub { font-size:7px; }
+      .toplinks a { padding:7px; font-size:11px; }
+      .kpi { padding:12px; }
+      .metric { font-size:25px; }
+      .kpi-label { font-size:11px; }
+    }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  </style>
 </head>
-
 <body>
+<a class="skip" href="#contenido">Saltar al contenido principal</a>
+<header class="topbar">
+  <a class="brand" th:href="@{/}" href="/">
+    <span class="brand-icon" aria-hidden="true">✦</span>
+    <span><span class="brand-name">CiudadConecta</span><span class="brand-sub">PARTICIPACIÓN CIUDADANA</span></span>
+  </a>
+  <nav class="toplinks" aria-label="Navegación superior">
+    <a th:href="@{/}" href="/">Inicio</a>
+    <a th:href="@{/transparencia}" href="/transparencia" aria-current="page">Transparencia</a>
+  </nav>
+</header>
+<div class="shell">
 
-<nav th:replace="~{fragments/base :: nav}"></nav>
-
-<style>
-    /* CiudadConecta PC8 - Transparencia pública */
-
-    .pc8-trans-card {
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-
-    .pc8-trans-stat {
-        border: 1px solid #e5eaf0;
-        border-radius: 1rem;
-        height: 100%;
-        background: #fff;
-        box-shadow: 0 3px 12px rgba(16,43,70,.05);
-    }
-
-    .pc8-trans-number {
-        color: #173a61;
-        font-size: clamp(1.8rem,4vw,2.5rem);
-        font-weight: 750;
-        line-height: 1.15;
-    }
-
-    .pc8-trans-label {
-        font-size: .9rem;
-        color: #475569;
-        margin-top: .5rem;
-    }
-
-    .pc8-trans-icon {
-        font-size: 1.5rem;
-        margin-bottom: .7rem;
-    }
-
-    .pc8-trans-comparacion {
-        border: 1px solid #e1e7ef;
-        border-radius: .8rem;
-        padding: 1rem;
-        background: #f8fafc;
-        height: 100%;
-    }
-
-    .pc8-trans-grafico {
-        display: flex;
-        height: 22px;
-        border-radius: 999px;
-        overflow: hidden;
-        background: #e2e8f0;
-    }
-
-    .pc8-trans-segmento {
-        width: 0;
-        height: 100%;
-    }
-
-    .pc8-trans-pendientes {
-        background: #125ba0;
-    }
-
-    .pc8-trans-atendidos {
-        background: #178054;
-    }
-
-    .pc8-trans-rechazados {
-        background: #b63742;
-    }
-
-    .pc8-trans-leyenda {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-top: 1.3rem;
-    }
-
-    .pc8-trans-leyenda-item {
-        display: flex;
-        align-items: center;
-        gap: .55rem;
-        font-size: .9rem;
-    }
-
-    .pc8-trans-punto {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-
-    .pc8-trans-barra {
-        background: #e6edf4;
-        border-radius: 999px;
-        height: 12px;
-        overflow: hidden;
-        min-width: 100px;
-    }
-
-    .pc8-trans-barra-relleno {
-        height: 100%;
-        width: 0;
-        background: #087e8b;
-        border-radius: 999px;
-    }
-
-    .pc8-trans-porcentaje {
-        min-width: 46px;
-        text-align: right;
-        font-size: .82rem;
-        color: #475569;
-    }
-
-    .pc8-trans-privacidad {
-        background: #f0f9fa;
-        border-left: 4px solid #087e8b;
-        border-radius: .8rem;
-    }
-
-    @media (max-width: 575.98px) {
-        .pc8-trans-barra {
-            min-width: 75px;
-        }
-    }
-</style>
-
-<main id="contenido" class="container py-5">
-
-    <!-- ENCABEZADO -->
-
-    <header class="mb-4">
-
-        <p class="eyebrow-dark mb-1">
-            Información pública
-        </p>
-
-        <h1 class="h2 fw-bold mb-3">
-            Transparencia de reportes urbanos
-        </h1>
-
-        <p class="text-secondary mb-0">
-            Consulta estadísticas de las incidencias
-            registradas en CiudadConecta PC8
-            para el distrito de Chorrillos.
-        </p>
-
-    </header>
-
-    <!-- PRIVACIDAD -->
-
-    <div class="pc8-trans-privacidad p-3 p-md-4 mb-4">
-
-        <div class="d-flex gap-3 align-items-start">
-
-            <span class="fs-4" aria-hidden="true">
-                🔒
-            </span>
-
-            <div>
-
-                <h2 class="h6 fw-bold mb-2">
-                    Datos agregados y privacidad
-                </h2>
-
-                <p class="small mb-0">
-                    Esta página muestra cantidades
-                    generales de reportes.
-
-                    No publica nombres, DNI, correos,
-                    fotografías ni direcciones
-                    particulares.
-
-                    Las categorías personalizadas
-                    se agrupan para evitar la
-                    exposición accidental de
-                    información personal.
-                </p>
-
-            </div>
-
-        </div>
-
+  <main class="content" id="contenido">
+    <div class="pagehead">
+      <div><div class="eyebrow">Panel de transparencia</div>
+        <h1>Dashboard de CiudadConecta</h1>
+        <p class="description">Seguimiento de problemas urbanos registrados en <strong th:text="${distrito}">Chorrillos</strong>.</p>
+      </div>
+      <span class="place">⌖ Chorrillos · Lima, Perú</span>
     </div>
 
-    <!-- FILTROS POR PERÍODO -->
-
-    <section class="card border-0 shadow-sm
-                    pc8-trans-card mb-4"
-             aria-labelledby="titulo-filtros">
-
-        <div class="card-body p-4">
-
-            <h2 id="titulo-filtros"
-                class="h5 fw-bold mb-3">
-                Consultar estadísticas por período
-            </h2>
-
-            <form method="get"
-                  th:action="@{/transparencia}">
-
-                <div class="row g-3 align-items-end">
-
-                    <div class="col-md-9">
-
-                        <label for="periodo"
-                               class="form-label fw-semibold">
-                            Selecciona un período
-                        </label>
-
-                        <select id="periodo"
-                                name="periodo"
-                                class="form-select">
-
-                            <option value="todo"
-                                    th:selected="${periodoSeleccionado == 'todo'}">
-                                Todo el historial
-                            </option>
-
-                            <option value="mes"
-                                    th:selected="${periodoSeleccionado == 'mes'}">
-                                Mes actual
-                            </option>
-
-                            <option value="7"
-                                    th:selected="${periodoSeleccionado == '7'}">
-                                Últimos 7 días
-                            </option>
-
-                            <option value="30"
-                                    th:selected="${periodoSeleccionado == '30'}">
-                                Últimos 30 días
-                            </option>
-
-                            <option value="90"
-                                    th:selected="${periodoSeleccionado == '90'}">
-                                Últimos 90 días
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <button type="submit"
-                                class="btn btn-primary w-100">
-                            Aplicar filtro
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="mt-3">
-
-                    <a class="small"
-                       th:href="@{/transparencia}">
-                        Ver todo el historial
-                    </a>
-
-                </div>
-
-            </form>
-
-        </div>
-
+    <section class="privacy" aria-label="Protección de datos personales">
+      <span class="lock" aria-hidden="true">🔒</span>
+      <div><strong>Protección de datos personales</strong>
+        <p>Se muestran únicamente estadísticas agregadas. No se publican nombres, DNI, correos, fotografías ni direcciones particulares. Las categorías personalizadas se agrupan para proteger a los ciudadanos.</p>
+      </div>
     </section>
 
-    <!-- PERÍODO ACTUALMENTE SELECCIONADO -->
+    <section class="card filters" aria-labelledby="titulo-filtros">
+      <h2 id="titulo-filtros" class="chart-title">⌕ Consultar estadísticas</h2>
+      <form method="get" th:action="@{/transparencia}" action="/transparencia">
+        <div class="filters-grid">
+          <div class="field"><label for="periodo">Período de análisis</label>
+            <select id="periodo" name="periodo">
+              <option value="todo" th:selected="${periodoSeleccionado == 'todo'}">Todo el historial</option>
+              <option value="mes" th:selected="${periodoSeleccionado == 'mes'}">Mes actual</option>
+              <option value="7" th:selected="${periodoSeleccionado == '7'}">Últimos 7 días</option>
+              <option value="30" th:selected="${periodoSeleccionado == '30'}">Últimos 30 días</option>
+              <option value="90" th:selected="${periodoSeleccionado == '90'}">Últimos 90 días</option>
+            </select>
+          </div>
+          <div class="field"><label for="categoria">Categoría del problema</label>
+            <select id="categoria" name="categoria">
+              <option th:each="c : ${opcionesCategorias}" th:value="${c.valor}" th:text="${c.etiqueta}" th:selected="${categoriaSeleccionada == c.valor}" value="todas">Todas las categorías</option>
+            </select>
+          </div>
+          <button class="btn" type="submit">Aplicar filtros</button>
+        </div>
+      </form>
+      <div class="filters-bottom">
+        <span role="status">Mostrando <strong th:text="${totalFiltrado}">0</strong> reportes · <strong th:text="${periodoEtiqueta}">Todo el historial</strong></span>
+        <a class="reset" th:href="@{/transparencia}" href="/transparencia">Restablecer filtros</a>
+      </div>
+    </section>
 
-    <div class="d-flex flex-wrap
-                justify-content-between
-                align-items-center gap-2 mb-3">
+    <section id="resumen" aria-labelledby="kpi-title">
+      <div class="section-head"><h2 id="kpi-title">Resumen de incidencias</h2><span class="pill" th:text="${periodoEtiqueta}">Todo el historial</span></div>
+      <div class="kpis">
+        <article class="kpi featured"><div class="kpi-top"><span class="kpi-icon" aria-hidden="true">▤</span></div><div class="metric" th:text="${total}">0</div><div class="kpi-label">Reportes registrados</div></article>
+        <article class="kpi"><div class="kpi-top"><span class="kpi-icon" aria-hidden="true">⌛</span></div><div class="metric" th:text="${pendientes}">0</div><div class="kpi-label">Pendientes o en proceso</div></article>
+        <article class="kpi"><div class="kpi-top"><span class="kpi-icon" aria-hidden="true">✓</span></div><div class="metric" th:text="${atendidos}">0</div><div class="kpi-label">Atendidos o cerrados</div></article>
+        <article class="kpi"><div class="kpi-top"><span class="kpi-icon" aria-hidden="true">⊘</span></div><div class="metric" th:text="${rechazados}">0</div><div class="kpi-label">Reportes rechazados</div></article>
+        <article class="kpi"><div class="kpi-top"><span class="kpi-icon" aria-hidden="true">◷</span></div><div class="metric" th:text="${promedioTexto}">Sin datos</div><div class="kpi-label">Tiempo promedio hasta primera atención</div></article>
+      </div>
+      <p class="explain">Promedio calculado con el historial de primera atención, sobre <strong th:text="${reportesConTiempo}">0</strong> reportes con fecha válida. «Sin datos» significa que aún no existe una atención calculable.</p>
+    </section>
 
-        <h2 class="h4 fw-bold mb-0">
-            Resumen de incidencias
-        </h2>
+    <section class="charts" id="graficos" aria-label="Gráficos de reportes">
+      <article class="card chart">
+        <h2>▥ Reportes por categoría</h2>
+        <p class="subtext">Cantidad de incidencias por tipo de problema · reportes.</p>
+        <div class="category-bars" th:if="${!#lists.isEmpty(categorias)}">
+          <div class="bar-row" th:each="c : ${categorias}" th:attr="data-cantidad=${c.cantidad}">
+            <span class="bar-label" th:text="${c.etiqueta}">Categoría</span>
+            <div class="bar-track" aria-hidden="true"><span class="bar-fill"></span></div>
+            <span class="bar-number" th:text="${c.cantidad}">0</span>
+          </div>
+        </div>
+        <p class="empty" th:if="${#lists.isEmpty(categorias)}">No hay reportes para los filtros seleccionados.</p>
+      </article>
 
-        <span class="badge rounded-pill
-                     text-bg-primary px-3 py-2"
-              th:text="${periodoEtiqueta}">
-            Todo el historial
-        </span>
+      <article class="card chart">
+        <h2>◉ Situación actual de los reportes</h2>
+        <p class="subtext">Distribución por estado actual · porcentajes.</p>
+        <div class="plot"><canvas id="graficoEstados" role="img" aria-label="Distribución de reportes según su estado">Distribución de reportes por estado.</canvas></div>
+        <div id="leyendaEstados" class="legend"></div>
+        <ul class="sr-data" aria-label="Datos de estados" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">
+          <li th:each="e : ${estados}" th:text="|${e.etiqueta}: ${e.cantidad} reportes|">Estado: 0 reportes</li>
+        </ul>
+      </article>
 
+      <article class="card chart">
+        <h2>⌁ Evolución mensual de reportes</h2>
+        <p class="subtext">Últimos seis meses · reportes registrados por mes.</p>
+        <div class="plot"><canvas id="graficoEvolucion" role="img" aria-label="Evolución de reportes mensuales">Evolución mensual.</canvas></div>
+        <div id="sinEvolucion" class="empty" hidden>Sin datos de evolución mensual.</div>
+        <details style="font-size:12px;margin-top:8px">
+          <summary>Ver cifras mensuales</summary>
+          <ul><li th:each="m : ${evolucionMensual}" th:text="|${m.etiqueta}: ${m.cantidad} reportes|"></li></ul>
+        </details>
+      </article>
+    </section>
+
+    <div class="data-bottom">
+      <section class="card table-card" id="tabla-categorias" aria-labelledby="table-title">
+        <h2 id="table-title">▤ Detalle de incidencias por categoría</h2>
+        <p class="subtext">Datos filtrados y proporción respecto del total.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Categoría</th><th scope="col">Reportes</th><th scope="col">Porcentaje</th><th scope="col">Distribución</th></tr></thead>
+            <tbody>
+              <tr th:each="c : ${categorias}">
+                <td th:text="${c.etiqueta}">Categoría</td>
+                <td th:text="${c.cantidad}">0</td>
+                <td th:text="${totalFiltrado > 0 ? #numbers.formatDecimal(c.cantidad * 100.0 / totalFiltrado, 1, 1) + '%' : '0%'}">0%</td>
+                <td><div class="percentage-bar" aria-hidden="true"><span class="percentage-fill" th:style="|width:${totalFiltrado > 0 ? c.cantidad * 100.0 / totalFiltrado : 0}%;|"></span></div></td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(categorias)}"><td colspan="4">No hay reportes para esta selección.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <section class="card methodology" id="sobre-datos" aria-labelledby="datos-title">
+        <h2 id="datos-title">ⓘ Sobre los datos</h2>
+        <p>CiudadConecta presenta estadísticas de reportes urbanos correspondientes a su ámbito de operación: <strong>Chorrillos</strong>. No son cifras oficiales de la Municipalidad.</p>
+        <p>Los atendidos incluyen estados <strong>ATENDIDO</strong> y <strong>CERRADO</strong>. Los pendientes son estados en proceso. Los rechazados se muestran por separado.</p>
+        <p>El tiempo promedio mide desde el registro hasta la <strong>primera atención</strong> consignada en el historial, no necesariamente el cierre definitivo.</p>
+        <p>Los resultados se actualizan al aplicar los filtros o volver a cargar la página.</p>
+      </section>
     </div>
-
-    <!-- CUATRO INDICADORES -->
-
-    <section class="row g-3 mb-4"
-             aria-label="Indicadores públicos">
-
-        <!-- TOTAL -->
-
-        <div class="col-6 col-lg-3">
-
-            <div class="pc8-trans-stat">
-
-                <div class="p-3 p-md-4">
-
-                    <div class="pc8-trans-icon"
-                         aria-hidden="true">
-                        📋
-                    </div>
-
-                    <div id="valor-total"
-                         class="pc8-trans-number"
-                         th:text="${total}">
-                        0
-                    </div>
-
-                    <div class="pc8-trans-label">
-                        Reportes recibidos
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- EN PROCESO -->
-
-        <div class="col-6 col-lg-3">
-
-            <div class="pc8-trans-stat">
-
-                <div class="p-3 p-md-4">
-
-                    <div class="pc8-trans-icon"
-                         aria-hidden="true">
-                        ⏳
-                    </div>
-
-                    <div id="valor-pendientes"
-                         class="pc8-trans-number"
-                         th:text="${pendientes}">
-                        0
-                    </div>
-
-                    <div class="pc8-trans-label">
-                        En proceso
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- ATENDIDOS -->
-
-        <div class="col-6 col-lg-3">
-
-            <div class="pc8-trans-stat">
-
-                <div class="p-3 p-md-4">
-
-                    <div class="pc8-trans-icon"
-                         aria-hidden="true">
-                        ✅
-                    </div>
-
-                    <div id="valor-atendidos"
-                         class="pc8-trans-number"
-                         th:text="${atendidos}">
-                        0
-                    </div>
-
-                    <div class="pc8-trans-label">
-                        Atendidos o cerrados
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- RECHAZADOS -->
-
-        <div class="col-6 col-lg-3">
-
-            <div class="pc8-trans-stat">
-
-                <div class="p-3 p-md-4">
-
-                    <div class="pc8-trans-icon"
-                         aria-hidden="true">
-                        🚫
-                    </div>
-
-                    <div id="valor-rechazados"
-                         class="pc8-trans-number"
-                         th:text="${rechazados}">
-                        0
-                    </div>
-
-                    <div class="pc8-trans-label">
-                        Rechazados
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- COMPARACIÓN MENSUAL -->
-
-    <section class="card border-0 shadow-sm
-                    pc8-trans-card mb-4"
-             aria-labelledby="titulo-comparacion">
-
-        <div class="card-body p-4">
-
-            <h2 id="titulo-comparacion"
-                class="h5 fw-bold mb-2">
-                Reportes registrados por mes
-            </h2>
-
-            <p class="small text-secondary mb-4">
-                Comparación del volumen de reportes
-                nuevos en el mes actual y el anterior.
-                Estas cifras no cambian al modificar
-                el filtro superior.
-            </p>
-
-            <div class="row g-3">
-
-                <!-- MES ACTUAL -->
-
-                <div class="col-md-6">
-
-                    <div class="pc8-trans-comparacion">
-
-                        <span class="small text-secondary"
-                              th:text="${mesActualNombre}">
-                            Mes actual
-                        </span>
-
-                        <div class="pc8-trans-number mt-2"
-                             th:text="${recibidosMesActual}">
-                            0
-                        </div>
-
-                        <p class="small mb-0">
-                            Reportes registrados
-                            en el mes actual
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <!-- MES ANTERIOR -->
-
-                <div class="col-md-6">
-
-                    <div class="pc8-trans-comparacion">
-
-                        <span class="small text-secondary"
-                              th:text="${mesAnteriorNombre}">
-                            Mes anterior
-                        </span>
-
-                        <div class="pc8-trans-number mt-2"
-                             th:text="${recibidosMesAnterior}">
-                            0
-                        </div>
-
-                        <p class="small mb-0">
-                            Reportes registrados
-                            durante el mes anterior
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <p class="small text-secondary mt-3 mb-0">
-                El mes actual todavía puede estar
-                en curso. Por eso, esta comparación
-                es descriptiva y no representa
-                una variación de desempeño municipal.
-            </p>
-
-        </div>
-
-    </section>
-
-    <!-- DISTRIBUCIÓN DE SITUACIONES -->
-
-    <section class="card border-0 shadow-sm
-                    pc8-trans-card mb-4"
-             aria-labelledby="titulo-situacion">
-
-        <div class="card-body p-4">
-
-            <h2 id="titulo-situacion"
-                class="h5 fw-bold mb-2">
-                Situación actual de los reportes
-            </h2>
-
-            <p class="small text-secondary mb-4">
-                Estado actual de las incidencias
-                registradas durante el período
-                seleccionado.
-            </p>
-
-            <div id="grafico-situacion"
-                 class="pc8-trans-grafico"
-                 role="img"
-                 aria-label="Distribución de reportes según su situación">
-
-                <div id="segmento-pendientes"
-                     class="pc8-trans-segmento
-                            pc8-trans-pendientes">
-                </div>
-
-                <div id="segmento-atendidos"
-                     class="pc8-trans-segmento
-                            pc8-trans-atendidos">
-                </div>
-
-                <div id="segmento-rechazados"
-                     class="pc8-trans-segmento
-                            pc8-trans-rechazados">
-                </div>
-
-            </div>
-
-            <div class="pc8-trans-leyenda">
-
-                <div class="pc8-trans-leyenda-item">
-
-                    <span class="pc8-trans-punto
-                                 pc8-trans-pendientes"
-                          aria-hidden="true">
-                    </span>
-
-                    <span>
-                        En proceso:
-                        <strong id="porcentaje-pendientes">
-                            0%
-                        </strong>
-                    </span>
-
-                </div>
-
-                <div class="pc8-trans-leyenda-item">
-
-                    <span class="pc8-trans-punto
-                                 pc8-trans-atendidos"
-                          aria-hidden="true">
-                    </span>
-
-                    <span>
-                        Atendidos o cerrados:
-                        <strong id="porcentaje-atendidos">
-                            0%
-                        </strong>
-                    </span>
-
-                </div>
-
-                <div class="pc8-trans-leyenda-item">
-
-                    <span class="pc8-trans-punto
-                                 pc8-trans-rechazados"
-                          aria-hidden="true">
-                    </span>
-
-                    <span>
-                        Rechazados:
-                        <strong id="porcentaje-rechazados">
-                            0%
-                        </strong>
-                    </span>
-
-                </div>
-
-            </div>
-
-            <p th:if="${total == 0}"
-               class="small text-secondary mt-4 mb-0">
-                No hay reportes para el período seleccionado.
-            </p>
-
-        </div>
-
-    </section>
-
-    <!-- CATEGORÍAS -->
-
-    <section class="card border-0 shadow-sm
-                    pc8-trans-card mb-4"
-             aria-labelledby="titulo-categorias">
-
-        <div class="card-body p-4">
-
-            <h2 id="titulo-categorias"
-                class="h5 fw-bold mb-2">
-                Reportes por categoría
-            </h2>
-
-            <p class="small text-secondary mb-3">
-                Distribución de problemas urbanos
-                registrados en el período seleccionado.
-            </p>
-
-            <div class="table-responsive">
-
-                <table class="table table-hover
-                              align-middle mb-0">
-
-                    <caption class="caption-top small">
-                        Cantidades y proporciones
-                        por categoría.
-                    </caption>
-
-                    <thead class="table-light">
-
-                        <tr>
-
-                            <th scope="col">
-                                Categoría
-                            </th>
-
-                            <th scope="col"
-                                class="text-end">
-                                Cantidad
-                            </th>
-
-                            <th scope="col"
-                                style="min-width: 150px;">
-                                Proporción
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        <tr th:each="c : ${categorias}"
-                            class="pc8-fila-categoria"
-                            th:attr="data-cantidad=${c.cantidad}">
-
-                            <!-- NOMBRE -->
-
-                            <td class="fw-semibold"
-                                th:text="${c.etiqueta}">
-                                Categoría
-                            </td>
-
-                            <!-- CANTIDAD -->
-
-                            <td class="text-end"
-                                th:text="${c.cantidad}">
-                                0
-                            </td>
-
-                            <!-- PORCENTAJE -->
-
-                            <td>
-
-                                <div class="d-flex
-                                            align-items-center
-                                            gap-2">
-
-                                    <div class="pc8-trans-barra"
-                                         role="progressbar"
-                                         aria-valuemin="0"
-                                         aria-valuemax="100"
-                                         th:attr="aria-label=${c.etiqueta}">
-
-                                        <div class="pc8-trans-barra-relleno">
-                                        </div>
-
-                                    </div>
-
-                                    <span class="pc8-trans-porcentaje">
-                                        0%
-                                    </span>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                        <tr th:if="${#lists.isEmpty(categorias)}">
-
-                            <td colspan="3"
-                                class="text-center
-                                       text-secondary py-5">
-                                No hay categorías con reportes
-                                en este período.
-                            </td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- INTERPRETACIÓN -->
-
-    <section class="card border-0 shadow-sm
-                    pc8-trans-card mb-4"
-             aria-labelledby="titulo-interpretacion">
-
-        <div class="card-body p-4">
-
-            <h2 id="titulo-interpretacion"
-                class="h5 fw-bold mb-3">
-                Cómo interpretar los resultados
-            </h2>
-
-            <div class="row g-3">
-
-                <div class="col-md-4">
-
-                    <h3 class="h6 fw-bold">
-                        En proceso
-                    </h3>
-
-                    <p class="small text-secondary mb-0">
-                        Reportes registrados,
-                        en revisión, asignados
-                        o en atención.
-                    </p>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <h3 class="h6 fw-bold">
-                        Atendidos o cerrados
-                    </h3>
-
-                    <p class="small text-secondary mb-0">
-                        Reportes con atención registrada
-                        o proceso finalizado.
-                        Atendido no significa
-                        necesariamente cerrado.
-                    </p>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <h3 class="h6 fw-bold">
-                        Rechazados
-                    </h3>
-
-                    <p class="small text-secondary mb-0">
-                        Reportes descartados durante
-                        la revisión municipal,
-                        con una justificación
-                        registrada en su historial.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- ACLARACIÓN ACADÉMICA -->
-
-    <div class="alert alert-light border">
-
-        <h2 class="h6 fw-bold">
-            Acerca de estas estadísticas
-        </h2>
-
-        <p class="small mb-2">
-            Los valores proceden de los reportes
-            almacenados en MariaDB para esta
-            instancia de CiudadConecta PC8.
-        </p>
-
-        <p class="small mb-0">
-            Este es un prototipo académico.
-            Las cifras no representan estadísticas
-            oficiales de la Municipalidad de Chorrillos.
-
-            Los filtros utilizan la fecha de creación
-            del reporte; los estados corresponden
-            a su situación actual.
-
-            No se incluyen datos personales
-            ni indicadores de satisfacción ciudadana.
-        </p>
-
-    </div>
-
-</main>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    'use strict';
-
-    // =====================================
-    // LECTURA DE VALORES
-    // =====================================
-
-    function obtenerNumero(id) {
-
-        const elemento =
-            document.getElementById(id);
-
-        if (!elemento) {
-            return 0;
-        }
-
-        const valor = Number(
-            elemento.textContent.trim()
-        );
-
-        return Number.isFinite(valor)
-            ? Math.max(0, valor)
-            : 0;
+  </main>
+</div>
+<footer class="footer"><p><strong>CiudadConecta</strong> · Participación ciudadana</p><p>Proyecto académico PC8 · Chorrillos, Lima, Perú</p></footer>
+
+<script th:inline="javascript">
+  "use strict";
+  const estadosData = /*[[${estados}]]*/ [];
+  const evolucionData = /*[[${evolucionMensual}]]*/ [];
+  const coloresEstado = ["#0b84d4","#1e8a5c","#c04450"];
+
+  function montarCanvas(canvas) {
+    const w = Math.max(180,canvas.parentElement.clientWidth);
+    const h = 230, dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(w*dpr);
+    canvas.height = Math.round(h*dpr);
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    return {ctx,w,h};
+  }
+
+  function graficarEstados() {
+    const c=document.getElementById("graficoEstados"), leyenda=document.getElementById("leyendaEstados");
+    if(!c || !leyenda) return;
+    const {ctx,w,h}=montarCanvas(c);
+    leyenda.replaceChildren();
+    const datos=Array.isArray(estadosData)?estadosData:[];
+    const total=datos.reduce((s,d)=>s+Math.max(0,Number(d.cantidad)||0),0);
+    if(!total) {
+      ctx.fillStyle="#536b80";ctx.font="14px system-ui";ctx.textAlign="center";
+      ctx.fillText("Sin reportes para este período",w/2,h/2);
+      return;
     }
-
-    const total =
-        obtenerNumero('valor-total');
-
-    const pendientes =
-        obtenerNumero('valor-pendientes');
-
-    const atendidos =
-        obtenerNumero('valor-atendidos');
-
-    const rechazados =
-        obtenerNumero('valor-rechazados');
-
-    // =====================================
-    // PORCENTAJES
-    // =====================================
-
-    function porcentaje(cantidad) {
-
-        if (total === 0) {
-            return 0;
-        }
-
-        return Math.max(
-            0,
-            Math.min(100, cantidad / total * 100)
-        );
-    }
-
-    function porcentajeTexto(cantidad) {
-        return porcentaje(cantidad).toFixed(1) + '%';
-    }
-
-    // =====================================
-    // GRÁFICO POR SITUACIÓN
-    // =====================================
-
-    const segmentos = [
-        {
-            barra: 'segmento-pendientes',
-            texto: 'porcentaje-pendientes',
-            cantidad: pendientes
-        },
-        {
-            barra: 'segmento-atendidos',
-            texto: 'porcentaje-atendidos',
-            cantidad: atendidos
-        },
-        {
-            barra: 'segmento-rechazados',
-            texto: 'porcentaje-rechazados',
-            cantidad: rechazados
-        }
-    ];
-
-    segmentos.forEach(item => {
-
-        const barra =
-            document.getElementById(item.barra);
-
-        const texto =
-            document.getElementById(item.texto);
-
-        if (barra) {
-            barra.style.width =
-                porcentaje(item.cantidad) + '%';
-        }
-
-        if (texto) {
-            texto.textContent =
-                porcentajeTexto(item.cantidad);
-        }
+    const cx=w/2,cy=110,r=Math.min(90,w*.27),grosor=Math.max(18,r*.32);
+    let a=-Math.PI/2;
+    datos.forEach((d,i)=>{
+      const n=Math.max(0,Number(d.cantidad)||0);
+      if(!n) return;
+      const sig=a+2*Math.PI*n/total;
+      ctx.beginPath();ctx.arc(cx,cy,r,a,sig);
+      ctx.strokeStyle=coloresEstado[i%coloresEstado.length];ctx.lineWidth=grosor;
+      ctx.stroke();a=sig;
     });
-
-    const grafico =
-        document.getElementById('grafico-situacion');
-
-    if (grafico) {
-
-        grafico.setAttribute(
-            'aria-label',
-            total === 0
-                ? 'No hay reportes en el período.'
-                : `De ${total} reportes: ` +
-                  `${pendientes} en proceso, ` +
-                  `${atendidos} atendidos o cerrados ` +
-                  `y ${rechazados} rechazados.`
-        );
-    }
-
-    // =====================================
-    // PROPORCIÓN POR CATEGORÍA
-    // =====================================
-
-    const filas = [
-        ...document.querySelectorAll(
-            '.pc8-fila-categoria'
-        )
-    ];
-
-    filas.forEach(fila => {
-
-        const valor =
-            Number(fila.dataset.cantidad);
-
-        const cantidad =
-            Number.isFinite(valor)
-                ? Math.max(0, valor)
-                : 0;
-
-        const porcentajeCategoria =
-            porcentaje(cantidad);
-
-        const relleno =
-            fila.querySelector(
-                '.pc8-trans-barra-relleno'
-            );
-
-        const texto =
-            fila.querySelector(
-                '.pc8-trans-porcentaje'
-            );
-
-        const barra =
-            fila.querySelector(
-                '[role="progressbar"]'
-            );
-
-        if (relleno) {
-            relleno.style.width =
-                porcentajeCategoria + '%';
-        }
-
-        if (texto) {
-            texto.textContent =
-                porcentajeCategoria.toFixed(1) + '%';
-        }
-
-        if (barra) {
-            barra.setAttribute(
-                'aria-valuenow',
-                porcentajeCategoria.toFixed(1)
-            );
-        }
+    ctx.fillStyle="#183e64";ctx.font="bold 27px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(total,cx,cy-8);
+    ctx.fillStyle="#536b80";ctx.font="11px system-ui";ctx.fillText("REPORTES",cx,cy+16);
+    datos.forEach((d,i)=>{
+      const item=document.createElement("span");item.className="legend-item";
+      const dot=document.createElement("span");dot.className="legend-dot";dot.style.background=coloresEstado[i%coloresEstado.length];
+      const txt=document.createElement("span");txt.textContent=`${d.etiqueta}: ${(Math.max(0,Number(d.cantidad)||0)*100/total).toFixed(1)}%`;
+      item.append(dot,txt);leyenda.append(item);
     });
-});
+  }
+
+  function graficarEvolucion() {
+    const c=document.getElementById("graficoEvolucion"),vacio=document.getElementById("sinEvolucion");
+    if(!c) return;
+    const datos=Array.isArray(evolucionData)?evolucionData:[];
+    c.hidden=datos.length===0;
+    if(vacio) vacio.hidden=datos.length!==0;
+    if(!datos.length)return;
+    const {ctx,w,h}=montarCanvas(c);
+    const left=35,right=12,top=18,bottom=51;
+    const pw=w-left-right,ph=h-top-bottom;
+    const max=Math.max(1,...datos.map(d=>Math.max(0,Number(d.cantidad)||0)));
+    const maxAxis=Math.ceil(max/4)*4;
+    ctx.font="10px system-ui";ctx.fillStyle="#60768b";ctx.textAlign="right";
+    for(let i=0;i<=4;i++){
+      const y=top+ph*i/4;
+      ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);
+      ctx.strokeStyle="#dce8f2";ctx.lineWidth=1;ctx.stroke();
+      ctx.fillText(String(maxAxis*(4-i)/4),left-7,y+3);
+    }
+    const points=datos.map((d,i)=>({
+      x:left+pw*(datos.length===1?.5:i/(datos.length-1)),
+      y:top+ph*(1-(Math.max(0,Number(d.cantidad)||0)/maxAxis)),
+      n:Math.max(0,Number(d.cantidad)||0),
+      name:String(d.etiqueta||"")
+    }));
+    ctx.beginPath();
+    points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.lineTo(points.at(-1).x,top+ph);ctx.lineTo(points[0].x,top+ph);ctx.closePath();
+    ctx.fillStyle="#d6ebfa";ctx.fill();
+    ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    ctx.strokeStyle="#0688da";ctx.lineWidth=2.5;ctx.stroke();
+    points.forEach(p=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fillStyle="#087bd0";ctx.fill();
+      ctx.fillStyle="#173c64";ctx.font="bold 10px system-ui";ctx.textAlign="center";
+      ctx.fillText(String(p.n),p.x,Math.max(11,p.y-10));
+      ctx.fillStyle="#536b80";ctx.font="9px system-ui";
+      let label=p.name.replace(/\s+\d{4}$/,"");
+      ctx.fillText(label,p.x,h-22);
+    });
+  }
+
+  function graficarBarras() {
+    const rows=[...document.querySelectorAll(".bar-row")];
+    const max=Math.max(1,...rows.map(r=>Number(r.dataset.cantidad)||0));
+    rows.forEach(r=>{
+      const n=Math.max(0,Number(r.dataset.cantidad)||0);
+      const fill=r.querySelector(".bar-fill");
+      if(fill)fill.style.width=(n/max*100)+"%";
+    });
+  }
+  function actualizar() { graficarBarras();graficarEstados();graficarEvolucion(); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",actualizar);
+  else actualizar();
+  let resizeId;
+  window.addEventListener("resize",()=>{clearTimeout(resizeId);resizeId=setTimeout(actualizar,160);});
 </script>
-
-<footer th:replace="~{fragments/base :: footer}">
-</footer>
-
 </body>
 </html>
