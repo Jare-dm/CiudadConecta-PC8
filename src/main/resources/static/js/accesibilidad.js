@@ -31,6 +31,12 @@
 
     if (botonContraste) botonContraste.setAttribute('aria-pressed', String(contraste));
     if (botonMovimiento) botonMovimiento.setAttribute('aria-pressed', String(movimientoReducido));
+
+    // Indicar los límites del ajuste y evitar clics sin efecto.
+    const menos = document.getElementById('texto-menos');
+    const mas = document.getElementById('texto-mas');
+    if (menos) menos.disabled = escala === escalas[0];
+    if (mas) mas.disabled = escala === escalas[escalas.length - 1];
     if (mensaje && estado()) estado().textContent = mensaje;
 
     guardar('pc8-escala', String(escala));

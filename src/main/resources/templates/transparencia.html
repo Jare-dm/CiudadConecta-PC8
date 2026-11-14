@@ -4,2067 +4,3255 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport"
 
-<meta name="description"
+          content="width=device-width, initial-scale=1">
 
-  content="Dashboard de seguimiento urbano de CiudadConecta en Chorrillos.">
+    <meta name="description"
 
-<title>Dashboard de Transparencia | CiudadConecta</title>
+          content="Dashboard de seguimiento urbano de CiudadConecta en Chorrillos.">
 
-<style>
+    <title>Dashboard de Transparencia | CiudadConecta</title>
 
-:root {
+    <!-- Estilos del lector compartidos con la página principal -->
+    <link rel="stylesheet" th:href="@{/css/pc8-lectura-accesible.css}" href="/css/pc8-lectura-accesible.css">
+    <link rel="stylesheet" th:href="@{/css/pc8-lector.css}" href="/css/pc8-lector.css">
 
-  --navy: #123c66;
+    <!-- Estilos Leaflet para el mapa público de concentraciones -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-  --navy-dark: #092e53;
+    <style>
 
-  --blue: #087bd0;
+        :root {
 
-  --cyan: #1ea6e2;
+            --navy: #123c66;
 
-  --page: #eef4fa;
+            --navy-dark: #092e53;
 
-  --ink: #193955;
+            --blue: #087bd0;
 
-  --muted: #536b80;
+            --cyan: #1ea6e2;
 
-  --line: #d7e4f0;
+            --page: #eef4fa;
 
-  --white: #fff;
+            --ink: #193955;
 
-  --green: #147d54;
+            --muted: #536b80;
 
-  --amber: #9a5b09;
+            --line: #d7e4f0;
 
-  --red: #b63846;
+            --white: #fff;
 
-  --shadow: 0 5px 18px rgba(21, 57, 94, .085);
+            --green: #147d54;
 
-}
+            --amber: #9a5b09;
 
-* {
+            --red: #b63846;
 
-  box-sizing: border-box;
+            --shadow: 0 5px 18px rgba(21, 57, 94, .085);
 
-}
+        }
 
-html {
+        * {
 
-  scroll-behavior: smooth;
+            box-sizing: border-box;
 
-}
+        }
 
-body {
+        html {
 
-  margin: 0;
+            scroll-behavior: smooth;
 
-  background: var(--page);
+        }
 
-  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        body {
 
-  color: var(--ink);
+            margin: 0;
 
-}
+            background: var(--page);
 
-[hidden] {
+            font: 0.9375rem/1.5 system-ui, -apple-system,
 
-  display: none !important;
+                  "Segoe UI", sans-serif;
 
-}
+            color: var(--ink);
 
-a {
+        }
 
-  color: inherit;
+        [hidden] {
 
-}
+            display: none !important;
 
-button, select {
+        }
 
-  font: inherit;
+        a {
 
-}
+            color: inherit;
 
-:focus-visible {
+        }
 
-  outline: 3px solid #edaa22;
+        button, select {
 
-  outline-offset: 3px;
+            font: inherit;
 
-}
+        }
 
-.skip {
+        :focus-visible {
 
-  position: absolute;
+            outline: 3px solid #edaa22;
 
-  z-index: 300;
+            outline-offset: 3px;
 
-  top: -100px;
+        }
 
-  left: 12px;
+        /* ACCESIBILIDAD */
 
-  background: #fff;
+        .skip {
 
-  padding: 12px;
+            position: absolute;
 
-}
+            z-index: 300;
 
-.skip:focus {
+            top: -100px;
 
-  top: 12px;
+            left: 12px;
 
-}
+            background: #fff;
 
-.topbar {
+            padding: 12px;
 
-  min-height: 68px;
+        }
 
-  background: linear-gradient(105deg, var(--navy-dark), #165584);
+        .skip:focus {
 
-  color: #fff;
+            top: 12px;
 
-  display: flex;
+        }
 
-  align-items: center;
+        /* ENCABEZADO */
 
-  justify-content: space-between;
+        .topbar {
 
-  padding: 11px clamp(16px, 3vw, 35px);
+            min-height: 68px;
 
-  gap: 14px;
+            background: linear-gradient(
 
-}
+                105deg,
 
-.brand {
+                var(--navy-dark),
 
-  display: flex;
+                #165584
 
-  align-items: center;
+            );
 
-  gap: 11px;
+            color: #fff;
 
-  text-decoration: none;
+            display: flex;
 
-}
+            align-items: center;
 
-.brand-icon {
+            justify-content: space-between;
 
-  width: 40px;
+            padding: 11px clamp(16px, 3vw, 35px);
 
-  height: 40px;
+            gap: 14px;
 
-  background: #ffc44e;
+        }
 
-  color: #123554;
+        .brand {
 
-  border-radius: 11px;
+            display: flex;
 
-  display: grid;
+            align-items: center;
 
-  place-items: center;
+            gap: 11px;
 
-  font-size: 27px;
+            text-decoration: none;
 
+        }
+
+        .brand-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    flex: 0 0 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border-radius: 11px;
+    background: #ffc44e;
+    color: #123554;
+    line-height: 1;
 }
 
-.brand-name {
+.brand-icon svg {
+    display: block;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    fill: currentColor;
+}
 
-  display: block;
+        .brand-name {
 
-  font-size: 19px;
+            display: block;
 
-  font-weight: 800;
+            font-size: 1.1875rem;
 
-  line-height: 1.15;
+            font-weight: 800;
 
-}
+            line-height: 1.15;
 
-.brand-sub {
+        }
 
-  display: block;
+        .brand-sub {
 
-  font-size: 9px;
+            display: block;
 
-  font-weight: 700;
+            font-size: 0.5625rem;
 
-  letter-spacing: 1.2px;
+            font-weight: 700;
 
-}
+            letter-spacing: 1.2px;
 
-.toplinks {
+        }
 
-  display: flex;
+        .toplinks {
 
-  gap: 7px;
+            display: flex;
 
-}
+            align-items: center;
 
-.toplinks a {
+            gap: 7px;
 
-  padding: 9px 13px;
+        }
 
-  border-radius: 8px;
+        .toplinks a {
 
-  font-size: 13px;
+            padding: 9px 13px;
 
-  text-decoration: none;
+            border-radius: 8px;
 
-  font-weight: 650;
+            font-size: 0.8125rem;
 
-}
+            text-decoration: none;
 
-.toplinks a:hover, .toplinks a[aria-current] {
+            font-weight: 650;
 
-  background: #ffffff25;
+        }
 
-}
+        .toplinks a:hover,
 
-.shell {
+        .toplinks a[aria-current] {
 
-  display: block;
+            background: #ffffff25;
 
-  min-height: calc(100vh - 68px);
+        }
 
-}
+        .contrast-toggle {
 
-.content {
+            padding: 9px 12px;
 
-  width: min(1400px, calc(100% - 48px));
+            border: 1px solid rgba(255,255,255,.55);
 
-  min-width: 0;
+            border-radius: 8px;
 
-  margin: 25px auto 35px;
+            background: transparent;
 
-}
+            color: #fff;
 
-.eyebrow {
+            font: inherit;
 
-  font-size: 11px;
+            font-size: 0.8125rem;
 
-  font-weight: 800;
+            font-weight: 700;
 
-  letter-spacing: 1.3px;
+            cursor: pointer;
 
-  color: #0865ad;
+        }
 
-  text-transform: uppercase;
+        .contrast-toggle:hover {
 
-}
+            background: rgba(255,255,255,.18);
 
-.pagehead {
+        }
 
-  display: flex;
+        /* CONTENIDO */
 
-  justify-content: space-between;
+        .shell {
 
-  align-items: center;
+            display: block;
 
-  gap: 16px;
+            min-height: calc(100vh - 68px);
 
-  margin-bottom: 17px;
+        }
 
-}
+        .content {
 
-h1 {
+            width: min(1400px, calc(100% - 48px));
 
-  font-size: clamp(24px, 3vw, 33px);
+            min-width: 0;
 
-  line-height: 1.15;
+            margin: 25px auto 35px;
 
-  margin: 5px 0 6px;
+        }
 
-  color: #163d65;
+        .eyebrow {
 
-}
+            font-size: 0.6875rem;
 
-.description {
+            font-weight: 800;
 
-  margin: 0;
+            letter-spacing: 1.3px;
 
-  color: var(--muted);
+            color: #0865ad;
 
-  font-size: 14px;
+            text-transform: uppercase;
 
-}
+        }
 
-.place {
+        .pagehead {
 
-  background: #dceefa;
+            display: flex;
 
-  border-radius: 40px;
+            justify-content: space-between;
 
-  font-weight: 750;
+            align-items: center;
 
-  font-size: 13px;
+            gap: 16px;
 
-  padding: 10px 16px;
+            margin-bottom: 17px;
 
-  white-space: nowrap;
+        }
 
-  color: #124f83;
+        h1 {
 
-}
+            font-size: clamp(24px, 3vw, 33px);
 
-.privacy {
+            line-height: 1.15;
 
-  padding: 14px 18px;
+            margin: 5px 0 6px;
 
-  margin: 0 0 17px;
+            color: #163d65;
 
-  border-left: 4px solid #1391a6;
+        }
 
-  border-radius: 11px;
+        .description {
 
-  background: #e2f6fa;
+            margin: 0;
 
-  display: flex;
+            color: var(--muted);
 
-  gap: 12px;
+            font-size: 0.8750rem;
 
-  align-items: flex-start;
+        }
 
-}
+        .place {
 
-.privacy strong {
+            background: #dceefa;
 
-  font-size: 14px;
+            border-radius: 40px;
 
-}
+            font-weight: 750;
 
-.privacy p {
+            font-size: 0.8125rem;
 
-  margin: 2px 0 0;
+            padding: 10px 16px;
 
-  color: #385870;
+            white-space: nowrap;
 
-  font-size: 12px;
+            color: #124f83;
 
-}
+        }
 
-.lock {
+        /* PRIVACIDAD */
 
-  font-size: 23px;
+        .privacy {
 
-}
+            padding: 14px 18px;
 
-.card {
+            margin: 0 0 17px;
 
-  min-width: 0;
+            border-left: 4px solid #1391a6;
 
-  background: white;
+            border-radius: 11px;
 
-  border: 1px solid var(--line);
+            background: #e2f6fa;
 
-  border-radius: 13px;
+            display: flex;
 
-  box-shadow: var(--shadow);
+            gap: 12px;
 
-  padding: 19px;
+            align-items: flex-start;
 
-}
+        }
 
-.filters {
+        .privacy strong {
 
-  margin-bottom: 23px;
+            font-size: 0.8750rem;
 
-}
+        }
 
-.filters-grid {
+        .privacy p {
 
-  display: grid;
+            margin: 2px 0 0;
 
-  grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr) auto;
+            color: #385870;
 
-  gap: 14px;
+            font-size: 0.7500rem;
 
-  align-items: end;
+        }
 
-}
+        .lock {
 
-.field label {
+            font-size: 1.4375rem;
 
-  display: block;
+        }
 
-  font-size: 12px;
+        /* TARJETAS */
 
-  font-weight: 750;
+        .card {
 
-  margin-bottom: 6px;
+            min-width: 0;
 
-}
+            background: #fff;
 
-select {
+            border: 1px solid var(--line);
 
-  min-height: 44px;
+            border-radius: 13px;
 
-  width: 100%;
+            box-shadow: var(--shadow);
 
-  padding: 9px 11px;
+            padding: 19px;
 
-  border-radius: 8px;
+        }
 
-  border: 1px solid #a8bdcf;
+        /* FILTROS */
 
-  background: #fff;
+        .filters {
 
-  color: #203b55;
+            margin-bottom: 23px;
 
-}
+        }
 
-.btn {
+        .filters-grid {
 
-  border: 0;
+            display: grid;
 
-  color: white;
+            grid-template-columns:
 
-  background: #086fbd;
+                minmax(160px, 1fr)
 
-  padding: 10px 19px;
+                minmax(160px, 1fr)
 
-  min-height: 44px;
+                auto;
 
-  border-radius: 8px;
+            gap: 14px;
 
-  font-weight: 750;
+            align-items: end;
 
-  cursor: pointer;
+        }
 
-}
+        .field label {
 
-.btn:hover {
+            display: block;
 
-  background: #075b9c;
+            font-size: 0.7500rem;
 
-}
+            font-weight: 750;
 
-.filters-bottom {
+            margin-bottom: 6px;
 
-  margin-top: 12px;
+        }
 
-  display: flex;
+        select {
 
-  flex-wrap: wrap;
+            min-height: 44px;
 
-  justify-content: space-between;
+            width: 100%;
 
-  gap: 8px;
+            padding: 9px 11px;
 
-  font-size: 12px;
+            border-radius: 8px;
 
-  color: var(--muted);
+            border: 1px solid #a8bdcf;
 
-}
+            background: #fff;
 
-.reset {
+            color: #203b55;
 
-  color: #075a9d;
+        }
 
-  font-weight: 700;
+        .btn {
 
-}
+            border: 0;
 
-.section-head {
+            color: white;
 
-  margin: 0 0 12px;
+            background: #086fbd;
 
-  display: flex;
+            padding: 10px 19px;
 
-  align-items: center;
+            min-height: 44px;
 
-  justify-content: space-between;
+            border-radius: 8px;
 
-  gap: 10px;
+            font-weight: 750;
 
-}
+            cursor: pointer;
 
-.section-head h2 {
+        }
 
-  font-size: 19px;
+        .btn:hover {
 
-  margin: 0;
+            background: #075b9c;
 
-}
+        }
 
-.pill {
+        .filters-bottom {
 
-  border-radius: 40px;
+            margin-top: 12px;
 
-  color: #fff;
+            display: flex;
 
-  background: #106cbb;
+            flex-wrap: wrap;
 
-  font-size: 11px;
+            justify-content: space-between;
 
-  font-weight: 700;
+            gap: 8px;
 
-  padding: 6px 12px;
+            font-size: 0.7500rem;
 
-}
+            color: var(--muted);
 
-.kpis {
+        }
 
-  display: grid;
+        .reset {
 
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+            color: #075a9d;
 
-  gap: 13px;
+            font-weight: 700;
 
-}
+        }
 
-.kpi {
+        /* SECCIONES */
 
-  padding: 17px;
+        .section-head {
 
-  border-radius: 12px;
+            margin: 0 0 12px;
 
-  border: 1px solid var(--line);
+            display: flex;
 
-  background: #fff;
+            align-items: center;
 
-  box-shadow: var(--shadow);
+            justify-content: space-between;
 
-  min-width: 0;
+            gap: 10px;
 
-  border-top: 4px solid #0d83cc;
+        }
 
-}
+        .section-head h2 {
 
-.kpi:nth-child(2) {
+            font-size: 1.1875rem;
 
-  border-top-color: #d49728;
+            margin: 0;
 
-}
+        }
 
-.kpi:nth-child(3) {
+        .pill {
 
-  border-top-color: #19865b;
+            border-radius: 40px;
 
-}
+            color: #fff;
 
-.kpi:nth-child(4) {
+            background: #106cbb;
 
-  border-top-color: #bb4450;
+            font-size: 0.6875rem;
 
-}
+            font-weight: 700;
 
-.kpi:nth-child(5) {
+            padding: 6px 12px;
 
-  border-top-color: #1398ae;
+        }
 
-}
+        /* INDICADORES KPI */
 
-.kpi.featured {
+        .kpis {
 
-  border-color: #0989d4;
+            display: grid;
 
-  background: linear-gradient(135deg, #078ddc, #066ab7);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
 
-  color: white;
+            gap: 13px;
 
-}
+        }
 
-.kpi.featured .metric, .kpi.featured .kpi-label {
+        .kpi {
 
-  color: #fff;
+            padding: 17px;
 
-}
+            border-radius: 12px;
 
-.kpi-top {
+            border: 1px solid var(--line);
 
-  display: flex;
+            background: #fff;
 
-  align-items: center;
+            box-shadow: var(--shadow);
 
-  justify-content: space-between;
+            min-width: 0;
 
-  gap: 6px;
+            border-top: 4px solid #0d83cc;
 
-}
+        }
 
-.kpi-icon {
+        .kpi:nth-child(2) {
 
-  font-size: 24px;
+            border-top-color: #d49728;
 
-  line-height: 1;
+        }
 
-}
+        .kpi:nth-child(3) {
 
-.metric {
+            border-top-color: #19865b;
 
-  font-size: clamp(24px, 2.5vw, 34px);
+        }
 
-  font-weight: 850;
+        .kpi:nth-child(4) {
 
-  line-height: 1.2;
+            border-top-color: #bb4450;
 
-  color: #17496e;
+        }
 
-  margin-top: 12px;
+        .kpi:nth-child(5) {
 
-  overflow-wrap: anywhere;
+            border-top-color: #1398ae;
 
-}
+        }
 
-.kpi:last-child .metric {
+        .kpi:nth-child(6) {
 
-  font-size: clamp(18px, 2vw, 26px);
+            border-top-color: #19865b;
 
-}
+        }
 
-.kpi-label {
+        .kpi.featured {
 
-  margin-top: 7px;
+            border-color: #0989d4;
 
-  color: #50677d;
+            background: linear-gradient(
 
-  font-size: 12px;
+                135deg,
 
-  font-weight: 700;
+                #078ddc,
 
-}
+                #066ab7
 
-.metric-note {
+            );
 
-  font-size: 11px;
+            color: white;
 
-  margin-top: 8px;
+        }
 
-  color: var(--muted);
+        .kpi.featured .metric,
 
-}
+        .kpi.featured .kpi-label {
 
-.explain {
+            color: #fff;
 
-  margin: 11px 0 0;
+        }
 
-  color: var(--muted);
+        .kpi-top {
 
-  font-size: 12px;
+            display: flex;
 
-}
+            align-items: center;
 
-.charts {
+            justify-content: space-between;
 
-  margin-top: 18px;
+            gap: 6px;
 
-  display: grid;
+        }
 
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+        .kpi-icon {
 
-  gap: 15px;
+            font-size: 1.5000rem;
 
-  align-items: stretch;
+            line-height: 1;
 
-}
+        }
 
-.chart h2, .table-card h2, .methodology h2 {
+        .metric {
 
-  font-size: 16px;
+            font-size: clamp(24px, 2.5vw, 34px);
 
-  margin: 0 0 4px;
+            font-weight: 850;
 
-  color: #163d65;
+            line-height: 1.2;
 
-}
+            color: #17496e;
 
-.chart .subtext, .table-card .subtext {
+            margin-top: 12px;
 
-  margin: 0 0 15px;
+            overflow-wrap: anywhere;
 
-  font-size: 12px;
+        }
 
-  color: var(--muted);
+        .kpi:nth-child(5) .metric,
 
-}
+        .kpi:nth-child(6) .metric {
 
-.chart {
+            font-size: clamp(18px, 2vw, 26px);
 
-  min-width: 0;
+        }
 
-}
+        .kpi-label {
 
-.plot {
+            margin-top: 7px;
 
-  height: 230px;
+            color: #50677d;
 
-  width: 100%;
+            font-size: 0.7500rem;
 
-}
+            font-weight: 700;
 
-canvas {
+        }
 
-  display: block;
+        .explain {
 
-  width: 100%;
+            margin: 11px 0 0;
 
-  height: 230px;
+            color: var(--muted);
 
-}
+            font-size: 0.7500rem;
 
-.category-bars {
+        }
 
-  display: flex;
+        /* GRÁFICOS */
 
-  flex-direction: column;
+        .charts {
 
-  justify-content: center;
+            margin-top: 18px;
 
-  gap: 14px;
+            display: grid;
 
-  min-height: 200px;
+            grid-template-columns:
 
-}
+                repeat(3, minmax(0, 1fr));
 
-.bar-row {
+            gap: 15px;
 
-  display: grid;
+            align-items: stretch;
 
-  grid-template-columns: minmax(75px, 35%) minmax(40px, 1fr) 30px;
+        }
 
-  align-items: center;
+        .chart h2,
 
-  gap: 8px;
+        .table-card h2,
 
-  font-size: 12px;
+        .methodology h2 {
 
-}
+            font-size: 1.0000rem;
 
-.bar-label {
+            margin: 0 0 4px;
 
-  overflow-wrap: anywhere;
+            color: #163d65;
 
-  line-height: 1.25;
+        }
 
-}
+        .chart .subtext,
 
-.bar-track, .percentage-bar {
+        .table-card .subtext {
 
-  height: 12px;
+            margin: 0 0 15px;
 
-  background: #e7eff7;
+            font-size: 0.7500rem;
 
-  border-radius: 20px;
+            color: var(--muted);
 
-  overflow: hidden;
+        }
 
-}
+        .chart {
 
-.bar-fill, .percentage-fill {
+            min-width: 0;
 
-  display: block;
+        }
 
-  background: linear-gradient(90deg, #0d74c7, #20ade8);
+        .plot {
 
-  height: 100%;
+            height: 230px;
 
-  width: 0;
+            width: 100%;
 
-  border-radius: 20px;
+        }
 
-}
+        .plot canvas {
 
-.bar-number {
+            display: block;
 
-  text-align: right;
+            width: 100%;
 
-  font-weight: 750;
+            height: 230px;
 
-}
+        }
 
-.legend {
+        /* BARRAS DE CATEGORÍAS */
 
-  display: flex;
+        .category-bars {
 
-  gap: 10px;
+            display: flex;
 
-  flex-wrap: wrap;
+            flex-direction: column;
 
-  margin-top: 6px;
+            justify-content: center;
 
-}
+            gap: 14px;
 
-.legend-item {
+            min-height: 200px;
 
-  display: flex;
+        }
 
-  align-items: center;
+        .bar-row {
 
-  gap: 5px;
+            display: grid;
 
-  font-size: 11px;
+            grid-template-columns:
 
-  color: #3a5168;
+                minmax(75px, 35%)
 
-}
+                minmax(40px, 1fr)
 
-.legend-dot {
+                30px;
 
-  width: 10px;
+            align-items: center;
 
-  height: 10px;
+            gap: 8px;
 
-  border-radius: 50%;
+            font-size: 0.7500rem;
 
-  flex: none;
+        }
 
-}
+        .bar-label {
 
-.data-bottom {
+            overflow-wrap: anywhere;
 
-  display: grid;
+            line-height: 1.25;
 
-  grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
+        }
 
-  gap: 15px;
+        .bar-track,
 
-  margin-top: 15px;
+        .percentage-bar {
 
-}
+            height: 12px;
 
-.table-wrap {
+            background: #e7eff7;
 
-  overflow-x: auto;
+            border-radius: 20px;
 
-}
+            overflow: hidden;
 
-table {
+        }
 
-  border-collapse: collapse;
+        .bar-fill,
 
-  width: 100%;
+        .percentage-fill {
 
-  font-size: 12px;
+            display: block;
 
-}
+            background: linear-gradient(
 
-th, td {
+                90deg,
 
-  padding: 11px 10px;
+                #0d74c7,
 
-  text-align: left;
+                #20ade8
 
-  border-bottom: 1px solid #e6edf5;
+            );
 
-}
+            height: 100%;
 
-th {
+            width: 0;
 
-  color: #164974;
+            border-radius: 20px;
 
-  background: #e9f3fb;
+        }
 
-}
+        .bar-number {
 
-tbody tr:hover {
+            text-align: right;
 
-  background: #f4f9fd;
+            font-weight: 750;
 
-}
+        }
 
-.percentage-bar {
+        /* LEYENDAS */
 
-  min-width: 75px;
+        .legend {
 
-  height: 10px;
+            display: flex;
 
-}
+            gap: 10px;
 
-.methodology {
+            flex-wrap: wrap;
 
-  background: linear-gradient(130deg, #e7f2fc, #f4f9fd);
+            margin-top: 6px;
 
-}
+        }
 
-.methodology p {
+        .legend-item {
 
-  font-size: 12px;
+            display: flex;
 
-  color: #415b72;
+            align-items: center;
 
-  line-height: 1.7;
+            gap: 5px;
 
-}
+            font-size: 0.6875rem;
 
-.methodology a {
+            color: #3a5168;
 
-  color: #075f9e;
+        }
 
-  font-weight: 750;
+        .legend-dot {
 
-}
+            width: 10px;
 
-.empty {
+            height: 10px;
 
-  padding: 25px 10px;
+            border-radius: 50%;
 
-  text-align: center;
+            flex: none;
 
-  font-size: 12px;
+        }
 
-  color: var(--muted);
+        /* TABLA Y METODOLOGÍA */
 
-}
+        .data-bottom {
 
-.footer {
+            display: grid;
 
-  background: #0d3357;
+            grid-template-columns:
 
-  color: #e5f3ff;
+                minmax(0, 2fr)
 
-  text-align: center;
+                minmax(250px, 1fr);
 
-  font-size: 12px;
+            gap: 15px;
 
-  padding: 17px;
+            margin-top: 15px;
 
-}
+        }
 
-.footer p {
+        .table-wrap {
 
-  margin: 3px;
+            overflow-x: auto;
 
-}
+        }
 
-@media ( max-width :1150px) {
+        table {
 
-  .kpis {
+            border-collapse: collapse;
 
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+            width: 100%;
 
-  }
+            font-size: 0.7500rem;
 
-  .charts {
+        }
 
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+        th, td {
 
-  }
+            padding: 11px 10px;
 
-  .charts .chart:last-child {
+            text-align: left;
 
-    grid-column: 1/-1;
+            border-bottom: 1px solid #e6edf5;
 
-  }
+        }
 
-}
+        th {
 
-@media ( max-width :750px) {
+            color: #164974;
 
-  .content {
+            background: #e9f3fb;
 
-    width: calc(100% - 24px);
+        }
 
-    margin: 20px auto;
+        tbody tr:hover {
 
-  }
+            background: #f4f9fd;
 
-  .pagehead {
+        }
 
-    align-items: start;
+        .percentage-bar {
 
-  }
+            min-width: 75px;
 
-  .place {
+            height: 10px;
 
-    display: none;
+        }
 
-  }
+        .methodology {
 
-  .filters-grid {
+            background: linear-gradient(
 
-    grid-template-columns: 1fr;
+                130deg,
 
-  }
+                #e7f2fc,
 
-  .btn {
+                #f4f9fd
 
-    width: 100%;
+            );
 
-  }
+        }
 
-  .kpis {
+        .methodology p {
 
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+            font-size: 0.7500rem;
 
-  }
+            color: #415b72;
 
-  .charts, .data-bottom {
+            line-height: 1.7;
 
-    grid-template-columns: 1fr;
+        }
 
-  }
+        .methodology a {
 
-  .charts .chart:last-child {
+            color: #075f9e;
 
-    grid-column: auto;
+            font-weight: 750;
 
-  }
+        }
 
-}
+        .empty {
 
-@media ( max-width :440px) {
+            padding: 25px 10px;
 
-  .topbar {
+            text-align: center;
 
-    padding: 9px;
+            font-size: 0.7500rem;
 
-  }
+            color: var(--muted);
 
-  .brand-name {
+        }
 
-    font-size: 15px;
+        .footer {
 
-  }
+            background: #0d3357;
 
-  .brand-sub {
+            color: #e5f3ff;
 
-    font-size: 7px;
+            text-align: center;
 
-  }
+            font-size: 0.7500rem;
 
-  .toplinks a {
+            padding: 17px;
 
-    padding: 7px;
+        }
 
-    font-size: 11px;
+        .footer p {
 
-  }
+            margin: 3px;
 
-  .kpi {
+        }
 
-    padding: 12px;
+        /* DATOS ACCESIBLES PARA LECTORES DE PANTALLA */
 
-  }
+        .sr-data {
 
-  .metric {
+            position: absolute;
 
-    font-size: 25px;
+            width: 1px;
 
-  }
+            height: 1px;
 
-  .kpi-label {
+            padding: 0;
 
-    font-size: 11px;
+            margin: -1px;
 
-  }
+            overflow: hidden;
 
-}
+            clip-path: inset(50%);
 
-@media ( prefers-reduced-motion :reduce) {
+            white-space: nowrap;
 
-  html {
+            border: 0;
 
-    scroll-behavior: auto;
+        }
 
-  }
+        /* DISEÑO RESPONSIVE */
 
-}
+        @media (max-width: 1150px) {
 
-/* Preferencia de movimiento reducido controlada por accesibilidad.js */
-html.pc8-motion-off,
-html.pc8-motion-off *,
-html.pc8-motion-off *::before,
-html.pc8-motion-off *::after {
-  scroll-behavior: auto !important;
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-}
+            .charts {
 
-/* ACCESIBILIDAD: MODO ALTO CONTRASTE */
+                grid-template-columns:
 
-html.contraste-alto {
+                    repeat(2, minmax(0, 1fr));
 
-  --page: #000;
+            }
 
-  --ink: #fff;
+            .charts .chart:last-child {
 
-  --muted: #fff;
+                grid-column: 1 / -1;
 
-  --line: #fff;
+            }
 
-  --shadow: none;
+        }
 
-  background: #000;
+        @media (max-width: 750px) {
 
-  color: #fff;
+            .content {
 
-}
+                width: calc(100% - 24px);
 
-html.contraste-alto .topbar, html.contraste-alto .footer {
+                margin: 20px auto;
 
-  background: #000;
+            }
 
-  color: #fff;
+            .pagehead {
 
-  border-bottom: 2px solid #fff;
+                align-items: start;
 
-}
+            }
 
-html.contraste-alto .content, html.contraste-alto .shell {
+            .place {
 
-  background: #000;
+                display: none;
 
-}
+            }
 
-html.contraste-alto .card, html.contraste-alto .kpi, html.contraste-alto .privacy,
+            .filters-grid {
 
-  html.contraste-alto .methodology {
+                grid-template-columns: 1fr;
 
-  background: #101010;
+            }
 
-  background-image: none;
+            .btn {
 
-  color: #fff;
+                width: 100%;
 
-  border: 2px solid #fff;
+            }
 
-  box-shadow: none;
+            .kpis {
 
-}
+                grid-template-columns:
 
-html.contraste-alto .kpi.featured {
+                    repeat(2, minmax(0, 1fr));
 
-  background: #111;
+            }
 
-  border: 2px solid #ffeb3b;
+            .charts,
 
-}
+            .data-bottom {
 
-html.contraste-alto .kpi::before {
+                grid-template-columns: 1fr;
 
-  background: none;
+            }
 
-}
+            .charts .chart:last-child {
 
-html.contraste-alto h1, html.contraste-alto h2, html.contraste-alto .description,
+                grid-column: auto;
 
-  html.contraste-alto .eyebrow, html.contraste-alto .metric, html.contraste-alto .kpi-label,
+            }
 
-  html.contraste-alto .metric-note, html.contraste-alto .explain, html.contraste-alto .subtext,
+        }
 
-  html.contraste-alto .privacy p, html.contraste-alto .filters-bottom,
+        @media (max-width: 440px) {
 
-  html.contraste-alto .methodology p, html.contraste-alto .methodology a,
+            .topbar {
 
-  html.contraste-alto .legend-item, html.contraste-alto .empty, html.contraste-alto .bar-label,
+                padding: 9px;
 
-  html.contraste-alto td, html.contraste-alto th {
+            }
 
-  color: #fff !important;
+            .brand-name {
 
-}
+                font-size: 0.9375rem;
 
-html.contraste-alto .eyebrow, html.contraste-alto .reset {
+            }
 
-  color: #ffeb3b !important;
+            .brand-sub {
 
-}
+                font-size: 0.4375rem;
 
-html.contraste-alto .place, html.contraste-alto .pill {
+            }
 
-  background: #ffeb3b;
+            .toplinks {
 
-  color: #000;
+                flex-wrap: wrap;
 
-}
+                justify-content: flex-end;
 
-html.contraste-alto .brand-icon {
+            }
 
-  background: #ffeb3b;
+            .toplinks a,
 
-  color: #000;
+            .contrast-toggle {
 
-}
+                padding: 7px;
 
-html.contraste-alto .toplinks a[aria-current] {
+                font-size: 0.6875rem;
 
-  background: #ffeb3b;
+            }
 
-  color: #000;
+            .kpi {
 
-}
+                padding: 12px;
 
-html.contraste-alto select {
+            }
 
-  background: #000;
+            .metric {
 
-  color: #fff;
+                font-size: 1.5625rem;
 
-  border: 2px solid #fff;
+            }
 
-}
+            .kpi-label {
 
-html.contraste-alto .btn, html.contraste-alto .contrast-toggle {
+                font-size: 0.6875rem;
 
-  background: #ffeb3b;
+            }
 
-  color: #000;
+        }
 
-  border: 2px solid #fff;
+        @media (prefers-reduced-motion: reduce) {
 
-}
+            html {
 
-html.contraste-alto .btn:hover, html.contraste-alto .contrast-toggle:hover
+                scroll-behavior: auto;
 
-  {
+            }
 
-  background: #fff;
+        }
 
-  color: #000;
+        /* MOVIMIENTO REDUCIDO */
 
-}
+        html.pc8-motion-off,
 
-html.contraste-alto th {
+        html.pc8-motion-off *,
 
-  background: #232323;
+        html.pc8-motion-off *::before,
 
-  border-color: #fff;
+        html.pc8-motion-off *::after {
 
-}
+            scroll-behavior: auto !important;
 
-html.contraste-alto td {
+            animation-duration: 0.01ms !important;
 
-  border-color: #ddd;
+            animation-iteration-count: 1 !important;
 
-}
+            transition-duration: 0.01ms !important;
 
-html.contraste-alto tbody tr:hover {
+        }
 
-  background: #262626;
+        /* MODO ALTO CONTRASTE */
 
-}
+        html.contraste-alto {
 
-html.contraste-alto .bar-track, html.contraste-alto .percentage-bar {
+            --page: #000;
 
-  background: #454545;
+            --ink: #fff;
 
-  border: 1px solid #fff;
+            --muted: #fff;
 
-}
+            --line: #fff;
 
-html.contraste-alto .bar-fill, html.contraste-alto .percentage-fill {
+            --shadow: none;
 
-  background: #ffeb3b;
+            background: #000;
 
-}
+            color: #fff;
 
-html.contraste-alto .legend-dot {
+        }
 
-  border: 1px solid #fff;
+        html.contraste-alto .topbar,
 
-}
+        html.contraste-alto .footer {
 
-html.contraste-alto :focus-visible {
+            background: #000;
 
-  outline: 3px solid #ffeb3b;
+            color: #fff;
 
-  outline-offset: 3px;
+            border-bottom: 2px solid #fff;
 
-}
+        }
 
-.contrast-toggle {
+        html.contraste-alto .content,
 
-  padding: 9px 12px;
+        html.contraste-alto .shell {
 
-  border: 1px solid rgba(255, 255, 255, .55);
+            background: #000;
 
-  border-radius: 8px;
+        }
 
-  background: transparent;
+        html.contraste-alto .card,
 
-  color: #fff;
+        html.contraste-alto .kpi,
 
-  font: inherit;
+        html.contraste-alto .privacy,
 
-  font-size: 13px;
+        html.contraste-alto .methodology {
 
-  font-weight: 700;
+            background: #101010;
 
-  cursor: pointer;
+            background-image: none;
 
-}
+            color: #fff;
 
-.contrast-toggle:hover {
+            border: 2px solid #fff;
 
-  background: rgba(255, 255, 255, .18);
+            box-shadow: none;
 
-}
+        }
 
-.toplinks {
+        html.contraste-alto .kpi.featured {
 
-  align-items: center;
+            background: #111;
 
-}
+            border: 2px solid #ffeb3b;
 
-@media ( max-width :440px) {
+        }
 
-  .contrast-toggle {
+        html.contraste-alto h1,
 
-    padding: 7px;
+        html.contraste-alto h2,
 
-    font-size: 11px;
+        html.contraste-alto .description,
 
-  }
+        html.contraste-alto .eyebrow,
 
-  .toplinks {
+        html.contraste-alto .metric,
 
-    flex-wrap: wrap;
+        html.contraste-alto .kpi-label,
 
-    justify-content: flex-end;
+        html.contraste-alto .explain,
 
-  }
+        html.contraste-alto .subtext,
 
-}
+        html.contraste-alto .privacy p,
+
+        html.contraste-alto .filters-bottom,
+
+        html.contraste-alto .methodology p,
+
+        html.contraste-alto .methodology a,
+
+        html.contraste-alto .legend-item,
+
+        html.contraste-alto .empty,
+
+        html.contraste-alto .bar-label,
+
+        html.contraste-alto td,
+
+        html.contraste-alto th {
+
+            color: #fff !important;
+
+        }
+
+        html.contraste-alto .eyebrow,
+
+        html.contraste-alto .reset {
+
+            color: #ffeb3b !important;
+
+        }
+
+        html.contraste-alto .place,
+
+        html.contraste-alto .pill {
+
+            background: #ffeb3b;
+
+            color: #000;
+
+        }
+
+        html.contraste-alto .brand-icon {
+
+            background: #ffeb3b;
+
+            color: #000;
+
+        }
+
+        html.contraste-alto .toplinks a[aria-current] {
+
+            background: #ffeb3b;
+
+            color: #000;
+
+        }
+
+        html.contraste-alto select {
+
+            background: #000;
+
+            color: #fff;
+
+            border: 2px solid #fff;
+
+        }
+
+        html.contraste-alto .btn,
+
+        html.contraste-alto .contrast-toggle {
+
+            background: #ffeb3b;
+
+            color: #000;
+
+            border: 2px solid #fff;
+
+        }
+
+        html.contraste-alto th {
+
+            background: #232323;
+
+            border-color: #fff;
+
+        }
+
+        html.contraste-alto td {
+
+            border-color: #ddd;
+
+        }
+
+        html.contraste-alto tbody tr:hover {
+
+            background: #262626;
+
+        }
+
+        html.contraste-alto .bar-track,
+
+        html.contraste-alto .percentage-bar {
+
+            background: #454545;
+
+            border: 1px solid #fff;
+
+        }
+
+        html.contraste-alto .bar-fill,
+
+        html.contraste-alto .percentage-fill {
+
+            background: #ffeb3b;
+
+        }
+
+        html.contraste-alto .legend-dot {
+
+            border: 1px solid #fff;
+
+        }
+
+        html.contraste-alto :focus-visible {
+
+            outline: 3px solid #ffeb3b;
+
+            outline-offset: 3px;
+
+        }
+
+
+        /* Barra de accesibilidad del dashboard: independiente de Bootstrap */
+        .pc8-a11y-toolbar {
+            background: #edf4fb;
+            color: #183e64;
+            border-bottom: 1px solid #cbdceb;
+            padding: 10px clamp(12px, 3vw, 35px);
+        }
+        .pc8-a11y-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 16px; }
+        .pc8-a11y-controls, .pc8-a11y-buttons { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+        .pc8-a11y-title { font-size: .82rem; font-weight: 800; margin-right: 6px; }
+        .pc8-a11y-buttons button {
+            font: inherit; font-size: .8rem; font-weight: 650; cursor: pointer;
+            min-height: 40px; padding: 7px 11px; border-radius: 5px;
+            border: 1px solid #116fbd; background: transparent; color: #075d9b;
+        }
+        .pc8-a11y-buttons button:hover { background: #d8eafa; }
+        .pc8-a11y-buttons button[aria-pressed="true"] { background: #095f9f; color: #fff; }
+        .pc8-a11y-buttons #reiniciar-accesibilidad { border-color: #67798c; color: #344f68; }
+        .pc8-a11y-help { color: #075d9b; font-weight: 700; font-size: .82rem; }
+        .pc8-sr-only {
+            position: absolute !important; width: 1px !important; height: 1px !important;
+            padding: 0 !important; margin: -1px !important; overflow: hidden !important;
+            clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important;
+        }
+        .pc8-lector { background: #edf4fb; padding: 8px clamp(12px,3vw,35px); }
+        .pc8-lector-disclosure { max-width: 1400px; margin: 0 auto; border: 1px solid #cbdceb; background: #fff; border-radius: 9px; }
+        .pc8-lector-summary { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 11px 14px; list-style: revert; }
+        .pc8-lector-summary-copy { display: flex; flex-direction: column; }
+        .pc8-lector-title { font-weight: 800; color: #194769; }
+        .pc8-lector-description { font-size: .8rem; color: #526a80; }
+        .pc8-lector-panel { padding: 12px 16px 17px; border-top: 1px solid #d6e5f0; }
+        .pc8-lector-controls, .pc8-lector-settings { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .pc8-lector-controls button { min-height: 44px; border-radius: 7px; border: 1px solid #125d96; background: #f5faff; color: #134c7b; padding: 8px 13px; font: inherit; cursor: pointer; }
+        .pc8-lector-controls button.pc8-lector-primary { background: #0871bc; color: #fff; }
+        .pc8-lector-controls button:disabled { opacity: .5; cursor: not-allowed; }
+        .pc8-lector-setting { display: flex; flex-direction: column; gap: 4px; min-width: 150px; flex: 1 1 180px; }
+        .pc8-lector-setting label { font-weight: 700; }
+        .pc8-lector-setting select, .pc8-lector-setting input { max-width: 100%; }
+        .pc8-lector-status { font-size: .85rem; color: #365d7c; margin: 8px 0 0; }
+        @media(max-width: 750px) {
+            .pc8-a11y-container, .pc8-a11y-controls { align-items: stretch; }
+            .pc8-a11y-controls { flex-wrap: wrap; }
+            .pc8-lector-controls button { flex: 1 1 130px; }
+        }
+        /* Evitar tarjetas muy estrechas con el texto al 175% y 200% en móviles */
+        @media(max-width: 750px) {
+            html[style*="175%"] .kpis, html[style*="200%"] .kpis { grid-template-columns: 1fr; }
+        }
+        /* Mantener los controles legibles en modo contraste */
+        html.contraste-alto .pc8-a11y-toolbar,
+        html.contraste-alto .pc8-lector { background: #000; color: #fff; border-color: #fff; }
+        html.contraste-alto .pc8-lector-disclosure,
+        html.contraste-alto .pc8-lector-panel { background: #101010; color: #fff; border-color: #fff; }
+        html.contraste-alto .pc8-a11y-title,
+        html.contraste-alto .pc8-lector-title,
+        html.contraste-alto .pc8-lector-description,
+        html.contraste-alto .pc8-lector-status { color: #fff; }
+        html.contraste-alto .pc8-a11y-help { color: #ffeb3b; }
+        html.contraste-alto .pc8-a11y-buttons button,
+        html.contraste-alto .pc8-lector-controls button { background: #ffeb3b; color: #000; border: 2px solid #fff; }
+        html.contraste-alto .pc8-a11y-buttons button[aria-pressed="true"] { background: #000; color: #ffeb3b; border-color: #ffeb3b; }
+        html.contraste-alto .pc8-a11y-buttons #reiniciar-accesibilidad { color: #000; }
+        html.contraste-alto .pc8-lector-setting select { background: #000; color: #fff; border: 2px solid #fff; }
+
+
+        /* MAPA PÚBLICO: solo áreas agregadas, no puntos individuales */
+        .pc8-mapa-publico-card { margin-top: 19px; }
+        .pc8-mapa-publico-card h2 { margin: 0 0 7px; font-size: 1.19rem; color: #163d65; }
+        .pc8-mapa-publico-card p { color: #536b80; font-size: .84rem; }
+        .pc8-mapa-acciones { display: flex; gap: 9px; flex-wrap: wrap; margin: 12px 0; }
+        .pc8-mapa-boton {
+            border: 1px solid #0b73b9; background: #fff; color: #0a5790;
+            min-height: 44px; border-radius: 7px; padding: 8px 12px;
+            font-weight: 700; cursor: pointer; font-size: .82rem;
+        }
+        .pc8-mapa-boton:hover, .pc8-mapa-boton[aria-pressed="true"] {
+            background: #0b6fb5; color: #fff;
+        }
+        .pc8-mapa-boton:disabled { opacity: .65; cursor: not-allowed; }
+        #pc8-mapa-publico {
+            width: 100%; height: 395px; min-height: 300px; background: #e7eff6;
+            border: 1px solid #bdd3e6; border-radius: 9px; position: relative; z-index: 0;
+        }
+        .pc8-mapa-publico-leyenda {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 9px;
+            margin: 11px 0; font-size: .76rem; color: #415b72;
+        }
+        .pc8-mapa-publico-barra {
+            display: inline-block; width: 142px; height: 12px; border-radius: 10px;
+            background: linear-gradient(90deg, #2ca36c, #e6d74c, #f29a37, #c63c38);
+            border: 1px solid #64748b;
+        }
+        .pc8-mapa-nota { padding: 11px 13px; background: #eaf4fa; border-left: 4px solid #13849e; border-radius: 6px; }
+        .pc8-mapa-publico-tabla { margin-top: 15px; }
+        .pc8-mapa-publico-tabla h3 { font-size: .97rem; margin: 0 0 8px; color: #163d65; }
+        .pc8-mapa-boton-tabla { min-height: 40px; padding: 6px 10px; }
+        #pc8-mapa-publico:focus-visible { outline: 3px solid #edaa22; outline-offset: 3px; }
+        @media (max-width: 750px) {
+            #pc8-mapa-publico { height: 310px; }
+            .pc8-mapa-acciones .pc8-mapa-boton { flex: 1 1 145px; width: auto; }
+        }
+        html.contraste-alto .pc8-mapa-publico-card h2,
+        html.contraste-alto .pc8-mapa-publico-card h3,
+        html.contraste-alto .pc8-mapa-publico-card p,
+        html.contraste-alto .pc8-mapa-publico-leyenda { color: #fff !important; }
+        html.contraste-alto .pc8-mapa-nota { background: #101010; border-color: #ffeb3b; }
+        html.contraste-alto #pc8-mapa-publico { border: 3px solid #ffeb3b; }
+        html.contraste-alto .pc8-mapa-boton {
+            background: #000; color: #ffeb3b; border: 2px solid #ffeb3b;
+        }
+        html.contraste-alto .pc8-mapa-boton:hover,
+        html.contraste-alto .pc8-mapa-boton[aria-pressed="true"] {
+            background: #ffeb3b; color: #000;
+        }
+
+    </style>
 
-</style>
+    <!-- Restaurar preferencias de todas las páginas antes de mostrarlas -->
+    <script>
+      (() => {
+        try {
+          const escala = Number(localStorage.getItem('pc8-escala') || '100');
+          if ([100,125,150,175,200].includes(escala)) document.documentElement.style.fontSize = escala + '%';
+          document.documentElement.classList.toggle('contraste-alto', localStorage.getItem('pc8-contraste') === 'si');
+          document.documentElement.classList.toggle('pc8-motion-off', localStorage.getItem('pc8-reducir-movimiento') === 'si');
+        } catch (_) {}
+      })();
+    </script>
 
 </head>
 
 <body>
 
-  <a class="skip" href="#contenido">Saltar al contenido principal</a>
+<a class="skip" href="#contenido">
 
-  <header class="topbar">
+    Saltar al contenido principal
 
-    <a class="brand" th:href="@{/}" href="/"> <span class="brand-icon"
+</a>
 
-        aria-hidden="true">✦</span> <span><span class="brand-name">CiudadConecta</span><span
+<!-- ENCABEZADO -->
 
-            class="brand-sub">PARTICIPACIÓN CIUDADANA</span></span>
+<header class="topbar">
+
+    <a class="brand" th:href="@{/}" href="/">
+
+        <span class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="26" height="26" focusable="false" aria-hidden="true">
+                <path d="M20 1.5 L25 15 L38.5 20 L25 25 L20 38.5 L15 25 L1.5 20 L15 15 Z"/>
+            </svg>
+        </span>
+
+        <span>
+
+            <span class="brand-name">
+
+                CiudadConecta
+
+            </span>
+
+            <span class="brand-sub">
+
+                PARTICIPACIÓN CIUDADANA
+
+            </span>
+
+        </span>
 
     </a>
 
-    <nav class="toplinks" aria-label="Navegación superior">
+    <nav class="toplinks"
 
-        <button type="button" class="contrast-toggle" id="contraste-btn"
+         aria-label="Navegación superior">
 
-            aria-pressed="false">Alto contraste</button>
+        <a th:href="@{/}" href="/">
 
-        <a th:href="@{/}" href="/">Inicio</a> <a th:href="@{/transparencia}"
+            Inicio
 
-            href="/transparencia" aria-current="page">Transparencia</a>
+        </a>
+
+        <a th:href="@{/transparencia}"
+
+           href="/transparencia"
+
+           aria-current="page">
+
+            Transparencia
+
+        </a>
 
     </nav>
 
-  </header>
+</header>
 
-  <div class="shell">
+<!-- Las mismas herramientas de la Landing Page: mismos IDs y JS -->
+<div class="pc8-a11y-toolbar" role="region" aria-label="Herramientas de accesibilidad">
+  <div class="pc8-a11y-container">
+    <div class="pc8-a11y-controls">
+      <span class="pc8-a11y-title">Accesibilidad</span>
+      <div class="pc8-a11y-buttons" role="group" aria-label="Personalizar la visualización">
+        <button type="button" id="texto-menos" aria-label="Reducir tamaño del texto">A−</button>
+        <button type="button" id="texto-mas" aria-label="Aumentar tamaño del texto">A+</button>
+        <button type="button" id="contraste-btn" aria-pressed="false">Alto contraste</button>
+        <button type="button" id="movimiento-btn" aria-pressed="false">Reducir animaciones</button>
+        <button type="button" id="reiniciar-accesibilidad">Restablecer</button>
+      </div>
+    </div>
+    <a class="pc8-a11y-help" th:href="@{/accesibilidad}" href="/accesibilidad">Ayuda de accesibilidad ↗</a>
+    <span id="estado-accesibilidad" role="status" aria-live="polite" aria-atomic="true" class="pc8-sr-only"></span>
+  </div>
+</div>
 
-    <main class="content" id="contenido">
+<section class="pc8-lector" aria-labelledby="pc8-lector-titulo">
+  <details class="pc8-lector-disclosure">
+    <summary class="pc8-lector-summary">
+      <span aria-hidden="true">🔊</span>
+      <span class="pc8-lector-summary-copy">
+        <span class="pc8-lector-title" id="pc8-lector-titulo">Escuchar contenido</span>
+        <span class="pc8-lector-description">Abrir controles de lectura en voz alta</span>
+      </span>
+    </summary>
+    <div class="pc8-lector-panel">
+      <div class="pc8-lector-controls" role="group" aria-label="Controles de lectura">
+        <button type="button" id="pc8-leer-pagina" class="pc8-lector-primary">▶ Leer página</button>
+        <button type="button" id="pc8-leer-desde-foco">Leer desde mi posición</button>
+        <button type="button" id="pc8-lectura-pausar" disabled>Ⅱ Pausar</button>
+        <button type="button" id="pc8-lectura-reanudar" disabled>▶ Reanudar</button>
+        <button type="button" id="pc8-lectura-detener" disabled>■ Detener</button>
+      </div>
+      <div class="pc8-lector-settings">
+        <div class="pc8-lector-setting">
+          <label for="pc8-lectura-voz">Seleccionar voz</label>
+          <select id="pc8-lectura-voz"><option value="">Automática (español)</option></select>
+        </div>
+        <div class="pc8-lector-setting">
+          <label for="pc8-lectura-velocidad">Velocidad: <output id="pc8-velocidad-valor">1.0×</output></label>
+          <input id="pc8-lectura-velocidad" type="range" min="0.6" max="1.5" step="0.1" value="1">
+        </div>
+        <div class="pc8-lector-setting">
+          <label for="pc8-lectura-tono">Tono: <output id="pc8-tono-valor">1.0</output></label>
+          <input id="pc8-lectura-tono" type="range" min="0.5" max="2" step="0.1" value="1">
+        </div>
+      </div>
+      <p id="pc8-lectura-estado" class="pc8-lector-status" role="status" aria-live="polite" aria-atomic="true">Lector de voz disponible.</p>
+    </div>
+  </details>
+</section>
 
-        <div class="pagehead">
 
-            <div>
+<div class="shell">
 
-                <div class="eyebrow">Panel de transparencia</div>
+<main class="content" id="contenido">
 
-                <h1>Dashboard de CiudadConecta</h1>
+    <!-- TÍTULO -->
 
-                <p class="description">
+    <div class="pagehead">
 
-                    Seguimiento de problemas urbanos registrados en <strong
+        <div>
 
-                        th:text="${distrito}">Chorrillos</strong>.
+            <div class="eyebrow">
 
-                </p>
+                Panel de transparencia
 
             </div>
 
-            <span class="place">⌖ Chorrillos · Lima, Perú</span>
+            <h1>
+
+                Dashboard de CiudadConecta
+
+            </h1>
+
+            <p class="description">
+
+                Seguimiento de problemas urbanos
+
+                registrados en
+
+                <strong th:text="${distrito}">
+
+                    Chorrillos
+
+                </strong>.
+
+            </p>
 
         </div>
 
-        <section class="privacy" aria-label="Protección de datos personales">
+        <span class="place">
 
-            <span class="lock" aria-hidden="true">🔒</span>
+            ⌖ Chorrillos · Lima, Perú
 
-            <div>
+        </span>
 
-                <strong>Protección de datos personales</strong>
+    </div>
 
-                <p>Se muestran únicamente estadísticas agregadas. No se
+    <!-- PROTECCIÓN DE DATOS -->
 
-                    publican nombres, DNI, correos, fotografías ni direcciones
+    <section class="privacy"
 
-                    particulares. Las categorías personalizadas se agrupan para
+             aria-label="Protección de datos personales">
 
-                    proteger a los ciudadanos.</p>
+        <span class="lock" aria-hidden="true">
 
-            </div>
+            🔒
 
-        </section>
+        </span>
 
-        <section class="card filters" aria-labelledby="titulo-filtros">
+        <div>
 
-            <h2 id="titulo-filtros" class="chart-title">⌕ Consultar
+            <strong>
 
-                estadísticas</h2>
+                Protección de datos personales
 
-            <form method="get" th:action="@{/transparencia}"
+            </strong>
 
-                action="/transparencia">
+            <p>
 
-                <div class="filters-grid">
+                Se muestran únicamente estadísticas
 
-                    <div class="field">
+                agregadas. No se publican nombres,
 
-                        <label for="periodo">Período de análisis</label> <select
+                DNI, correos, fotografías ni
 
-                            id="periodo" name="periodo">
+                direcciones particulares.
 
-                            <option value="todo"
+                Las categorías personalizadas se
 
-                                th:selected="${periodoSeleccionado == 'todo'}">Todo el
+                agrupan para proteger a los ciudadanos.
 
-                                historial</option>
+            </p>
 
-                            <option value="mes"
+        </div>
 
-                                th:selected="${periodoSeleccionado == 'mes'}">Mes
+    </section>
 
-                                actual</option>
+    <!-- FILTROS -->
 
-                            <option value="7" th:selected="${periodoSeleccionado == '7'}">Últimos
+    <section class="card filters"
 
-                                7 días</option>
+             aria-labelledby="titulo-filtros">
 
-                            <option value="30" th:selected="${periodoSeleccionado == '30'}">Últimos
+        <h2 id="titulo-filtros">
 
-                                30 días</option>
+            ⌕ Consultar estadísticas
 
-                            <option value="90" th:selected="${periodoSeleccionado == '90'}">Últimos
+        </h2>
 
-                                90 días</option>
+        <form method="get"
 
-                        </select>
+              th:action="@{/transparencia}"
 
-                    </div>
+              action="/transparencia">
 
-                    <div class="field">
+            <div class="filters-grid">
 
-                        <label for="categoria">Categoría del problema</label> <select
+                <div class="field">
 
-                            id="categoria" name="categoria">
+                    <label for="periodo">
 
-                            <option th:each="c : ${opcionesCategorias}"
+                        Período de análisis
 
-                                th:value="${c.valor}" th:text="${c.etiqueta}"
+                    </label>
 
-                                th:selected="${categoriaSeleccionada == c.valor}" value="todas">Todas
+                    <select id="periodo" name="periodo">
 
-                                las categorías</option>
+                        <option value="todo"
 
-                        </select>
+                                th:selected="${periodoSeleccionado == 'todo'}">
 
-                    </div>
+                            Todo el historial
 
-                    <button class="btn" type="submit">Aplicar filtros</button>
+                        </option>
+
+                        <option value="mes"
+
+                                th:selected="${periodoSeleccionado == 'mes'}">
+
+                            Mes actual
+
+                        </option>
+
+                        <option value="7"
+
+                                th:selected="${periodoSeleccionado == '7'}">
+
+                            Últimos 7 días
+
+                        </option>
+
+                        <option value="30"
+
+                                th:selected="${periodoSeleccionado == '30'}">
+
+                            Últimos 30 días
+
+                        </option>
+
+                        <option value="90"
+
+                                th:selected="${periodoSeleccionado == '90'}">
+
+                            Últimos 90 días
+
+                        </option>
+
+                    </select>
 
                 </div>
 
-            </form>
+                <div class="field">
 
-            <div class="filters-bottom">
+                    <label for="categoria">
 
-                <span role="status">Mostrando <strong
+                        Categoría del problema
 
-                    th:text="${totalFiltrado}">0</strong> reportes · <strong
+                    </label>
 
-                    th:text="${periodoEtiqueta}">Todo el historial</strong></span> <a
+                    <select id="categoria" name="categoria">
 
-                    class="reset" th:href="@{/transparencia}" href="/transparencia">Restablecer
+                        <option th:each="c : ${opcionesCategorias}"
 
-                    filtros</a>
+                                th:value="${c.valor}"
+
+                                th:text="${c.etiqueta}"
+
+                                th:selected="${categoriaSeleccionada == c.valor}"
+
+                                value="todas">
+
+                            Todas las categorías
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button class="btn" type="submit">
+
+                    Aplicar filtros
+
+                </button>
+
+            </div>
+
+        </form>
+
+        <div class="filters-bottom">
+
+            <span role="status">
+
+                Mostrando
+
+                <strong th:text="${totalFiltrado}">
+
+                    0
+
+                </strong>
+
+                reportes ·
+
+                <strong th:text="${periodoEtiqueta}">
+
+                    Todo el historial
+
+                </strong>
+
+            </span>
+
+            <a class="reset"
+
+               th:href="@{/transparencia}"
+
+               href="/transparencia">
+
+                Restablecer filtros
+
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- SEIS INDICADORES KPI -->
+
+    <section id="resumen"
+
+             aria-labelledby="kpi-title">
+
+        <div class="section-head">
+
+            <h2 id="kpi-title">
+
+                Resumen de incidencias
+
+            </h2>
+
+            <span class="pill"
+
+                  th:text="${periodoEtiqueta}">
+
+                Todo el historial
+
+            </span>
+
+        </div>
+
+        <div class="kpis">
+
+            <!-- KPI 1 -->
+
+            <article class="kpi featured">
+
+                <div class="kpi-top">
+
+                    <span class="kpi-icon"
+
+                          aria-hidden="true">▤</span>
+
+                </div>
+
+                <div class="metric"
+
+                     th:text="${total}">
+
+                    0
+
+                </div>
+
+                <div class="kpi-label">
+
+                    Reportes registrados
+
+                </div>
+
+            </article>
+
+            <!-- KPI 2 -->
+
+            <article class="kpi">
+
+                <div class="kpi-top">
+
+                    <span class="kpi-icon"
+
+                          aria-hidden="true">⌛</span>
+
+                </div>
+
+                <div class="metric"
+
+                     th:text="${pendientes}">
+
+                    0
+
+                </div>
+
+                <div class="kpi-label">
+
+                    Pendientes o en proceso
+
+                </div>
+
+            </article>
+
+            <!-- KPI 3 -->
+
+            <article class="kpi">
+
+                <div class="kpi-top">
+
+                    <span class="kpi-icon"
+
+                          aria-hidden="true">✓</span>
+
+                </div>
+
+                <div class="metric"
+
+                     th:text="${atendidos}">
+
+                    0
+
+                </div>
+
+                <div class="kpi-label">
+
+                    Atendidos o cerrados
+
+                </div>
+
+            </article>
+
+            <!-- KPI 4 -->
+
+            <article class="kpi">
+
+                <div class="kpi-top">
+
+                    <span class="kpi-icon"
+
+                          aria-hidden="true">⊘</span>
+
+                </div>
+
+                <div class="metric"
+
+                     th:text="${rechazados}">
+
+                    0
+
+                </div>
+
+                <div class="kpi-label">
+
+                    Reportes rechazados
+
+                </div>
+
+            </article>
+
+            <!-- KPI 5 -->
+
+            <article class="kpi">
+
+                <div class="kpi-top">
+
+                    <span class="kpi-icon"
+
+                          aria-hidden="true">◷</span>
+
+                </div>
+
+                <div class="metric"
+
+                     th:text="${promedioTexto}">
+
+                    Sin datos
+
+                </div>
+
+                <div class="kpi-label">
+
+                    Tiempo promedio hasta
+
+                    primera atención
+
+                </div>
+
+            </article>
+
+            <!-- KPI 6: NUEVO -->
+
+            <article class="kpi">
+
+                <div class="kpi-top">
+
+                    <span class="kpi-icon"
+
+                          aria-hidden="true">✓</span>
+
+                </div>
+
+                <div class="metric"
+
+                     th:text="${promedioCierreTexto}">
+
+                    Sin datos
+
+                </div>
+
+                <div class="kpi-label">
+
+                    Tiempo promedio hasta
+
+                    cierre definitivo
+
+                </div>
+
+            </article>
+
+        </div>
+
+        <p class="explain">
+
+            El promedio de primera atención se calcula
+
+            con el historial de
+
+            <strong th:text="${reportesConTiempo}">
+
+                0
+
+            </strong>
+
+            reportes con fecha válida.
+
+        </p>
+
+        <p class="explain">
+
+            El promedio hasta cierre definitivo se calcula
+
+            con el historial de
+
+            <strong th:text="${reportesConCierre}">
+
+                0
+
+            </strong>
+
+            reportes con fecha válida de cierre.
+
+            Cuando no existen registros suficientes,
+
+            se muestra «Sin datos».
+
+        </p>
+
+    </section>
+
+    <!-- GRÁFICOS -->
+
+    <section class="charts"
+
+             id="graficos"
+
+             aria-label="Gráficos de reportes">
+
+        <!-- GRÁFICO POR CATEGORÍA -->
+
+        <article class="card chart">
+
+            <h2>
+
+                Reportes por categoría
+
+            </h2>
+
+            <p class="subtext">
+
+                Cantidad de incidencias por
+
+                tipo de problema · reportes.
+
+            </p>
+
+            <div class="category-bars"
+
+                 th:if="${!#lists.isEmpty(categorias)}">
+
+                <div class="bar-row"
+
+                     th:each="c : ${categorias}"
+
+                     th:attr="data-cantidad=${c.cantidad}">
+
+                    <span class="bar-label"
+
+                          th:text="${c.etiqueta}">
+
+                        Categoría
+
+                    </span>
+
+                    <div class="bar-track"
+
+                         aria-hidden="true">
+
+                        <span class="bar-fill"></span>
+
+                    </div>
+
+                    <span class="bar-number"
+
+                          th:text="${c.cantidad}">
+
+                        0
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <p class="empty"
+
+               th:if="${#lists.isEmpty(categorias)}">
+
+                No hay reportes para los
+
+                filtros seleccionados.
+
+            </p>
+
+        </article>
+
+        <!-- GRÁFICO POR ESTADO -->
+
+        <article class="card chart">
+
+            <h2>
+
+                Situación actual de los reportes
+
+            </h2>
+
+            <p class="subtext">
+
+                Distribución por estado actual ·
+
+                porcentajes.
+
+            </p>
+
+            <div class="plot">
+
+                <canvas id="graficoEstados"
+
+                        role="img"
+
+                        aria-label="Distribución de reportes según su estado">
+
+                    Distribución de reportes por estado.
+
+                </canvas>
+
+            </div>
+
+            <div id="leyendaEstados"
+
+                 class="legend">
+
+            </div>
+
+            <ul class="sr-data"
+
+                aria-label="Datos de estados">
+
+                <li th:each="e : ${estados}"
+
+                    th:text="|${e.etiqueta}: ${e.cantidad} reportes|">
+
+                    Estado: 0 reportes
+
+                </li>
+
+            </ul>
+
+        </article>
+
+        <!-- GRÁFICO DE EVOLUCIÓN -->
+
+        <article class="card chart">
+
+            <h2>
+
+                Evolución mensual de reportes
+
+            </h2>
+
+            <p class="subtext">
+
+                Últimos seis meses ·
+
+                reportes registrados por mes.
+
+            </p>
+
+            <div class="plot">
+
+                <canvas id="graficoEvolucion"
+
+                        role="img"
+
+                        aria-label="Evolución de reportes mensuales">
+
+                    Evolución mensual.
+
+                </canvas>
+
+            </div>
+
+            <div id="sinEvolucion"
+
+                 class="empty"
+
+                 hidden>
+
+                Sin datos de evolución mensual.
+
+            </div>
+
+            <details style="font-size: 0.7500rem; margin-top:8px">
+
+                <summary>
+
+                    Ver cifras mensuales
+
+                </summary>
+
+                <ul>
+
+                    <li th:each="m : ${evolucionMensual}"
+
+                        th:text="|${m.etiqueta}: ${m.cantidad} reportes|">
+
+                    </li>
+
+                </ul>
+
+            </details>
+
+        </article>
+
+    </section>
+
+    <!-- MAPA PÚBLICO: AGRUPACIONES ESTADÍSTICAS, SIN UBICACIONES PERSONALES -->
+    <section class="card pc8-mapa-publico-card" aria-labelledby="pc8-publico-titulo">
+        <h2 id="pc8-publico-titulo">Mapa de concentración de incidencias</h2>
+        <p>Observa las áreas de Chorrillos que acumulan más reportes urbanos.</p>
+        <p id="pc8-mapa-publico-resumen" role="status">Cargando concentraciones geográficas…</p>
+        <div class="pc8-mapa-acciones" role="group" aria-label="Opciones del mapa público">
+            <button type="button" id="pc8-publico-calor" class="pc8-mapa-boton" aria-pressed="true">Mapa de calor</button>
+            <button type="button" id="pc8-publico-areas" class="pc8-mapa-boton" aria-pressed="false">Ver áreas</button>
+            <button type="button" id="pc8-publico-centrar" class="pc8-mapa-boton">Centrar mapa</button>
+        </div>
+        <div id="pc8-mapa-publico" tabindex="0" role="region"
+             aria-label="Mapa de concentraciones públicas aproximadas de Chorrillos"
+             th:attr="data-url=@{/transparencia/mapa-publico}"
+             data-url="/transparencia/mapa-publico"></div>
+        <p id="pc8-mapa-publico-estado" role="status" aria-live="polite" aria-atomic="true">
+            Preparando el mapa público…
+        </p>
+        <div class="pc8-mapa-publico-leyenda" aria-label="Leyenda de intensidad">
+            <span>Menos concentración</span><span class="pc8-mapa-publico-barra" aria-hidden="true"></span><span>Más concentración</span>
+        </div>
+        <p class="pc8-mapa-nota">
+            <strong>Privacidad:</strong> se representan zonas estadísticas aproximadas, no las ubicaciones reales de los reportes.
+            Solo se publican áreas con cuatro o más incidencias. Este mapa resume <strong>todo el historial</strong>:
+            no cambia con los filtros de fecha y categoría de los gráficos, para evitar identificar reportes individuales.
+            La intensidad refleja cantidad de reportes, no gravedad. No son estadísticas oficiales de la Municipalidad.
+        </p>
+        <div class="pc8-mapa-publico-tabla">
+            <h3 id="pc8-publico-zonas-titulo">Áreas con mayor concentración</h3>
+            <div class="table-wrap">
+                <table aria-labelledby="pc8-publico-zonas-titulo">
+                    <thead><tr><th scope="col">Área aproximada</th><th scope="col">Incidencias agrupadas</th><th scope="col">Acción</th></tr></thead>
+                    <tbody id="pc8-mapa-publico-zonas">
+                        <tr><td colspan="3">Cargando información…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- TABLA DE RESULTADOS -->
+
+    <div class="data-bottom">
+
+        <section class="card table-card"
+
+                 id="tabla-categorias"
+
+                 aria-labelledby="table-title">
+
+            <h2 id="table-title">
+
+                Detalle de incidencias por categoría
+
+            </h2>
+
+            <p class="subtext">
+
+                Datos filtrados y proporción
+
+                respecto del total.
+
+            </p>
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th scope="col">Categoría</th>
+
+                            <th scope="col">Reportes</th>
+
+                            <th scope="col">Porcentaje</th>
+
+                            <th scope="col">Distribución</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="c : ${categorias}">
+
+                            <td th:text="${c.etiqueta}">
+
+                                Categoría
+
+                            </td>
+
+                            <td th:text="${c.cantidad}">
+
+                                0
+
+                            </td>
+
+                            <td th:text="${totalFiltrado > 0 ? #numbers.formatDecimal(c.cantidad * 100.0 / totalFiltrado, 1, 1) + '%' : '0%'}">
+
+                                0%
+
+                            </td>
+
+                            <td>
+
+                                <div class="percentage-bar"
+
+                                     aria-hidden="true">
+
+                                    <span class="percentage-fill"
+
+                                          th:style="|width:${totalFiltrado > 0 ? c.cantidad * 100.0 / totalFiltrado : 0}%;|">
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(categorias)}">
+
+                            <td colspan="4">
+
+                                No hay reportes para esta selección.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
         </section>
 
-        <section id="resumen" aria-labelledby="kpi-title">
+        <!-- METODOLOGÍA -->
 
-            <div class="section-head">
+        <section class="card methodology"
 
-                <h2 id="kpi-title">Resumen de incidencias</h2>
+                 id="sobre-datos"
 
-                <span class="pill" th:text="${periodoEtiqueta}">Todo el
+                 aria-labelledby="datos-title">
 
-                    historial</span>
+            <h2 id="datos-title">
 
-            </div>
+                ⓘ Sobre los datos
 
-            <div class="kpis">
+            </h2>
 
-                <article class="kpi featured">
+            <p>
 
-                    <div class="kpi-top">
+                CiudadConecta presenta estadísticas
 
-                        <span class="kpi-icon" aria-hidden="true">▤</span>
+                de reportes urbanos correspondientes
 
-                    </div>
+                a su ámbito de operación:
 
-                    <div class="metric" th:text="${total}">0</div>
+                <strong>Chorrillos</strong>.
 
-                    <div class="kpi-label">Reportes registrados</div>
+                No son cifras oficiales de la Municipalidad.
 
-                </article>
+            </p>
 
-                <article class="kpi">
+            <p>
 
-                    <div class="kpi-top">
+                Los atendidos incluyen los estados
 
-                        <span class="kpi-icon" aria-hidden="true">⌛</span>
+                <strong>ATENDIDO</strong> y
 
-                    </div>
+                <strong>CERRADO</strong>.
 
-                    <div class="metric" th:text="${pendientes}">0</div>
+                Los pendientes son estados en proceso.
 
-                    <div class="kpi-label">Pendientes o en proceso</div>
+                Los rechazados se muestran por separado.
 
-                </article>
+            </p>
 
-                <article class="kpi">
+            <p>
 
-                    <div class="kpi-top">
+                El tiempo promedio hasta primera atención
 
-                        <span class="kpi-icon" aria-hidden="true">✓</span>
+                mide desde el registro hasta el primer
 
-                    </div>
+                estado ATENDIDO consignado en el historial.
 
-                    <div class="metric" th:text="${atendidos}">0</div>
+            </p>
 
-                    <div class="kpi-label">Atendidos o cerrados</div>
+            <p>
 
-                </article>
+                El tiempo promedio hasta cierre definitivo
 
-                <article class="kpi">
+                mide desde el registro hasta la fecha
 
-                    <div class="kpi-top">
+                de cierre registrada en el historial.
 
-                        <span class="kpi-icon" aria-hidden="true">⊘</span>
+                No incluye reportes sin cierre válido.
 
-                    </div>
+            </p>
 
-                    <div class="metric" th:text="${rechazados}">0</div>
+            <p>
 
-                    <div class="kpi-label">Reportes rechazados</div>
+                Los resultados se actualizan al aplicar
 
-                </article>
-
-                <article class="kpi">
-
-                    <div class="kpi-top">
-
-                        <span class="kpi-icon" aria-hidden="true">◷</span>
-
-                    </div>
-
-                    <div class="metric" th:text="${promedioTexto}">Sin datos</div>
-
-                    <div class="kpi-label">Tiempo promedio hasta primera
-
-                        atención</div>
-
-                </article>
-
-            </div>
-
-            <p class="explain">
-
-                Promedio calculado con el historial de primera atención, sobre <strong
-
-                    th:text="${reportesConTiempo}">0</strong> reportes con fecha
-
-                válida. «Sin datos» significa que aún no existe una atención
-
-                calculable.
+                los filtros o volver a cargar la página.
 
             </p>
 
         </section>
 
-        <section class="charts" id="graficos"
+    </div>
 
-            aria-label="Gráficos de reportes">
+</main>
 
-            <article class="card chart">
+</div>
 
-                <h2>▥ Reportes por categoría</h2>
+<!-- PIE DE PÁGINA -->
 
-                <p class="subtext">Cantidad de incidencias por tipo de problema
-
-                    · reportes.</p>
-
-                <div class="category-bars" th:if="${!#lists.isEmpty(categorias)}">
-
-                    <div class="bar-row" th:each="c : ${categorias}"
-
-                        th:attr="data-cantidad=${c.cantidad}">
-
-                        <span class="bar-label" th:text="${c.etiqueta}">Categoría</span>
-
-                        <div class="bar-track" aria-hidden="true">
-
-                            <span class="bar-fill"></span>
-
-                        </div>
-
-                        <span class="bar-number" th:text="${c.cantidad}">0</span>
-
-                    </div>
-
-                </div>
-
-                <p class="empty" th:if="${#lists.isEmpty(categorias)}">No hay
-
-                    reportes para los filtros seleccionados.</p>
-
-            </article>
-
-            <article class="card chart">
-
-                <h2>◉ Situación actual de los reportes</h2>
-
-                <p class="subtext">Distribución por estado actual ·
-
-                    porcentajes.</p>
-
-                <div class="plot">
-
-                    <canvas id="graficoEstados" role="img"
-
-                        aria-label="Distribución de reportes según su estado">Distribución de reportes por estado.</canvas>
-
-                </div>
-
-                <div id="leyendaEstados" class="legend"></div>
-
-                <ul class="sr-data" aria-label="Datos de estados"
-
-                    style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%)">
-
-                    <li th:each="e : ${estados}"
-
-                        th:text="|${e.etiqueta}: ${e.cantidad} reportes|">Estado: 0
-
-                        reportes</li>
-
-                </ul>
-
-            </article>
-
-            <article class="card chart">
-
-                <h2>⌁ Evolución mensual de reportes</h2>
-
-                <p class="subtext">Últimos seis meses · reportes registrados
-
-                    por mes.</p>
-
-                <div class="plot">
-
-                    <canvas id="graficoEvolucion" role="img"
-
-                        aria-label="Evolución de reportes mensuales">Evolución mensual.</canvas>
-
-                </div>
-
-                <div id="sinEvolucion" class="empty" hidden>Sin datos de
-
-                    evolución mensual.</div>
-
-                <details style="font-size: 12px; margin-top: 8px">
-
-                    <summary>Ver cifras mensuales</summary>
-
-                    <ul>
-
-                        <li th:each="m : ${evolucionMensual}"
-
-                            th:text="|${m.etiqueta}: ${m.cantidad} reportes|"></li>
-
-                    </ul>
-
-                </details>
-
-            </article>
-
-        </section>
-
-        <div class="data-bottom">
-
-            <section class="card table-card" id="tabla-categorias"
-
-                aria-labelledby="table-title">
-
-                <h2 id="table-title">▤ Detalle de incidencias por categoría</h2>
-
-                <p class="subtext">Datos filtrados y proporción respecto del
-
-                    total.</p>
-
-                <div class="table-wrap">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th scope="col">Categoría</th>
-
-                                <th scope="col">Reportes</th>
-
-                                <th scope="col">Porcentaje</th>
-
-                                <th scope="col">Distribución</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            <tr th:each="c : ${categorias}">
-
-                                <td th:text="${c.etiqueta}">Categoría</td>
-
-                                <td th:text="${c.cantidad}">0</td>
-
-                                <td
-
-                                    th:text="${totalFiltrado > 0 ? #numbers.formatDecimal(c.cantidad * 100.0 / totalFiltrado, 1, 1) + '%' : '0%'}">0%</td>
-
-                                <td><div class="percentage-bar" aria-hidden="true">
-
-                                        <span class="percentage-fill"
-
-                                            th:style="|width:${totalFiltrado > 0 ? c.cantidad * 100.0 / totalFiltrado : 0}%;|"></span>
-
-                                    </div></td>
-
-                            </tr>
-
-                            <tr th:if="${#lists.isEmpty(categorias)}">
-
-                                <td colspan="4">No hay reportes para esta selección.</td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </section>
-
-            <section class="card methodology" id="sobre-datos"
-
-                aria-labelledby="datos-title">
-
-                <h2 id="datos-title">ⓘ Sobre los datos</h2>
-
-                <p>
-
-                    CiudadConecta presenta estadísticas de reportes urbanos
-
-                    correspondientes a su ámbito de operación: <strong>Chorrillos</strong>.
-
-                    No son cifras oficiales de la Municipalidad.
-
-                </p>
-
-                <p>
-
-                    Los atendidos incluyen estados <strong>ATENDIDO</strong> y <strong>CERRADO</strong>.
-
-                    Los pendientes son estados en proceso. Los rechazados se muestran
-
-                    por separado.
-
-                </p>
-
-                <p>
-
-                    El tiempo promedio mide desde el registro hasta la <strong>primera
-
-                        atención</strong> consignada en el historial, no necesariamente el cierre
-
-                    definitivo.
-
-                </p>
-
-                <p>Los resultados se actualizan al aplicar los filtros o volver
-
-                    a cargar la página.</p>
-
-            </section>
-
-        </div>
-
-    </main>
-
-  </div>
-
-  <footer class="footer">
+<footer class="footer">
 
     <p>
 
-        <strong>CiudadConecta</strong> · Participación ciudadana
+        <strong>CiudadConecta</strong>
+
+        · Participación ciudadana
 
     </p>
 
-    <p>Proyecto académico PC8 · Chorrillos, Lima, Perú</p>
+    <p>
 
-  </footer>
+        Proyecto académico PC8 ·
 
-  <script th:inline="javascript">
+        Chorrillos, Lima, Perú
 
-  "use strict";
+    </p>
 
-  const estadosData = /*[[${estados}]]*/ [];
+</footer>
 
-  const evolucionData = /*[[${evolucionMensual}]]*/ [];
+<!-- GRÁFICOS CON CANVAS -->
 
-  function contrasteActivo() {
+<script th:inline="javascript">
 
-    return document.documentElement.classList.contains("contraste-alto");
+"use strict";
 
-  }
+const estadosData = /*[[${estados}]]*/ [];
 
-  function temaGrafico() {
+const evolucionData = /*[[${evolucionMensual}]]*/ [];
 
-    return contrasteActivo() ? {
+function contrasteActivo() {
 
-      estados:["#ffeb3b", "#00ffff", "#ff86c8"],
+    return document.documentElement.classList
 
-      texto:"#ffffff", secundario:"#ffffff", rejilla:"#777777",
+        .contains("contraste-alto");
 
-      linea:"#ffeb3b", area:"rgba(255,235,59,.17)"
+}
 
-    } : {
+function temaGrafico() {
 
-      estados:["#0b84d4", "#1e8a5c", "#c04450"],
+    return contrasteActivo()
 
-      texto:"#183e64", secundario:"#536b80", rejilla:"#dce8f2",
+        ? {
 
-      linea:"#0688da", area:"#d6ebfa"
+            estados: [
 
-    };
+                "#ffeb3b",
 
-  }
+                "#00ffff",
 
-  function montarCanvas(canvas) {
+                "#ff86c8"
 
-    const w = Math.max(180,canvas.parentElement.clientWidth);
+            ],
 
-    const h = 230, dpr = window.devicePixelRatio || 1;
+            texto: "#ffffff",
 
-    canvas.width = Math.round(w*dpr);
+            secundario: "#ffffff",
 
-    canvas.height = Math.round(h*dpr);
+            rejilla: "#777777",
+
+            linea: "#ffeb3b",
+
+            area: "rgba(255,235,59,.17)"
+
+        }
+
+        : {
+
+            estados: [
+
+                "#0b84d4",
+
+                "#1e8a5c",
+
+                "#c04450"
+
+            ],
+
+            texto: "#183e64",
+
+            secundario: "#536b80",
+
+            rejilla: "#dce8f2",
+
+            linea: "#0688da",
+
+            area: "#d6ebfa"
+
+        };
+
+}
+
+function montarCanvas(canvas) {
+
+    const w = Math.max(
+
+        180,
+
+        canvas.parentElement.clientWidth
+
+    );
+
+    const h = 230;
+
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = Math.round(w * dpr);
+
+    canvas.height = Math.round(h * dpr);
 
     const ctx = canvas.getContext("2d");
 
-    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    ctx.clearRect(0,0,w,h);
+    ctx.clearRect(0, 0, w, h);
 
-    return {ctx,w,h};
+    return {ctx, w, h};
 
-  }
+}
 
-  function graficarEstados() {
+function graficarEstados() {
 
-    const c=document.getElementById("graficoEstados"), leyenda=document.getElementById("leyendaEstados");
+    const c = document.getElementById("graficoEstados");
 
-    if(!c || !leyenda) return;
+    const leyenda =
 
-    const {ctx,w,h}=montarCanvas(c);
+        document.getElementById("leyendaEstados");
 
-    const tema=temaGrafico();
+    if (!c || !leyenda) {
+
+        return;
+
+    }
+
+    const {ctx, w, h} = montarCanvas(c);
+
+    const tema = temaGrafico();
 
     leyenda.replaceChildren();
 
-    const datos=Array.isArray(estadosData)?estadosData:[];
+    const datos = Array.isArray(estadosData)
 
-    const total=datos.reduce((s,d)=>s+Math.max(0,Number(d.cantidad)||0),0);
+        ? estadosData
 
-    if(!total) {
+        : [];
 
-      ctx.fillStyle=tema.secundario;ctx.font="14px system-ui";ctx.textAlign="center";
+    const total = datos.reduce(
 
-      ctx.fillText("Sin reportes para este período",w/2,h/2);
+        (s, d) => s + Math.max(
 
-      return;
+            0,
 
-    }
+            Number(d.cantidad) || 0
 
-    const cx=w/2,cy=110,r=Math.min(90,w*.27),grosor=Math.max(18,r*.32);
+        ),
 
-    let a=-Math.PI/2;
+        0
 
-    datos.forEach((d,i)=>{
+    );
 
-      const n=Math.max(0,Number(d.cantidad)||0);
+    if (!total) {
 
-      if(!n) return;
+        ctx.fillStyle = tema.secundario;
 
-      const sig=a+2*Math.PI*n/total;
+        ctx.font = "14px system-ui";
 
-      ctx.beginPath();ctx.arc(cx,cy,r,a,sig);
+        ctx.textAlign = "center";
 
-      ctx.strokeStyle=tema.estados[i%tema.estados.length];ctx.lineWidth=grosor;
+        ctx.fillText(
 
-      ctx.stroke();a=sig;
+            "Sin reportes para este período",
 
-    });
+            w / 2,
 
-    ctx.fillStyle=tema.texto;ctx.font="bold 27px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
+            h / 2
 
-    ctx.fillText(total,cx,cy-8);
+        );
 
-    ctx.fillStyle=tema.secundario;ctx.font="11px system-ui";ctx.fillText("REPORTES",cx,cy+16);
-
-    datos.forEach((d,i)=>{
-
-      const item=document.createElement("span");item.className="legend-item";
-
-      const dot=document.createElement("span");dot.className="legend-dot";dot.style.background=tema.estados[i%tema.estados.length];
-
-      const txt=document.createElement("span");txt.textContent=`${d.etiqueta}: ${(Math.max(0,Number(d.cantidad)||0)*100/total).toFixed(1)}%`;
-
-      item.append(dot,txt);leyenda.append(item);
-
-    });
-
-  }
-
-  function graficarEvolucion() {
-
-    const c=document.getElementById("graficoEvolucion"),vacio=document.getElementById("sinEvolucion");
-
-    if(!c) return;
-
-    const datos=Array.isArray(evolucionData)?evolucionData:[];
-
-    c.hidden=datos.length===0;
-
-    if(vacio) vacio.hidden=datos.length!==0;
-
-    if(!datos.length)return;
-
-    const {ctx,w,h}=montarCanvas(c);
-
-    const tema=temaGrafico();
-
-    const left=35,right=12,top=18,bottom=51;
-
-    const pw=w-left-right,ph=h-top-bottom;
-
-    const max=Math.max(1,...datos.map(d=>Math.max(0,Number(d.cantidad)||0)));
-
-    const maxAxis=Math.ceil(max/4)*4;
-
-    ctx.font="10px system-ui";ctx.fillStyle=tema.secundario;ctx.textAlign="right";
-
-    for(let i=0;i<=4;i++){
-
-      const y=top+ph*i/4;
-
-      ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);
-
-      ctx.strokeStyle=tema.rejilla;ctx.lineWidth=1;ctx.stroke();
-
-      ctx.fillText(String(maxAxis*(4-i)/4),left-7,y+3);
+        return;
 
     }
 
-    const points=datos.map((d,i)=>({
+    const cx = w / 2;
 
-      x:left+pw*(datos.length===1?.5:i/(datos.length-1)),
+    const cy = 110;
 
-      y:top+ph*(1-(Math.max(0,Number(d.cantidad)||0)/maxAxis)),
+    const r = Math.min(90, w * .27);
 
-      n:Math.max(0,Number(d.cantidad)||0),
+    const grosor = Math.max(18, r * .32);
 
-      name:String(d.etiqueta||"")
+    let a = -Math.PI / 2;
+
+    datos.forEach((d, i) => {
+
+        const n = Math.max(
+
+            0,
+
+            Number(d.cantidad) || 0
+
+        );
+
+        if (!n) {
+
+            return;
+
+        }
+
+        const sig = a + 2 * Math.PI * n / total;
+
+        ctx.beginPath();
+
+        ctx.arc(cx, cy, r, a, sig);
+
+        ctx.strokeStyle =
+
+            tema.estados[i % tema.estados.length];
+
+        ctx.lineWidth = grosor;
+
+        ctx.stroke();
+
+        a = sig;
+
+    });
+
+    ctx.fillStyle = tema.texto;
+
+    ctx.font = "bold 27px system-ui";
+
+    ctx.textAlign = "center";
+
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(total, cx, cy - 8);
+
+    ctx.fillStyle = tema.secundario;
+
+    ctx.font = "11px system-ui";
+
+    ctx.fillText("REPORTES", cx, cy + 16);
+
+    datos.forEach((d, i) => {
+
+        const item = document.createElement("span");
+
+        item.className = "legend-item";
+
+        const dot = document.createElement("span");
+
+        dot.className = "legend-dot";
+
+        dot.style.background =
+
+            tema.estados[i % tema.estados.length];
+
+        const txt = document.createElement("span");
+
+        const porcentaje =
+
+            Math.max(0, Number(d.cantidad) || 0)
+
+            * 100 / total;
+
+        txt.textContent =
+
+            `${d.etiqueta}: ${porcentaje.toFixed(1)}%`;
+
+        item.append(dot, txt);
+
+        leyenda.append(item);
+
+    });
+
+}
+
+function graficarEvolucion() {
+
+    const c = document.getElementById(
+
+        "graficoEvolucion"
+
+    );
+
+    const vacio = document.getElementById(
+
+        "sinEvolucion"
+
+    );
+
+    if (!c) {
+
+        return;
+
+    }
+
+    const datos = Array.isArray(evolucionData)
+
+        ? evolucionData
+
+        : [];
+
+    c.hidden = datos.length === 0;
+
+    if (vacio) {
+
+        vacio.hidden = datos.length !== 0;
+
+    }
+
+    if (!datos.length) {
+
+        return;
+
+    }
+
+    const {ctx, w, h} = montarCanvas(c);
+
+    const tema = temaGrafico();
+
+    const left = 35;
+
+    const right = 12;
+
+    const top = 18;
+
+    const bottom = 51;
+
+    const pw = w - left - right;
+
+    const ph = h - top - bottom;
+
+    const max = Math.max(
+
+        1,
+
+        ...datos.map(d =>
+
+            Math.max(0, Number(d.cantidad) || 0)
+
+        )
+
+    );
+
+    const maxAxis = Math.ceil(max / 4) * 4;
+
+    ctx.font = "10px system-ui";
+
+    ctx.fillStyle = tema.secundario;
+
+    ctx.textAlign = "right";
+
+    for (let i = 0; i <= 4; i++) {
+
+        const y = top + ph * i / 4;
+
+        ctx.beginPath();
+
+        ctx.moveTo(left, y);
+
+        ctx.lineTo(w - right, y);
+
+        ctx.strokeStyle = tema.rejilla;
+
+        ctx.lineWidth = 1;
+
+        ctx.stroke();
+
+        ctx.fillText(
+
+            String(maxAxis * (4 - i) / 4),
+
+            left - 7,
+
+            y + 3
+
+        );
+
+    }
+
+    const points = datos.map((d, i) => ({
+
+        x: left + pw * (
+
+            datos.length === 1
+
+                ? .5
+
+                : i / (datos.length - 1)
+
+        ),
+
+        y: top + ph * (
+
+            1 - (
+
+                Math.max(
+
+                    0,
+
+                    Number(d.cantidad) || 0
+
+                ) / maxAxis
+
+            )
+
+        ),
+
+        n: Math.max(
+
+            0,
+
+            Number(d.cantidad) || 0
+
+        ),
+
+        name: String(d.etiqueta || "")
 
     }));
 
     ctx.beginPath();
 
-    points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    points.forEach((p, i) => {
 
-    ctx.lineTo(points.at(-1).x,top+ph);ctx.lineTo(points[0].x,top+ph);ctx.closePath();
+        if (i) {
 
-    ctx.fillStyle=tema.area;ctx.fill();
+            ctx.lineTo(p.x, p.y);
 
-    ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+        } else {
 
-    ctx.strokeStyle=tema.linea;ctx.lineWidth=2.5;ctx.stroke();
+            ctx.moveTo(p.x, p.y);
 
-    points.forEach(p=>{
-
-      ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fillStyle=tema.linea;ctx.fill();
-
-      ctx.fillStyle=tema.texto;ctx.font="bold 10px system-ui";ctx.textAlign="center";
-
-      ctx.fillText(String(p.n),p.x,Math.max(11,p.y-10));
-
-      ctx.fillStyle=tema.secundario;ctx.font="9px system-ui";
-
-      let label=p.name.replace(/\s+\d{4}$/,"");
-
-      ctx.fillText(label,p.x,h-22);
+        }
 
     });
 
-  }
+    ctx.lineTo(points.at(-1).x, top + ph);
 
-  function graficarBarras() {
+    ctx.lineTo(points[0].x, top + ph);
 
-    const rows=[...document.querySelectorAll(".bar-row")];
+    ctx.closePath();
 
-    const max=Math.max(1,...rows.map(r=>Number(r.dataset.cantidad)||0));
+    ctx.fillStyle = tema.area;
 
-    rows.forEach(r=>{
+    ctx.fill();
 
-      const n=Math.max(0,Number(r.dataset.cantidad)||0);
+    ctx.beginPath();
 
-      const fill=r.querySelector(".bar-fill");
+    points.forEach((p, i) => {
 
-      if(fill)fill.style.width=(n/max*100)+"%";
+        if (i) {
+
+            ctx.lineTo(p.x, p.y);
+
+        } else {
+
+            ctx.moveTo(p.x, p.y);
+
+        }
 
     });
 
-  }
+    ctx.strokeStyle = tema.linea;
 
-  function actualizar() { graficarBarras();graficarEstados();graficarEvolucion(); }
+    ctx.lineWidth = 2.5;
 
-  // El contraste lo administra accesibilidad.js. Aquí solo se actualizan los gráficos.
-  const observadorContraste = new MutationObserver(() => actualizar());
-  observadorContraste.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["class"]
-  });
+    ctx.stroke();
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", actualizar);
-  } else {
+    points.forEach(p => {
+
+        ctx.beginPath();
+
+        ctx.arc(
+
+            p.x,
+
+            p.y,
+
+            3.5,
+
+            0,
+
+            Math.PI * 2
+
+        );
+
+        ctx.fillStyle = tema.linea;
+
+        ctx.fill();
+
+        ctx.fillStyle = tema.texto;
+
+        ctx.font = "bold 10px system-ui";
+
+        ctx.textAlign = "center";
+
+        ctx.fillText(
+
+            String(p.n),
+
+            p.x,
+
+            Math.max(11, p.y - 10)
+
+        );
+
+        ctx.fillStyle = tema.secundario;
+
+        ctx.font = "9px system-ui";
+
+        const label = p.name.replace(
+
+            /\s+\d{4}$/,
+
+            ""
+
+        );
+
+        ctx.fillText(
+
+            label,
+
+            p.x,
+
+            h - 22
+
+        );
+
+    });
+
+}
+
+function graficarBarras() {
+
+    const rows = [
+
+        ...document.querySelectorAll(".bar-row")
+
+    ];
+
+    const max = Math.max(
+
+        1,
+
+        ...rows.map(
+
+            r => Number(r.dataset.cantidad) || 0
+
+        )
+
+    );
+
+    rows.forEach(r => {
+
+        const n = Math.max(
+
+            0,
+
+            Number(r.dataset.cantidad) || 0
+
+        );
+
+        const fill = r.querySelector(".bar-fill");
+
+        if (fill) {
+
+            fill.style.width = (n / max * 100) + "%";
+
+        }
+
+    });
+
+}
+
+function actualizar() {
+
+    graficarBarras();
+
+    graficarEstados();
+
+    graficarEvolucion();
+
+}
+
+/* Actualizar gráficos cuando cambia el contraste */
+
+const observadorContraste = new MutationObserver(
+
+    () => actualizar()
+
+);
+
+observadorContraste.observe(
+
+    document.documentElement,
+
+    {
+
+        attributes: true,
+
+        attributeFilter: ["class"]
+
+    }
+
+);
+
+if (document.readyState === "loading") {
+
+    document.addEventListener(
+
+        "DOMContentLoaded",
+
+        actualizar
+
+    );
+
+} else {
+
     actualizar();
-  }
 
-  let resizeId;
+}
 
-  window.addEventListener("resize",()=>{clearTimeout(resizeId);resizeId=setTimeout(actualizar,160);});
+let resizeId;
+
+window.addEventListener("resize", () => {
+
+    clearTimeout(resizeId);
+
+    resizeId = setTimeout(
+
+        actualizar,
+
+        160
+
+    );
+
+});
 
 </script>
 
-<script th:src="@{/js/accesibilidad.js}" defer></script>
+<!-- MAPA PÚBLICO DE CONCENTRACIONES -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script th:src="@{/js/pc8-mapa-transparencia.js}" src="/js/pc8-mapa-transparencia.js" defer></script>
+
+<!-- ACCESIBILIDAD GENERAL -->
+
+<script th:src="@{/js/accesibilidad.js}" src="/js/accesibilidad.js" defer></script>
+<script th:src="@{/js/lectura-accesible.js}" src="/js/lectura-accesible.js" defer></script>
 
 </body>
 

@@ -40,6 +40,8 @@
     const indicadores = [...document.querySelectorAll('[data-indicador]')];
 
     const progreso = document.getElementById('pc8-paso-estado');
+
+
     const botonAnterior = document.getElementById('pc8-anterior');
     const botonSiguiente = document.getElementById('pc8-siguiente');
     const botonEnviar = document.getElementById('pc8-enviar');
@@ -116,6 +118,10 @@
         progreso.textContent =
             `Paso ${numero + 1} de 3: ${nombresPasos[numero]}`;
 
+
+
+
+
         botonAnterior.hidden = numero === 0;
         botonSiguiente.hidden = numero === 2;
         botonEnviar.hidden = numero !== 2;
@@ -156,18 +162,75 @@
     // VALIDACIÓN DE CAMPOS
     // ==========================================
 
-    function comprobarCampo(campo) {
 
-        if (!campo.checkValidity()) {
+	function comprobarCampo(campo) {
 
-            campo.reportValidity();
-            enfocarCampo(campo);
+	    if (!campo || campo.checkValidity()) {
+	        return true;
+	    }
 
-            return false;
-        }
+	    // Buscar el nombre visible del campo.
+	    const etiqueta = campo.labels
+	        ? [...campo.labels]
+	            .map(label => label.textContent.trim())
+	            .filter(Boolean)
+	            .join(' ')
+	        : '';
 
-        return true;
-    }
+	    const nombreCampo =
+	        etiqueta.replace(/\s+/g, ' ').replace(/\*/g, '').trim() ||
+	        campo.getAttribute('aria-label') ||
+	        campo.name ||
+	        'indicado';
+
+	    let detalle = '';
+
+	    if (campo.validity.valueMissing) {
+	        detalle = `Debes completar el campo "${nombreCampo}".`;
+
+	    } else if (campo.validity.tooShort) {
+	        detalle =
+	            `El campo "${nombreCampo}" necesita más caracteres.`;
+
+	    } else if (campo.validity.tooLong) {
+	        detalle =
+	            `El campo "${nombreCampo}" supera la longitud permitida.`;
+
+	    } else if (campo.validity.rangeUnderflow ||
+	               campo.validity.rangeOverflow ||
+	               campo.validity.badInput) {
+	        detalle =
+	            `Introduce un valor válido en "${nombreCampo}".`;
+
+	    } else if (campo.validity.patternMismatch ||
+	               campo.validity.typeMismatch) {
+	        detalle =
+	            `Revisa el formato del campo "${nombreCampo}".`;
+
+	    } else {
+	        detalle =
+	            `Corrige el campo "${nombreCampo}" antes de continuar.`;
+	    }
+
+	    // Utilizamos el mensaje accesible que ya tiene el formulario.
+	    mostrarMensaje(detalle);
+
+	    // Marcar el campo para tecnologías de asistencia.
+	    campo.setAttribute('aria-invalid', 'true');
+
+	    // Abrir automáticamente las coordenadas si están ocultas.
+	    const contenedorCerrado = campo.closest('details');
+
+	    if (contenedorCerrado) {
+	        contenedorCerrado.open = true;
+	    }
+
+	    // Llevar el teclado al campo incorrecto.
+	    enfocarCampo(campo);
+
+	    return false;
+	}
+
 
     function comprobarPaso(numero) {
 
@@ -485,6 +548,30 @@
         false
     );
 
+
+	// ==========================================
+	// EDITAR INFORMACIÓN DESDE EL RESUMEN
+	// ==========================================
+
+	const botonEditarProblema =
+	    document.getElementById('pc8-editar-problema');
+
+	const botonEditarUbicacion =
+	    document.getElementById('pc8-editar-ubicacion');
+
+	if (botonEditarProblema) {
+	    botonEditarProblema.addEventListener('click', () => {
+	        irPaso(0);
+	    });
+	}
+
+	if (botonEditarUbicacion) {
+	    botonEditarUbicacion.addEventListener('click', () => {
+	        irPaso(1);
+	    });
+	}
+
+
     // BOTÓN SIGUIENTE
 
     botonSiguiente.addEventListener('click', () => {
@@ -505,16 +592,17 @@
 
     // ENVIAR REPORTE
 
+
+	// Evita procesar dos veces el envío
+	// dentro de la misma página.
+	let enviandoReporte = false;
+
+
     form.addEventListener('submit', event => {
 
-        if (consultaDuplicadosPendiente) {
-
-            event.preventDefault();
-
-            mostrarMensaje(
-                'Espera a que termine la comprobación ' +
-                'de reportes similares.'
-            );
+		if (enviandoReporte) {
+		event.preventDefault();
+		return;
 
             return;
         }
@@ -574,8 +662,14 @@
             return;
         }
 
+		enviandoReporte = true;
+
         botonEnviar.disabled = true;
         botonEnviar.textContent = 'Enviando reporte…';
+		mostrarMensaje(
+		    'Estamos enviando tu reporte. ' +
+		    'No es necesario pulsar nuevamente.'
+		);
     });
 
     // ==========================================

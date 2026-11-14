@@ -1,1074 +1,633 @@
 
 (() => {
-    'use strict';
+  'use strict';
 
-    // ==========================================
-    // CIUDADCONECTA PC8
-    // LECTOR DE VOZ ACCESIBLE
-    // Compatible con PC, tablets y celulares.
-    // ==========================================
+  // ==========================================
+  // CIUDADCONECTA PC8
+  // LECTOR DE VOZ ACCESIBLE
+  // ==========================================
 
-    const sintetizador =
-        ('speechSynthesis' in window &&
-         'SpeechSynthesisUtterance' in window)
-            ? window.speechSynthesis
-            : null;
+  const sintetizador =
+    ('speechSynthesis' in window &&
+     'SpeechSynthesisUtterance' in window)
+      ? window.speechSynthesis
+      : null;
 
-    let voces = [];
-    let fragmentos = [];
-    let indiceActual = 0;
-    let sesion = 0;
+  const $ = id => document.getElementById(id);
 
-    let leyendo = false;
-    let pausado = false;
+  const selectorBloques =
+    'h1,h2,h3,h4,h5,h6,p,li,td,th,' +
+    'legend,summary,label,button,a';
 
-    // Guarda el último elemento enfocado
-    // dentro del contenido principal.
-    let ultimoElementoEnfocado = null;
+  const selectorExcluir =
+    'nav,header,footer,' +
+    '.pc8-lector,.pc8-a11y-toolbar,' +
+    '[hidden],[inert],[aria-hidden="true"],' +
+    '.d-none,script,style,noscript,template';
 
-    const obtener = id => document.getElementById(id);
+  let voces = [];
+  let fragmentos = [];
+  let indice = 0;
+  let sesion = 0;
 
-    const controles = {
-        leer: obtener('pc8-leer-pagina'),
-        desdeFoco: obtener('pc8-leer-desde-foco'),
-        pausar: obtener('pc8-lectura-pausar'),
-        reanudar: obtener('pc8-lectura-reanudar'),
-        detener: obtener('pc8-lectura-detener'),
-        voz: obtener('pc8-lectura-voz'),
-        velocidad: obtener('pc8-lectura-velocidad'),
-        tono: obtener('pc8-lectura-tono'),
-        velocidadValor: obtener('pc8-velocidad-valor'),
-        tonoValor: obtener('pc8-tono-valor'),
-        estado: obtener('pc8-lectura-estado')
+  let leyendo = false;
+  let pausado = false;
+  let ultimoFoco = null;
+
+  const ui = {};
+
+  // ==========================================
+  // MENSAJES DE ESTADO
+  // ==========================================
+
+  function informar(mensaje) {
+    if (ui.estado) {
+      ui.estado.textContent = mensaje;
+    }
+  }
+
+  // ==========================================
+  // HABILITAR O DESHABILITAR BOTONES
+  // ==========================================
+
+  function actualizarBotones() {
+    if (ui.pausar) {
+      ui.pausar.disabled = !leyendo || pausado;
+    }
+
+    if (ui.reanudar) {
+      ui.reanudar.disabled = !leyendo || !pausado;
+    }
+
+    if (ui.detener) {
+      ui.detener.disabled = !leyendo;
+    }
+  }
+
+  // ==========================================
+  // OBTENER CONTENIDO PRINCIPAL
+  // ==========================================
+
+  function principal() {
+    return $('contenido') ||
+      document.querySelector('main');
+  }
+
+  function normalizar(texto) {
+    return String(texto || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // ==========================================
+  // COMPROBAR VISIBILIDAD
+  // ==========================================
+
+  function visible(elemento) {
+    if (elemento.closest(selectorExcluir)) {
+      return false;
+    }
+
+    let actual = elemento;
+
+    while (actual && actual.nodeType === 1) {
+      const estilo = getComputedStyle(actual);
+
+      if (
+        estilo.display === 'none' ||
+        estilo.visibility === 'hidden'
+      ) {
+        return false;
+      }
+
+      actual = actual.parentElement;
+    }
+
+    return true;
+  }
+
+  // ==========================================
+  // EXTRAER BLOQUES PARA LECTURA
+  // ==========================================
+
+  function obtenerBloques() {
+    const raiz = principal();
+
+    if (!raiz) {
+      return [];
+    }
+
+    return Array.from(
+      raiz.querySelectorAll(selectorBloques)
+    )
+      .filter(elemento => visible(elemento))
+
+      // Evitar leer dos veces el texto de
+      // bloques que contienen otros bloques.
+      .filter(elemento => {
+        const padre =
+          elemento.parentElement?.closest(
+            selectorBloques
+          );
+
+        return !padre || !raiz.contains(padre);
+      })
+
+      .map(elemento => ({
+        elemento,
+        texto: normalizar(
+          elemento.innerText ||
+          elemento.textContent
+        )
+      }))
+
+      .filter(bloque => bloque.texto.length > 0);
+  }
+
+  // ==========================================
+  // DIVIDIR EL TEXTO
+  // ==========================================
+
+  function dividir(texto, limite = 180) {
+    const resultado = [];
+    let parte = '';
+
+    for (const palabra of texto.split(/\s+/)) {
+      if (
+        parte &&
+        parte.length + palabra.length + 1 > limite
+      ) {
+        resultado.push(parte);
+        parte = '';
+      }
+
+      parte += (parte ? ' ' : '') + palabra;
+    }
+
+    if (parte) {
+      resultado.push(parte);
+    }
+
+    return resultado;
+  }
+
+  // ==========================================
+  // DETENER LECTURA
+  // ==========================================
+
+  function detener(mensaje = 'Lectura detenida.') {
+    sesion++;
+
+    if (sintetizador) {
+      sintetizador.cancel();
+    }
+
+    leyendo = false;
+    pausado = false;
+
+    fragmentos = [];
+    indice = 0;
+
+    actualizarBotones();
+    informar(mensaje);
+  }
+
+  // ==========================================
+  // SELECCIONAR VOZ
+  // ==========================================
+
+  function vozElegida() {
+    if (ui.voz && ui.voz.value !== '') {
+      return voces[Number(ui.voz.value)] || null;
+    }
+
+    return voces.find(voz =>
+      (voz.lang || '')
+        .toLowerCase()
+        .startsWith('es')
+    ) || null;
+  }
+
+  // ==========================================
+  // LEER SIGUIENTE FRAGMENTO
+  // ==========================================
+
+  function siguiente(token) {
+    if (
+      !sintetizador ||
+      token !== sesion ||
+      !leyendo ||
+      pausado
+    ) {
+      return;
+    }
+
+    if (indice >= fragmentos.length) {
+      leyendo = false;
+      actualizarBotones();
+      informar('Lectura finalizada.');
+      return;
+    }
+
+    const mensaje = new SpeechSynthesisUtterance(
+      fragmentos[indice]
+    );
+
+    const voz = vozElegida();
+
+    if (voz) {
+      mensaje.voice = voz;
+    }
+
+    mensaje.lang = voz ? voz.lang : 'es-PE';
+
+    mensaje.rate = ui.velocidad
+      ? Number(ui.velocidad.value)
+      : 1;
+
+    mensaje.pitch = ui.tono
+      ? Number(ui.tono.value)
+      : 1;
+
+    mensaje.onend = () => {
+      if (token !== sesion) {
+        return;
+      }
+
+      indice++;
+      siguiente(token);
     };
 
-    // ==========================================
-    // MENSAJES DEL LECTOR
-    // ==========================================
+    mensaje.onerror = evento => {
+      if (token !== sesion) {
+        return;
+      }
 
-    function informar(mensaje) {
+      if (
+        evento.error === 'canceled' ||
+        evento.error === 'interrupted'
+      ) {
+        return;
+      }
 
-        if (controles.estado) {
-            controles.estado.textContent = mensaje;
-        }
+      detener(
+        'No se pudo continuar la lectura en este navegador.'
+      );
+    };
 
+    sintetizador.speak(mensaje);
+  }
+
+  // ==========================================
+  // INICIAR LECTURA
+  // ==========================================
+
+  function iniciarDesde(bloques, desde) {
+    if (!sintetizador) {
+      informar(
+        'Este navegador no admite lectura por voz.'
+      );
+      return;
     }
 
-    // ==========================================
-    // ACTUALIZAR CONTROLES
-    // ==========================================
+    const texto = bloques
+      .slice(desde)
+      .map(bloque => bloque.texto)
+      .join('. ');
 
-    function actualizarControles() {
-
-        if (controles.pausar) {
-            controles.pausar.disabled =
-                !leyendo || pausado;
-        }
-
-        if (controles.reanudar) {
-            controles.reanudar.disabled =
-                !leyendo || !pausado;
-        }
-
-        if (controles.detener) {
-            controles.detener.disabled =
-                !leyendo;
-        }
-
+    if (!texto.trim()) {
+      informar(
+        'No se encontró texto visible para leer.'
+      );
+      return;
     }
 
-    // ==========================================
-    // OBTENER CONTENIDO PRINCIPAL
-    // ==========================================
+    detener('');
 
-    function obtenerContenido() {
+    fragmentos = dividir(texto);
+    indice = 0;
 
-        return document.querySelector('#contenido')
-            || document.querySelector('main')
-            || document.body;
+    leyendo = true;
+    pausado = false;
 
+    actualizarBotones();
+    informar('Lectura iniciada.');
+
+    siguiente(sesion);
+  }
+
+  // ==========================================
+  // LEER PÁGINA
+  // ==========================================
+
+  function leerPagina() {
+    iniciarDesde(obtenerBloques(), 0);
+  }
+
+  // ==========================================
+  // LEER DESDE EL FOCO
+  // ==========================================
+
+  function leerDesdeFoco() {
+    const bloques = obtenerBloques();
+    const raiz = principal();
+
+    const foco = document.activeElement;
+
+    const referencia =
+      foco && raiz && raiz.contains(foco)
+        ? foco
+        : ultimoFoco;
+
+    if (
+      !referencia ||
+      !raiz ||
+      !raiz.contains(referencia)
+    ) {
+      informar(
+        'Sin posición identificada. Lectura desde el inicio.'
+      );
+
+      iniciarDesde(bloques, 0);
+      return;
     }
 
-    // ==========================================
-    // LIMPIAR TEXTO
-    // ==========================================
+    const posicion = bloques.findIndex(
+      ({ elemento }) =>
+        elemento === referencia ||
+        elemento.contains(referencia) ||
+        Boolean(
+          referencia.compareDocumentPosition(
+            elemento
+          ) & Node.DOCUMENT_POSITION_FOLLOWING
+        )
+    );
 
-    function limpiarTexto(texto) {
+    iniciarDesde(
+      bloques,
+      posicion >= 0 ? posicion : 0
+    );
+  }
 
-        return String(texto || '')
-            .replace(/\s+/g, ' ')
-            .replace(/\u00a0/g, ' ')
-            .trim();
+  // ==========================================
+  // CARGAR VOCES DISPONIBLES
+  // ==========================================
 
+  function cargarVoces() {
+    if (!sintetizador || !ui.voz) {
+      return;
     }
 
-    // ==========================================
-    // CONSTRUIR TEXTO PARA LA LECTURA
-    // ==========================================
+    const disponibles = sintetizador.getVoices();
 
-    function construirTexto() {
+    if (!disponibles.length) {
+      voces = [];
+      informar('No se detectaron voces. Comprueba la configuración de voz del navegador o del sistema.');
+      return;
+    }
 
-        const original = obtenerContenido();
+    informar('Voces detectadas. Puedes iniciar la lectura.');
 
-        // Trabajar sobre una copia para no modificar
-        // el contenido ni los elementos originales.
+    const anterior = ui.voz.value;
 
-        const copia = original.cloneNode(true);
+    voces = disponibles;
 
-        // Obtener formularios originales y sus copias.
+    ui.voz.replaceChildren(
+      new Option('Automática (español)', '')
+    );
 
-        const originales = Array.from(
-            original.querySelectorAll(
-                'input, textarea, select'
-            )
+    voces
+      .map((voz, indice) => ({ voz, indice }))
+
+      .sort((a, b) =>
+        Number(
+          (b.voz.lang || '')
+            .toLowerCase()
+            .startsWith('es')
+        ) -
+        Number(
+          (a.voz.lang || '')
+            .toLowerCase()
+            .startsWith('es')
+        )
+      )
+
+      .forEach(({ voz, indice }) => {
+        ui.voz.add(
+          new Option(
+            `${voz.name} (${voz.lang})`,
+            String(indice)
+          )
         );
+      });
 
-        const copias = Array.from(
-            copia.querySelectorAll(
-                'input, textarea, select'
-            )
-        );
+    ui.voz.value =
+      anterior !== '' && voces[Number(anterior)]
+        ? anterior
+        : '';
+  }
 
-        // ======================================
-        // FORMULARIOS
-        // ======================================
+  // ==========================================
+  // INICIALIZAR CONTROLES
+  // ==========================================
 
-        copias.forEach((campo, i) => {
+  function inicializar() {
+    Object.assign(ui, {
+      leer: $('pc8-leer-pagina'),
 
-            const originalCampo = originales[i];
+      desdeFoco: $('pc8-leer-desde-foco'),
 
-            if (!originalCampo) return;
+      pausar: $('pc8-lectura-pausar'),
 
-            const tipo = (
-                originalCampo.type || ''
-            ).toLowerCase();
+      reanudar: $('pc8-lectura-reanudar'),
 
-            let valor = '';
+      detener: $('pc8-lectura-detener'),
 
-            // Campos ocultos.
+      voz: $('pc8-lectura-voz'),
 
-            if (tipo === 'hidden') {
+      velocidad: $('pc8-lectura-velocidad'),
 
-                campo.remove();
-                return;
+      tono: $('pc8-lectura-tono'),
 
-            }
+      velocidadValor: $('pc8-velocidad-valor'),
 
-            // Contraseñas: proteger información privada.
+      tonoValor: $('pc8-tono-valor'),
 
-            if (tipo === 'password') {
+      estado: $('pc8-lectura-estado')
+    });
 
-                valor =
-                    'Campo de contraseña. Por privacidad, no se lee su contenido.';
-
-            }
-
-            // Casillas y opciones.
-
-            else if (
-                tipo === 'checkbox' ||
-                tipo === 'radio'
-            ) {
-
-                valor = originalCampo.checked
-                    ? 'Seleccionado'
-                    : 'No seleccionado';
-
-            }
-
-            // Archivos adjuntos.
-
-            else if (tipo === 'file') {
-
-                valor =
-                    originalCampo.files &&
-                    originalCampo.files.length > 0
-                        ? 'Archivo adjunto seleccionado'
-                        : 'Sin archivo seleccionado';
-
-            }
-
-            // Listas desplegables.
-
-            else if (campo.tagName === 'SELECT') {
-
-                valor =
-                    originalCampo.selectedOptions.length
-                        ? originalCampo.selectedOptions[0].textContent
-                        : 'Sin selección';
-
-            }
-
-            // Botones de formulario.
-
-            else if (
-                tipo === 'submit' ||
-                tipo === 'button' ||
-                tipo === 'reset' ||
-                tipo === 'image'
-            ) {
-
-                valor =
-                    originalCampo.value ||
-                    originalCampo.getAttribute('aria-label') ||
-                    'Botón';
-
-            }
-
-            // Campos normales.
-
-            else {
-
-                valor =
-                    originalCampo.value || 'Sin completar';
-
-            }
-
-            // Obtener etiqueta del campo.
-
-            const etiqueta =
-                originalCampo.getAttribute('aria-label') ||
-                originalCampo.name ||
-                '';
-
-            const tieneEtiqueta =
-                originalCampo.labels &&
-                originalCampo.labels.length > 0;
-
-            campo.replaceWith(
-                document.createTextNode(
-                    etiqueta && !tieneEtiqueta
-                        ? etiqueta + ': ' + valor
-                        : valor
-                )
-            );
-
-        });
-
-        // ======================================
-        // MAPA LEAFLET
-        // ======================================
-        // No leer los elementos internos del mapa.
-        // El mapa original permanece intacto.
-
-        copia.querySelectorAll(
-            '.leaflet-container'
-        ).forEach(mapa => {
-
-            const descripcion =
-                mapa.getAttribute('aria-label') ||
-                mapa.getAttribute('title');
-
-            const texto = document.createElement('p');
-
-            texto.textContent = descripcion
-                ? 'Mapa interactivo: ' + descripcion
-                : 'Mapa interactivo. Puedes utilizar los controles del mapa para explorar la ubicación del reporte.';
-
-            mapa.replaceWith(texto);
-
-        });
-
-        // ======================================
-        // IMÁGENES
-        // ======================================
-
-        copia.querySelectorAll('img').forEach(imagen => {
-
-            const alt = imagen.getAttribute('alt');
-
-            if (alt && alt.trim()) {
-
-                imagen.replaceWith(
-                    document.createTextNode(
-                        'Imagen: ' + alt
-                    )
-                );
-
-            } else {
-
-                imagen.remove();
-
-            }
-
-        });
-
-        // ======================================
-        // ELEMENTOS QUE NO DEBEN LEERSE
-        // ======================================
-
-        copia.querySelectorAll(
-            'script, style, noscript, template,' +
-            'nav, header, footer,' +
-            '.pc8-lector,' +
-            '.pc8-a11y-toolbar,' +
-            '.pc8-footer,' +
-            '.pc8-skip-link,' +
-            '[hidden], [aria-hidden="true"],' +
-            '[inert], .d-none'
-        ).forEach(elemento => {
-
-            elemento.remove();
-
-        });
-
-        // ======================================
-        // EXTRAER TEXTO
-        // ======================================
-
-        const texto =
-            copia.innerText || copia.textContent;
-
-        return limpiarTexto(texto);
-
+    if (!ui.leer) {
+      return;
     }
 
-    // ==========================================
-    // DIVIDIR TEXTO EN FRAGMENTOS
-    // ==========================================
-    // Evita problemas al leer textos extensos.
+    // Comprobar compatibilidad.
 
-    function dividirTexto(texto, limite = 200) {
-
-        const oraciones =
-            texto.match(/[^.!?]+[.!?]?/g) || [texto];
-
-        const resultado = [];
-
-        let actual = '';
-
-        oraciones.forEach(oracion => {
-
-            oracion = oracion.trim();
-
-            if (!oracion) return;
-
-            // Dividir oraciones demasiado largas.
-
-            if (oracion.length > limite) {
-
-                if (actual) {
-                    resultado.push(actual);
-                    actual = '';
-                }
-
-                const palabras = oracion.split(/\s+/);
-
-                let fragmento = '';
-
-                palabras.forEach(palabra => {
-
-                    if (
-                        fragmento.length +
-                        palabra.length + 1 > limite
-                    ) {
-
-                        if (fragmento) {
-                            resultado.push(fragmento);
-                        }
-
-                        fragmento = palabra;
-
-                    } else {
-
-                        fragmento +=
-                            (fragmento ? ' ' : '') + palabra;
-
-                    }
-
-                });
-
-                if (fragmento) {
-                    resultado.push(fragmento);
-                }
-
-                return;
-
-            }
-
-            // Agrupar oraciones.
-
-            if (
-                actual.length +
-                oracion.length + 1 > limite
-            ) {
-
-                if (actual) {
-                    resultado.push(actual);
-                }
-
-                actual = oracion;
-
-            } else {
-
-                actual +=
-                    (actual ? ' ' : '') + oracion;
-
-            }
-
-        });
-
-        if (actual) {
-            resultado.push(actual);
+    if (!sintetizador) {
+      [
+        ui.leer,
+        ui.desdeFoco,
+        ui.pausar,
+        ui.reanudar,
+        ui.detener,
+        ui.voz,
+        ui.velocidad,
+        ui.tono
+      ].forEach(control => {
+        if (control) {
+          control.disabled = true;
         }
+      });
 
-        return resultado;
+      informar(
+        'La lectura por voz no está disponible en este navegador.'
+      );
 
+      return;
     }
 
-    // ==========================================
-    // CARGAR VOCES DISPONIBLES
-    // ==========================================
-
-    function cargarVoces() {
-
-        if (!sintetizador || !controles.voz) return;
-
-        const disponibles = sintetizador.getVoices();
-
-        if (!disponibles.length) return;
-
-        voces = disponibles;
-
-        const seleccionAnterior = controles.voz.value;
-
-        controles.voz.innerHTML = '';
-
-        // Voz automática.
-
-        const automatico = document.createElement('option');
-
-        automatico.value = '';
-
-        automatico.textContent =
-            'Automática (español)';
-
-        controles.voz.appendChild(automatico);
-
-        // Ordenar voces en español primero.
-
-        const ordenadas = voces
-            .map((voz, indice) => ({
-                voz,
-                indice
-            }))
-            .sort((a, b) => {
-
-                const esA =
-                    (a.voz.lang || '').toLowerCase().startsWith('es');
-
-                const esB =
-                    (b.voz.lang || '').toLowerCase().startsWith('es');
-
-                return Number(esB) - Number(esA);
-
-            });
-
-        ordenadas.forEach(item => {
-
-            const opcion = document.createElement('option');
-
-            opcion.value = String(item.indice);
-
-            opcion.textContent =
-                item.voz.name + ' (' + item.voz.lang + ')';
-
-            controles.voz.appendChild(opcion);
-
-        });
-
-        // Conservar selección anterior.
-
-        if (
-            seleccionAnterior !== '' &&
-            voces[Number(seleccionAnterior)]
-        ) {
-
-            controles.voz.value = seleccionAnterior;
-
-        } else {
-
-            controles.voz.value = '';
-
-        }
-
-    }
-
-    // ==========================================
-    // SELECCIONAR VOZ
-    // ==========================================
-
-    function obtenerVoz() {
-
-        if (!voces.length) return null;
-
-        const seleccion = controles.voz
-            ? controles.voz.value
-            : '';
-
-        if (seleccion !== '') {
-
-            return voces[Number(seleccion)] || null;
-
-        }
-
-        // Buscar voz en español automáticamente.
-
-        return voces.find(voz =>
-            (voz.lang || '').toLowerCase().startsWith('es')
-        ) || null;
-
-    }
-
-    // ==========================================
-    // LEER SIGUIENTE FRAGMENTO
-    // ==========================================
-
-    function leerFragmento(numeroSesion) {
-
-        if (
-            numeroSesion !== sesion ||
-            !leyendo ||
-            pausado
-        ) {
-            return;
-        }
-
-        // Comprobar si terminó la lectura.
-
-        if (indiceActual >= fragmentos.length) {
-
-            leyendo = false;
-            pausado = false;
-
-            actualizarControles();
-
-            informar('Lectura finalizada.');
-
-            return;
-
-        }
-
-        const texto = fragmentos[indiceActual];
-
-        const voz = obtenerVoz();
-
-        const mensaje =
-            new SpeechSynthesisUtterance(texto);
-
-        mensaje.lang = voz
-            ? voz.lang
-            : 'es-ES';
-
-        if (voz) {
-            mensaje.voice = voz;
-        }
-
-        // Velocidad.
-
-        mensaje.rate = controles.velocidad
-            ? Number(controles.velocidad.value)
-            : 1;
-
-        // Tono.
-
-        mensaje.pitch = controles.tono
-            ? Number(controles.tono.value)
-            : 1;
-
-        // Al terminar un fragmento.
-
-        mensaje.onend = () => {
-
-            if (numeroSesion !== sesion) return;
-
-            indiceActual++;
-
-            window.setTimeout(() => {
-
-                leerFragmento(numeroSesion);
-
-            }, 60);
-
-        };
-
-        // Manejo de errores.
-
-        mensaje.onerror = evento => {
-
-            if (numeroSesion !== sesion) return;
-
-            leyendo = false;
-            pausado = false;
-
-            actualizarControles();
-
-            if (
-                evento.error === 'canceled' ||
-                evento.error === 'interrupted'
-            ) {
-                informar('La lectura fue interrumpida.');
-                return;
-            }
-
-            informar(
-                'No se pudo continuar la lectura. Inténtalo nuevamente.'
-            );
-
-        };
-
-        sintetizador.speak(mensaje);
-
-    }
-
-    // ==========================================
-    // INICIAR LECTURA
-    // ==========================================
-
-    function iniciarLectura(texto) {
-
-        if (!sintetizador) {
-
-            informar(
-                'Tu navegador no admite la lectura por voz.'
-            );
-
-            return;
-
-        }
-
-        texto = limpiarTexto(texto);
-
-        if (!texto) {
-
-            informar(
-                'No se encontró contenido para leer.'
-            );
-
-            return;
-
-        }
-
-        // Cancelar lectura anterior.
-
-        sesion++;
-
-        sintetizador.cancel();
-
-        indiceActual = 0;
-
-        fragmentos = dividirTexto(texto);
-
-        leyendo = true;
-
-        pausado = false;
-
-        actualizarControles();
-
-        informar('Iniciando lectura del contenido.');
-
-        leerFragmento(sesion);
-
-    }
-
-    // ==========================================
-    // LEER PÁGINA COMPLETA
-    // ==========================================
-
-    function leerPagina() {
-
-        const texto = construirTexto();
-
-        iniciarLectura(texto);
-
-    }
-
-    // ==========================================
-    // LEER DESDE EL ELEMENTO ENFOCADO
-    // ==========================================
-
-    function leerDesdeFoco() {
-
-        const textoCompleto = construirTexto();
-
-        const principal = obtenerContenido();
-
-        const elementoActivo = document.activeElement;
-
-        // Si el foco está en el botón del lector,
-        // utilizar el último elemento enfocado
-        // dentro del contenido principal.
-
-        const activo =
-            elementoActivo instanceof Element &&
-            principal.contains(elementoActivo) &&
-            !elementoActivo.closest(
-                '.pc8-lector, .pc8-a11y-toolbar'
-            )
-                ? elementoActivo
-                : ultimoElementoEnfocado;
-
-        // Comprobar posición.
-
-        if (
-            !activo ||
-            !principal.contains(activo)
-        ) {
-
-            informar(
-                'No se identificó una posición dentro del contenido principal. Se iniciará desde el principio.'
-            );
-
-            iniciarLectura(textoCompleto);
-
-            return;
-
-        }
-
-        // Identificar el bloque de contenido.
-
-        const bloque = activo.closest(
-            'h1, h2, h3, h4, h5, h6,' +
-            'p, li, a, button, label,' +
-            'td, th, legend, summary,' +
-            'input, textarea, select'
-        );
-
-        const referencia = bloque || activo;
-
-        let textoReferencia = '';
-
-        // Campos de formulario.
-
-        if (
-            referencia.matches(
-                'input, textarea, select'
-            )
-        ) {
-
-            const etiqueta =
-                referencia.labels &&
-                referencia.labels.length
-                    ? referencia.labels[0].textContent
-                    : referencia.getAttribute('aria-label');
-
-            textoReferencia =
-                etiqueta || referencia.name || '';
-
-        }
-
-        // Otros elementos.
-
-        else {
-
-            textoReferencia =
-                referencia.innerText ||
-                referencia.textContent ||
-                referencia.getAttribute('aria-label') ||
-                '';
-
-        }
-
-        textoReferencia = limpiarTexto(textoReferencia);
-
-        // Buscar la posición del elemento en el texto.
-
-        const posicion = textoReferencia
-            ? textoCompleto.toLowerCase().indexOf(
-                textoReferencia.toLowerCase()
-            )
-            : -1;
-
-        if (posicion >= 0) {
-
-            iniciarLectura(
-                textoCompleto.substring(posicion)
-            );
-
-        } else {
-
-            informar(
-                'No se pudo identificar la posición actual. Se leerá desde el principio.'
-            );
-
-            iniciarLectura(textoCompleto);
-
-        }
-
-    }
-
-    // ==========================================
-    // PAUSAR
-    // ==========================================
-
-    function pausarLectura() {
-
-        if (!sintetizador || !leyendo || pausado) return;
-
-        sintetizador.pause();
-
-        pausado = true;
-
-        actualizarControles();
-
-        informar('Lectura pausada.');
-
-    }
-
-    // ==========================================
-    // REANUDAR
-    // ==========================================
-
-    function reanudarLectura() {
-
-        if (!sintetizador || !leyendo || !pausado) return;
-
-        sintetizador.resume();
-
-        pausado = false;
-
-        actualizarControles();
-
-        informar('Continuando lectura.');
-
-    }
-
-    // ==========================================
-    // DETENER
-    // ==========================================
-
-    function detenerLectura() {
-
-        if (sintetizador) {
-
-            sesion++;
-
-            sintetizador.cancel();
-
-        }
-
-        leyendo = false;
-
-        pausado = false;
-
-        fragmentos = [];
-
-        indiceActual = 0;
-
-        actualizarControles();
-
-        informar('Lectura detenida.');
-
-    }
-
-    // ==========================================
-    // CONFIGURAR VELOCIDAD
-    // ==========================================
-
-    function actualizarVelocidad() {
-
-        if (!controles.velocidad) return;
-
-        const valor = Number(
-            controles.velocidad.value
-        );
-
-        if (controles.velocidadValor) {
-
-            controles.velocidadValor.textContent =
-                valor.toFixed(1) + '×';
-
-        }
-
-    }
-
-    // ==========================================
-    // CONFIGURAR TONO
-    // ==========================================
-
-    function actualizarTono() {
-
-        if (!controles.tono) return;
-
-        const valor = Number(
-            controles.tono.value
-        );
-
-        if (controles.tonoValor) {
-
-            controles.tonoValor.textContent =
-                valor.toFixed(1);
-
-        }
-
-    }
-
-    // ==========================================
+    // ======================================
     // RECORDAR ÚLTIMO ELEMENTO ENFOCADO
-    // ==========================================
+    // ======================================
 
-    function registrarElementoEnfocado(evento) {
-
-        const elemento = evento.target;
-
-        if (!(elemento instanceof Element)) return;
-
-        // Ignorar los controles del lector
-        // y la barra de accesibilidad.
-
+    document.addEventListener(
+      'focusin',
+      evento => {
         if (
-            elemento.closest(
-                '.pc8-lector, .pc8-a11y-toolbar,' +
-                'nav, header, footer'
-            )
+          principal()?.contains(evento.target) &&
+          !evento.target.closest(
+            '.pc8-lector,.pc8-a11y-toolbar'
+          )
         ) {
-            return;
+          ultimoFoco = evento.target;
         }
+      }
+    );
 
-        const principal = obtenerContenido();
+    // ======================================
+    // BOTONES DE LECTURA
+    // ======================================
 
-        if (principal.contains(elemento)) {
+    ui.leer.addEventListener(
+      'click',
+      leerPagina
+    );
 
-            ultimoElementoEnfocado = elemento;
+    ui.desdeFoco?.addEventListener(
+      'click',
+      leerDesdeFoco
+    );
 
+    // ======================================
+    // PAUSAR
+    // ======================================
+
+    ui.pausar?.addEventListener('click', () => {
+      if (!leyendo || pausado) {
+        return;
+      }
+
+      sintetizador.pause();
+      pausado = true;
+
+      actualizarBotones();
+      informar('Lectura pausada.');
+    });
+
+    // ======================================
+    // REANUDAR
+    // ======================================
+
+    ui.reanudar?.addEventListener('click', () => {
+      if (!leyendo || !pausado) {
+        return;
+      }
+
+      pausado = false;
+      sintetizador.resume();
+
+      actualizarBotones();
+      informar('Lectura reanudada.');
+    });
+
+    // ======================================
+    // DETENER
+    // ======================================
+
+    ui.detener?.addEventListener(
+      'click',
+      () => detener()
+    );
+
+    // ======================================
+    // VELOCIDAD
+    // ======================================
+
+    ui.velocidad?.addEventListener(
+      'input',
+      () => {
+        if (ui.velocidadValor) {
+          ui.velocidadValor.textContent =
+            Number(ui.velocidad.value)
+              .toFixed(1) + '×';
         }
+      }
+    );
 
-    }
+    // ======================================
+    // TONO
+    // ======================================
 
-    // ==========================================
-    // INICIALIZACIÓN
-    // ==========================================
-
-    function iniciar() {
-
-        // Comprobar disponibilidad del navegador.
-
-        if (!sintetizador) {
-
-            informar(
-                'La lectura por voz no está disponible en este navegador.'
-            );
-
-            [
-                controles.leer,
-                controles.desdeFoco,
-                controles.pausar,
-                controles.reanudar,
-                controles.detener,
-                controles.voz,
-                controles.velocidad,
-                controles.tono
-            ].forEach(elemento => {
-
-                if (elemento) {
-                    elemento.disabled = true;
-                }
-
-            });
-
-            return;
-
+    ui.tono?.addEventListener(
+      'input',
+      () => {
+        if (ui.tonoValor) {
+          ui.tonoValor.textContent =
+            Number(ui.tono.value)
+              .toFixed(1);
         }
+      }
+    );
 
-        // ======================================
-        // RECORDAR EL ELEMENTO ENFOCADO
-        // ======================================
+    // ======================================
+    // VOCES Y ESTADO INICIAL
+    // ======================================
 
-        document.addEventListener(
-            'focusin',
-            registrarElementoEnfocado,
-            true
-        );
+    cargarVoces();
 
-        // ======================================
-        // CARGAR VOCES
-        // ======================================
-
-        cargarVoces();
-
-        sintetizador.addEventListener(
-            'voiceschanged',
-            cargarVoces
-        );
-
-        // ======================================
-        // BOTONES
-        // ======================================
-
-        controles.leer?.addEventListener(
-            'click',
-            leerPagina
-        );
-
-        controles.desdeFoco?.addEventListener(
-            'click',
-            leerDesdeFoco
-        );
-
-        controles.pausar?.addEventListener(
-            'click',
-            pausarLectura
-        );
-
-        controles.reanudar?.addEventListener(
-            'click',
-            reanudarLectura
-        );
-
-        controles.detener?.addEventListener(
-            'click',
-            detenerLectura
-        );
-
-        // ======================================
-        // VELOCIDAD
-        // ======================================
-
-        controles.velocidad?.addEventListener(
-            'input',
-            actualizarVelocidad
-        );
-
-        // ======================================
-        // TONO
-        // ======================================
-
-        controles.tono?.addEventListener(
-            'input',
-            actualizarTono
-        );
-
-        // ======================================
-        // VALORES INICIALES
-        // ======================================
-
-        actualizarVelocidad();
-
-        actualizarTono();
-
-        actualizarControles();
-
-        informar(
-            'Lector de voz disponible. Puedes escuchar el contenido de la página.'
-        );
-
-    }
-
-    // ==========================================
-    // EJECUTAR CUANDO EL DOCUMENTO ESTÉ LISTO
-    // ==========================================
-
-    if (document.readyState === 'loading') {
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            iniciar
-        );
-
+    if (sintetizador.addEventListener) {
+      sintetizador.addEventListener(
+        'voiceschanged',
+        cargarVoces
+      );
     } else {
-
-        iniciar();
-
+      sintetizador.onvoiceschanged = cargarVoces;
     }
+
+    actualizarBotones();
+
+    if (!voces.length) {
+      informar('El navegador admite lectura por voz, pero no detecta voces instaladas.');
+    }
+
+    // Detener cuando se abandona la página.
+
+    window.addEventListener(
+      'pagehide',
+      () => detener('')
+    );
+  }
+
+  // ==========================================
+  // EJECUTAR CUANDO CARGUE EL DOCUMENTO
+  // ==========================================
+
+  if (document.readyState === 'loading') {
+    document.addEventListener(
+      'DOMContentLoaded',
+      inicializar
+    );
+  } else {
+    inicializar();
+  }
 
 })();

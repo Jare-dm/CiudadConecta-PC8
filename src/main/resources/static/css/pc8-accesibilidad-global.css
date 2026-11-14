@@ -1,0 +1,65 @@
+/* CiudadConecta PC8 - Fase 1: refuerzos transversales.
+   Se carga al final. No modifica Leaflet ni el modelo de datos. */
+
+/* Reflujo: evitar que textos largos corten tarjetas y formularios. */
+:where(main, .card, .pc8-reporte-panel, .pc8-lector-panel, .pc8-a11y-toolbar) {
+  overflow-wrap: anywhere;
+}
+
+/* Controles legibles y utilizables con tacto o teclado. */
+.pc8-a11y-buttons .btn,
+.pc8-lector-btn,
+.pc8-lector-summary {
+  min-height: 44px;
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #b36b00 !important;
+  outline-offset: 3px !important;
+}
+
+/* El modo de alto contraste debe distinguir enlaces y estados del foco. */
+html.contraste-alto :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #ffff66 !important;
+  outline-offset: 3px !important;
+}
+html.contraste-alto .pc8-a11y-buttons .btn[aria-pressed="true"] {
+  color: #000 !important;
+  background: #ffff66 !important;
+  border: 2px solid #fff !important;
+}
+
+/* Respeto a los colores forzados por el sistema operativo. */
+@media (forced-colors: active) {
+  .pc8-a11y-buttons .btn[aria-pressed="true"] {
+    border: 2px solid Highlight !important;
+  }
+  .pc8-lector-summary, .pc8-lector-btn {
+    border: 1px solid ButtonText !important;
+  }
+}
+
+/* Evitar desbordamientos de las barras compartidas en móvil y con zoom. */
+@media (max-width: 575.98px) {
+  .pc8-a11y-container, .pc8-a11y-controls, .pc8-a11y-buttons {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .pc8-a11y-buttons {
+    flex-wrap: wrap;
+  }
+  .pc8-a11y-help {
+    white-space: normal;
+  }
+  .pc8-lector-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pc8-lector-btn {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc8-lector-summary::after { transition: none !important; }
+}

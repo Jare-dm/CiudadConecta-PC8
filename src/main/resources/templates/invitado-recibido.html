@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Reporte recibido')}" ></head>
+<body>
+<div th:replace="~{fragments/base :: nav}"></div>
+<main id="contenido" class="container py-5" style="max-width:800px">
+  <section class="card p-4 p-md-5 shadow-sm" aria-labelledby="titulo-exito">
+    <div class="text-success fs-1" aria-hidden="true">✓</div>
+    <h1 id="titulo-exito" class="h2 fw-bold">Tu incidencia fue registrada</h1>
+    <p class="lead">El reporte se ha guardado y aparece en el flujo de gestión municipal.</p>
+    <p class="mb-1">Código de referencia:</p>
+    <p class="h3 fw-bold font-monospace" th:text="${codigoInvitado}">PC8-XXXXXXXXXXXX</p>
+    <button id="pc8-copiar-codigo" type="button" class="btn btn-outline-primary mb-3"
+            th:attr="data-codigo=${codigoInvitado}">Copiar código</button>
+    <p id="pc8-resultado-copia" role="status" aria-live="polite"></p>
+    <div class="alert alert-info" role="note">
+      <strong>Guarda este código.</strong> En esta versión no existe una cuenta de invitado ni un acceso privado para seguir el reporte; el código es un comprobante, no una contraseña de consulta.
+      No compartas información personal en los canales públicos.
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a th:href="@{/invitado}" class="btn btn-primary">Volver a modo invitado</a>
+      <a th:href="@{/transparencia}" class="btn btn-outline-primary">Ver transparencia</a>
+    </div>
+  </section>
+</main>
+<script>
+  document.getElementById('pc8-copiar-codigo')?.addEventListener('click', async function () {
+    const estado = document.getElementById('pc8-resultado-copia');
+    try {
+      await navigator.clipboard.writeText(this.dataset.codigo);
+      estado.textContent = 'Código copiado.';
+    } catch (_) {
+      estado.textContent = 'Selecciona el código mostrado y cópialo manualmente.';
+    }
+  });
+</script>
+<div th:replace="~{fragments/base :: footer}"></div>
+</body>
+</html>

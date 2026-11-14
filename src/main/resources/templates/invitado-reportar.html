@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/base :: head('Reporte sin cuenta')}" ></head>
+<body>
+<div th:replace="~{fragments/base :: nav}"></div>
+<main id="contenido" class="container py-4 py-md-5" style="max-width:1050px">
+  <style>
+    .pc8-invitado-hero{background:linear-gradient(120deg,#e9f4ff,#fff);border:1px solid #bcd3e8;border-radius:1rem;padding:clamp(1rem,3vw,2rem)}
+    .pc8-invitado-panel{padding:clamp(1rem,3vw,2rem);border:1px solid #ccdeed;border-radius:1rem;background:#fff}
+    .pc8-invitado-mapa{height:350px;min-height:250px;border:2px solid #cedde8;border-radius:.75rem;z-index:0}
+    .pc8-invitado-ayuda{font-size:.91rem;color:#435d76}
+    .pc8-invitado-honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+    .pc8-invitado-error{color:#a92337;font-weight:650}
+    .pc8-invitado-mapa:focus-visible{outline:3px solid #f6b83f;outline-offset:3px}
+    html.contraste-alto .pc8-invitado-hero,html.contraste-alto .pc8-invitado-panel{background:#000!important;color:#fff!important;border:2px solid #ffeb3b!important}
+    html.contraste-alto .pc8-invitado-ayuda{color:#fff!important}
+    html.contraste-alto .form-label{color:#fff!important}
+    @media(max-width:600px){.pc8-invitado-mapa{height:280px}}
+  </style>
+  <nav aria-label="Ruta de navegación" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+      <li class="breadcrumb-item"><a th:href="@{/invitado}">Modo invitado</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Registrar incidencia</li>
+    </ol>
+  </nav>
+  <header class="pc8-invitado-hero mb-4">
+    <p class="text-uppercase fw-bold mb-2">Chorrillos · Participación ciudadana</p>
+    <h1 class="h2 fw-bold">Reportar una incidencia sin crear una cuenta</h1>
+    <p class="mb-2">No solicitamos nombre, DNI, correo ni teléfono. El reporte se incorpora a la bandeja municipal, con tu identidad protegida.</p>
+    <p class="mb-0"><strong>Importante:</strong> conserva el código que aparecerá al terminar. En esta versión no podrás consultar «Mis reportes», confirmar la atención ni recibir notificaciones personales.</p>
+  </header>
+
+  <div th:if="${errorInvitado}" class="alert alert-danger" role="alert" th:text="${errorInvitado}"></div>
+  <section class="pc8-invitado-panel" aria-labelledby="pc8-invitado-titulo">
+    <h2 id="pc8-invitado-titulo" class="h4 fw-bold mb-3">Datos de la incidencia</h2>
+    <form id="pc8-form-invitado" th:action="@{/invitado/reportar}" th:object="${form}"
+          method="post" enctype="multipart/form-data">
+      <input type="hidden" th:field="*{tokenFormulario}">
+      <div class="pc8-invitado-honeypot" aria-hidden="true">
+        <label for="pc8-sitio-web">Sitio web (dejar vacío)</label>
+        <input id="pc8-sitio-web" type="text" th:field="*{sitioWeb}" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="mb-4">
+        <label for="pc8-inv-categoria" class="form-label fw-bold">Tipo de problema *</label>
+        <select id="pc8-inv-categoria" class="form-select" th:field="*{categoriaOpcion}" required>
+          <option value="">Selecciona una categoría</option>
+          <option th:each="c : ${categoriasInvitado}" th:value="${'BASE:' + c.name()}" th:text="${c.etiqueta}"></option>
+        </select>
+        <p class="pc8-invitado-error mt-1" th:if="${#fields.hasErrors('categoriaOpcion')}" th:errors="*{categoriaOpcion}"></p>
+      </div>
+
+      <div class="mb-4">
+        <label for="pc8-inv-descripcion" class="form-label fw-bold">Describe qué ocurre *</label>
+        <textarea id="pc8-inv-descripcion" class="form-control" th:field="*{descripcion}"
+                  rows="5" minlength="12" maxlength="1000" required
+                  placeholder="Ej.: Hay un bache peligroso junto al cruce de dos avenidas."></textarea>
+        <p class="pc8-invitado-ayuda mt-1">Describe el problema, sin incluir nombres, DNI, teléfonos, correos, matrículas ni datos de personas.</p>
+        <p class="pc8-invitado-error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></p>
+      </div>
+
+      <div class="mb-4">
+        <label for="pc8-inv-ubicacion" class="form-label fw-bold">Dirección o referencia del problema *</label>
+        <input id="pc8-inv-ubicacion" class="form-control" th:field="*{ubicacion}"
+               minlength="8" maxlength="260" required placeholder="Ej.: Av. Defensores del Morro, cerca de un parque">
+        <p class="pc8-invitado-ayuda mt-1">Indica un lugar público. Evita direcciones particulares y datos de vecinos.</p>
+        <p class="pc8-invitado-error" th:if="${#fields.hasErrors('ubicacion')}" th:errors="*{ubicacion}"></p>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="h5 fw-bold">Ubicación en Chorrillos *</h3>
+        <p class="pc8-invitado-ayuda">Haz clic en el mapa o escribe las coordenadas. Para accesibilidad, puedes usar los campos numéricos. El servidor comprobará que el punto esté dentro del distrito.</p>
+        <div id="pc8-mapa-invitado" class="pc8-invitado-mapa mb-3" role="region" tabindex="0"
+             aria-label="Mapa para seleccionar la ubicación de la incidencia"></div>
+        <p id="pc8-mapa-invitado-estado" role="status" aria-live="polite" class="pc8-invitado-ayuda"></p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="pc8-inv-lat" class="form-label fw-bold">Latitud *</label>
+            <input id="pc8-inv-lat" class="form-control" type="number" step="any"
+                   min="-90" max="90" th:field="*{latitud}" required placeholder="-12.17">
+            <p class="pc8-invitado-error" th:if="${#fields.hasErrors('latitud')}" th:errors="*{latitud}"></p>
+          </div>
+          <div class="col-md-6">
+            <label for="pc8-inv-lon" class="form-label fw-bold">Longitud *</label>
+            <input id="pc8-inv-lon" class="form-control" type="number" step="any"
+                   min="-180" max="180" th:field="*{longitud}" required placeholder="-77.01">
+            <p class="pc8-invitado-error" th:if="${#fields.hasErrors('longitud')}" th:errors="*{longitud}"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="pc8-inv-foto" class="form-label fw-bold">Fotografía (opcional)</label>
+        <input id="pc8-inv-foto" class="form-control" type="file" th:field="*{foto}"
+               accept="image/jpeg,image/png" aria-describedby="pc8-inv-foto-ayuda">
+        <p id="pc8-inv-foto-ayuda" class="pc8-invitado-ayuda mt-1">Solo JPG o PNG, máximo 3 MB. Evita imágenes con rostros, placas o información privada. La fotografía será visible para el personal autorizado.</p>
+      </div>
+
+      <div class="border rounded p-3 mb-4">
+        <div class="form-check">
+          <input id="pc8-inv-acepta" class="form-check-input" type="checkbox" th:field="*{aceptaCondiciones}" required>
+          <label for="pc8-inv-acepta" class="form-check-label">
+            Confirmo que describo una incidencia urbana real en Chorrillos, que no incluyo datos personales y que entiendo que el envío será anónimo. *
+          </label>
+        </div>
+        <p class="pc8-invitado-error mt-1" th:if="${#fields.hasErrors('aceptaCondiciones')}" th:errors="*{aceptaCondiciones}"></p>
+      </div>
+
+      <p class="pc8-invitado-ayuda">Para evitar spam, los envíos como invitado están limitados temporalmente. El sistema utiliza datos técnicos de conexión durante el control de abusos, sin asociar tu identidad al reporte.</p>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <button id="pc8-inv-enviar" type="submit" class="btn btn-primary btn-lg">Enviar reporte anónimo</button>
+        <a th:href="@{/invitado}" class="btn btn-outline-secondary btn-lg">Volver</a>
+      </div>
+    </form>
+  </section>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script th:src="@{/js/pc8-reporte-invitado.js}" defer></script>
+<div th:replace="~{fragments/base :: footer}"></div>
+</body>
+</html>

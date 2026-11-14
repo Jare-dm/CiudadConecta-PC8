@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/base :: head('Manual de usuario')}"></head>
+<body>
+<div th:replace="~{fragments/base :: nav}"></div>
+<main id="contenido" class="container py-4 py-md-5">
+  <style>
+    .pc8-manual-intro {background:linear-gradient(125deg,#edf5ff,#fff);border:1px solid #cdddeb;border-radius:1rem;padding:clamp(1rem,3vw,2rem)}
+    .pc8-manual-nav a {display:block;border:1px solid #cbd8e5;border-radius:.7rem;padding:.8rem 1rem;background:#fff;color:#124b7e;font-weight:650;text-decoration:none;min-height:44px}
+    .pc8-manual-nav a:hover,.pc8-manual-nav a:focus-visible {text-decoration:underline;background:#f1f7ff}
+    .pc8-manual-step {border-left:4px solid #2466ac;padding-left:1rem;margin:1.1rem 0}
+    .pc8-manual-section {scroll-margin-top:1.5rem}
+    .pc8-manual-section h2 {border-bottom:1px solid #d7e3ed;padding-bottom:.65rem}
+    .pc8-manual-note {border-left:4px solid #c48b19;background:#fff8e8;padding:1rem;border-radius:.4rem}
+    .pc8-manual-section a.btn {min-height:44px;display:inline-flex;align-items:center}
+    .pc8-manual-faq summary {cursor:pointer;padding:1rem;font-weight:650}
+    .pc8-manual-faq details {border:1px solid #d5dfe8;border-radius:.65rem;background:#fff;margin-bottom:.65rem}
+    .pc8-manual-faq details p {padding:0 1rem 1rem;margin-bottom:0}
+    html.contraste-alto .pc8-manual-intro,html.contraste-alto .pc8-manual-nav a,html.contraste-alto .pc8-manual-faq details {background:#000!important;color:#fff!important;border-color:#ffff66!important}
+    html.contraste-alto .pc8-manual-note {background:#000!important;color:#fff!important;border:2px solid #ffff66!important}
+    html.contraste-alto .pc8-manual-step {border-color:#ffff66!important}
+    @media (prefers-reduced-motion:reduce) {.pc8-manual-nav a {transition:none!important}}
+  </style>
+  <nav aria-label="Ruta de navegación" class="mb-3">
+    <ol class="breadcrumb"><li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li><li class="breadcrumb-item active" aria-current="page">Manual de usuario</li></ol>
+  </nav>
+  <header class="pc8-manual-intro mb-4">
+    <p class="fw-bold text-primary mb-2">GUÍA PASO A PASO · CIUDADCONECTA PC8</p>
+    <h1 class="display-6 fw-bold">Manual de usuario</h1>
+    <p class="lead mb-2">Aprende a utilizar CiudadConecta para informar sobre problemas urbanos de Chorrillos y consultar el seguimiento de tus reportes.</p>
+    <p class="mb-3">Esta guía es pública. Puedes leerla sin iniciar sesión; para enviar reportes necesitas una cuenta ciudadana.</p>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-primary" th:href="@{/que-reportar}">Qué puedo reportar</a>
+      <a class="btn btn-outline-primary" th:href="@{/registro}" sec:authorize="isAnonymous()">Crear cuenta</a>
+      <a class="btn btn-outline-primary" th:href="@{/login}" sec:authorize="isAnonymous()">Iniciar sesión</a>
+      <a class="btn btn-outline-primary" th:href="@{/reportes/nuevo}" sec:authorize="hasRole('CIUDADANO')">Crear reporte</a>
+    </div>
+  </header>
+  <nav aria-label="Índice del manual" class="mb-5">
+    <h2 class="h4 mb-3">Contenido del manual</h2>
+    <div class="row g-2 pc8-manual-nav">
+      <div class="col-sm-6 col-lg-4"><a href="#visitante">1. Explorar como visitante</a></div>
+      <div class="col-sm-6 col-lg-4"><a href="#cuenta">2. Crear una cuenta</a></div>
+      <div class="col-sm-6 col-lg-4"><a href="#ingresar">3. Iniciar y cerrar sesión</a></div>
+      <div class="col-sm-6 col-lg-4"><a href="#reporte">4. Registrar una incidencia</a></div>
+      <div class="col-sm-6 col-lg-4"><a href="#seguimiento">5. Consultar reportes</a></div>
+      <div class="col-sm-6 col-lg-4"><a href="#accesibilidad">6. Accesibilidad</a></div>
+      <div class="col-sm-6 col-lg-4"><a href="#privacidad">7. Seguridad y privacidad</a></div>
+      <div class="col-sm-6 col-lg-4"><a href="#faq-manual">8. Preguntas frecuentes</a></div>
+    </div>
+  </nav>
+  <section id="visitante" class="pc8-manual-section mb-5" aria-labelledby="titulo-visitante">
+    <h2 id="titulo-visitante" class="h3 fw-bold">1. Explorar como visitante</h2>
+    <p>Sin crear una cuenta puedes consultar la portada pública, las estadísticas generales, la información de transparencia, la guía «Qué puedo reportar», el manual y las opciones públicas de accesibilidad.</p>
+    <div class="pc8-manual-step"><strong>Abre la página principal.</strong> Selecciona el nombre CiudadConecta en la cabecera o utiliza el enlace «Inicio».</div>
+    <div class="pc8-manual-step"><strong>Lee los ejemplos.</strong> Entra en «Qué puedo reportar» para reconocer las incidencias urbanas y saber qué datos conviene describir.</div>
+    <div class="pc8-manual-step"><strong>Decide si deseas participar.</strong> Para registrar una incidencia con seguimiento, utiliza «Crear cuenta» o «Ingresar».</div>
+    <p class="pc8-manual-note mb-0"><strong>Nota:</strong> el envío anónimo de reportes todavía no está implementado. El modo visitante actual es de consulta.</p>
+  </section>
+  <section id="cuenta" class="pc8-manual-section mb-5" aria-labelledby="titulo-cuenta">
+    <h2 id="titulo-cuenta" class="h3 fw-bold">2. Crear una cuenta ciudadana</h2>
+    <ol>
+      <li class="mb-2">Selecciona <strong>Crear cuenta</strong> en la parte superior.</li>
+      <li class="mb-2">Completa los campos del formulario de registro con información verdadera. Se solicitan datos como nombre, DNI, correo electrónico, teléfono y contraseña.</li>
+      <li class="mb-2">Revisa que el correo esté bien escrito y utiliza una contraseña que no compartas con otras personas.</li>
+      <li class="mb-2">Envía el formulario. Si un dato ya está registrado o hay una validación pendiente, revisa el mensaje mostrado y corrígelo.</li>
+      <li>Después del registro, ve a <strong>Ingresar</strong> para acceder con tu correo electrónico y contraseña.</li>
+    </ol>
+    <a class="btn btn-outline-primary" th:href="@{/registro}">Ir a Crear cuenta</a>
+  </section>
+  <section id="ingresar" class="pc8-manual-section mb-5" aria-labelledby="titulo-ingresar">
+    <h2 id="titulo-ingresar" class="h3 fw-bold">3. Iniciar y cerrar sesión</h2>
+    <div class="pc8-manual-step"><strong>Ingresar:</strong> selecciona «Ingresar», escribe el correo y la contraseña de tu cuenta, y pulsa el botón «Ingresar» del formulario.</div>
+    <div class="pc8-manual-step"><strong>Al entrar:</strong> los ciudadanos acceden al área de sus reportes. El personal autorizado accede al panel municipal según sus permisos.</div>
+    <div class="pc8-manual-step"><strong>Salir:</strong> utiliza el botón «Cerrar sesión» de la barra superior. No basta con cerrar la pestaña si utilizas un equipo compartido.</div>
+    <p class="pc8-manual-note mb-0">Si una página muestra «403 - Forbidden», podría tratarse de una sesión caducada o de una ruta sin permisos. Vuelve a la página pública e inicia sesión con la cuenta apropiada; si persiste, comunica el problema a quien administra el sistema.</p>
+  </section>
+  <section id="reporte" class="pc8-manual-section mb-5" aria-labelledby="titulo-reporte">
+    <h2 id="titulo-reporte" class="h3 fw-bold">4. Registrar una incidencia en tres pasos</h2>
+    <p>Primero ingresa con una cuenta de rol ciudadano. Después selecciona <strong>Nuevo reporte</strong>.</p>
+    <article class="card mb-3"><div class="card-body"><h3 class="h5">Paso 1. Describir el problema</h3><p>Escoge una categoría y, si corresponde, una subcategoría. Explica qué ocurrió, desde cuándo y qué efectos tiene. Evita incluir nombres, DNI u otros datos de terceros.</p><p class="mb-0"><strong>Ejemplo:</strong> «Hay dos luminarias apagadas en el parque desde hace tres noches; el acceso peatonal queda sin iluminación».</p></div></article>
+    <article class="card mb-3"><div class="card-body"><h3 class="h5">Paso 2. Indicar la ubicación</h3><p>Ubica el incidente dentro de Chorrillos utilizando el mapa Leaflet. Comprueba que el marcador representa el lugar real; si el mapa no resulta cómodo, usa la opción de coordenadas manuales disponible en el formulario.</p><p class="mb-0">Si te equivocas, regresa a este paso antes de enviar el reporte.</p></div></article>
+    <article class="card mb-3"><div class="card-body"><h3 class="h5">Paso 3. Revisar y confirmar</h3><p>Comprueba la categoría, descripción y ubicación en el resumen. Utiliza «Editar problema» o «Editar ubicación» si necesitas corregir algo. Añade fotografías cuando el formulario lo permita y tengas imágenes pertinentes.</p><p class="mb-0">Cuando todos los datos sean correctos, confirma una sola vez y espera el resultado del registro.</p></div></article>
+    <p class="pc8-manual-note">Si sales del formulario antes de terminar, podrías encontrar una opción para recuperar un borrador de esta sesión. Un borrador no equivale a un reporte enviado.</p>
+    <a class="btn btn-primary" th:href="@{/reportes/nuevo}" sec:authorize="hasRole('CIUDADANO')">Empezar un reporte</a>
+    <a class="btn btn-outline-primary" th:href="@{/login}" sec:authorize="isAnonymous()">Inicia sesión para reportar</a>
+  </section>
+  <section id="seguimiento" class="pc8-manual-section mb-5" aria-labelledby="titulo-seguimiento">
+    <h2 id="titulo-seguimiento" class="h3 fw-bold">5. Consultar el estado de tus reportes</h2>
+    <ol>
+      <li class="mb-2">Después de iniciar sesión como ciudadano, abre <strong>Mis reportes</strong>.</li>
+      <li class="mb-2">Busca una incidencia por su código o utiliza los filtros de estado disponibles.</li>
+      <li class="mb-2">Abre el detalle del reporte para revisar su información, fotografías, ubicación e historial, si se encuentran disponibles.</li>
+      <li class="mb-2">Consulta el estado: <strong>Registrado</strong>, <strong>En revisión</strong>, <strong>Atendido</strong>, <strong>Cerrado</strong> o <strong>Rechazado</strong>. Son estados del sistema, no promesas de un plazo concreto.</li>
+    </ol>
+    <p>Los reportes pasan por revisión del personal autorizado. El tiempo de atención depende de la evaluación y de la gestión de las áreas responsables.</p>
+    <a class="btn btn-outline-primary" th:href="@{/mis-reportes}" sec:authorize="hasRole('CIUDADANO')">Abrir Mis reportes</a>
+  </section>
+  <section id="accesibilidad" class="pc8-manual-section mb-5" aria-labelledby="titulo-accesibilidad">
+    <h2 id="titulo-accesibilidad" class="h3 fw-bold">6. Usar las herramientas de accesibilidad</h2>
+    <div class="row g-3">
+      <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h5">A− y A+</h3><p class="mb-0">Reducen o aumentan el tamaño del texto. Utiliza «Restablecer» para volver a los valores iniciales.</p></div></div></div>
+      <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h5">Alto contraste</h3><p class="mb-0">Cambia la presentación para resaltar textos, controles y bordes.</p></div></div></div>
+      <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h5">Reducir animaciones</h3><p class="mb-0">Disminuye los efectos de movimiento y las transiciones visuales.</p></div></div></div>
+      <div class="col-md-6"><div class="card h-100"><div class="card-body"><h3 class="h5">Escuchar contenido</h3><p class="mb-0">Despliega el lector de voz. Su funcionamiento depende del navegador y de las voces compatibles disponibles en el dispositivo.</p></div></div></div>
+    </div>
+    <p class="mt-3">Puedes recorrer los enlaces y botones mediante <kbd>Tab</kbd> y activar los controles con <kbd>Enter</kbd> o <kbd>Espacio</kbd> según corresponda.</p>
+    <a class="btn btn-outline-primary" th:href="@{/accesibilidad}">Ayuda de accesibilidad</a>
+  </section>
+  <section id="privacidad" class="pc8-manual-section mb-5" aria-labelledby="titulo-privacidad">
+    <h2 id="titulo-privacidad" class="h3 fw-bold">7. Seguridad, privacidad y uso responsable</h2>
+    <ul>
+      <li>Registra únicamente incidencias observables, con descripciones respetuosas y precisas.</li>
+      <li>Evita publicar información personal de terceros y fotografías que expongan datos innecesarios.</li>
+      <li>No compartas tu contraseña. Cierra sesión al terminar en computadoras públicas.</li>
+      <li>Revisa la ubicación antes de enviar. Una ubicación incorrecta dificulta la evaluación.</li>
+      <li>CiudadConecta es una herramienta de reporte urbano y <strong>no sustituye a los servicios de emergencia</strong>.</li>
+    </ul>
+  </section>
+  <section id="faq-manual" class="pc8-manual-section pc8-manual-faq mb-5" aria-labelledby="titulo-faq-manual">
+    <h2 id="titulo-faq-manual" class="h3 fw-bold">8. Preguntas frecuentes</h2>
+    <details><summary>¿Puedo usar CiudadConecta sin registrarme?</summary><p>Sí. Puedes consultar las páginas públicas y leer este manual. Por ahora, enviar y seguir reportes propios requiere una cuenta ciudadana.</p></details>
+    <details><summary>¿Qué hago si elegí una ubicación incorrecta?</summary><p>Antes del envío, utiliza «Editar ubicación» en el resumen del reporte para volver al paso correspondiente.</p></details>
+    <details><summary>¿Cómo sé si mi reporte se registró?</summary><p>Después de confirmar, el sistema muestra la confirmación y el detalle del reporte. Puedes consultar el código en «Mis reportes».</p></details>
+    <details><summary>¿Puedo recuperar lo que estaba escribiendo?</summary><p>El formulario puede ofrecer recuperar un borrador guardado en la misma sesión. Recuerda que recuperar un borrador no significa que la incidencia se haya enviado.</p></details>
+    <details><summary>¿Dónde puedo pedir ayuda si tengo problemas?</summary><p>Consulta el <a th:href="@{/soporte}">Centro de soporte y ayuda</a> para ver preguntas frecuentes y usar el formulario de contacto cuando esté habilitado el correo de soporte. El chat de atención y el seguimiento automático de consultas todavía no están disponibles.</p></details>
+    <details><summary>¿Puedo usar la plataforma desde el celular?</summary><p>Sí. La interfaz está diseñada para adaptarse a pantallas pequeñas. Puedes desplegar el menú y utilizar las herramientas de accesibilidad.</p></details>
+  </section>
+  <section class="p-4 bg-body-tertiary rounded-3" aria-labelledby="titulo-final-manual">
+    <h2 id="titulo-final-manual" class="h4">¿Qué deseas hacer ahora?</h2>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" th:href="@{/que-reportar}">Ver tipos de incidencias</a>
+      <a class="btn btn-outline-primary" th:href="@{/login}" sec:authorize="isAnonymous()">Iniciar sesión</a>
+      <a class="btn btn-outline-primary" th:href="@{/reportes/nuevo}" sec:authorize="hasRole('CIUDADANO')">Registrar incidencia</a>
+      <a class="btn btn-outline-secondary" th:href="@{/}">Volver al inicio</a>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>

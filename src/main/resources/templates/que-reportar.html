@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/base :: head('Qué puedo reportar')}"></head>
+<body>
+<div th:replace="~{fragments/base :: nav}"></div>
+<main id="contenido" class="container py-4 py-md-5">
+  <nav aria-label="Ruta de navegación" class="mb-3">
+    <ol class="breadcrumb"><li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li><li class="breadcrumb-item active" aria-current="page">Qué puedo reportar</li></ol>
+  </nav>
+  <header class="mb-4 mb-md-5">
+    <p class="text-primary fw-bold mb-2">GUÍA DE INCIDENCIAS · CHORRILLOS</p>
+    <h1 class="display-6 fw-bold">¿Qué problemas urbanos puedo reportar?</h1>
+    <p class="lead">Conoce algunos ejemplos de incidencias en espacios públicos y aprende a describirlas para facilitar su evaluación.</p>
+    <p class="text-secondary">Los ejemplos son orientativos. Las categorías disponibles al registrar un reporte pueden variar según la configuración de CiudadConecta.</p>
+  </header>
+  <section aria-labelledby="tipos-titulo" class="mb-5">
+    <h2 id="tipos-titulo" class="h3 fw-bold mb-3">Tipos de problemas</h2>
+    <div class="row g-3">
+      <div class="col-md-6 col-xl-4"><article class="card h-100 shadow-sm"><div class="card-body"><h3 class="h5">🗑️ Limpieza y residuos</h3><p>Basura acumulada en calles, contenedores desbordados o residuos abandonados en espacios públicos.</p><p class="mb-0"><strong>Describe:</strong> lugar, cantidad aproximada y desde cuándo ocurre.</p></div></article></div>
+      <div class="col-md-6 col-xl-4"><article class="card h-100 shadow-sm"><div class="card-body"><h3 class="h5">💡 Alumbrado público</h3><p>Luminarias apagadas, postes con iluminación intermitente o zonas públicas sin luz.</p><p class="mb-0"><strong>Describe:</strong> calle, referencia y número de postes afectados, si se conoce.</p></div></article></div>
+      <div class="col-md-6 col-xl-4"><article class="card h-100 shadow-sm"><div class="card-body"><h3 class="h5">🛣️ Pistas y veredas</h3><p>Baches, grietas, veredas deterioradas o superficies que dificultan el desplazamiento.</p><p class="mb-0"><strong>Describe:</strong> tramo afectado y dificultad que ocasiona.</p></div></article></div>
+      <div class="col-md-6 col-xl-4"><article class="card h-100 shadow-sm"><div class="card-body"><h3 class="h5">🌳 Áreas verdes</h3><p>Jardines públicos descuidados, árboles que requieren evaluación o mobiliario deteriorado en parques.</p><p class="mb-0"><strong>Describe:</strong> parque, sector y elemento afectado.</p></div></article></div>
+      <div class="col-md-6 col-xl-4"><article class="card h-100 shadow-sm"><div class="card-body"><h3 class="h5">🚶 Espacios públicos</h3><p>Obstáculos en zonas peatonales, señalización dañada u otras condiciones del entorno urbano.</p><p class="mb-0"><strong>Describe:</strong> ubicación exacta y cómo afecta el uso del espacio.</p></div></article></div>
+      <div class="col-md-6 col-xl-4"><article class="card h-100 shadow-sm"><div class="card-body"><h3 class="h5">📍 Otros problemas</h3><p>Situaciones urbanas que no encajan en los ejemplos anteriores, siempre que exista una categoría adecuada en el formulario.</p><p class="mb-0"><strong>Describe:</strong> lo que observas, sin incluir datos personales ajenos.</p></div></article></div>
+    </div>
+  </section>
+  <section aria-labelledby="buen-reporte" class="mb-5">
+    <h2 id="buen-reporte" class="h3 fw-bold mb-3">Cómo preparar un reporte útil</h2>
+    <ol class="list-group list-group-numbered">
+      <li class="list-group-item"><strong>Identifica el problema.</strong> Selecciona la categoría más cercana a lo que sucede.</li>
+      <li class="list-group-item"><strong>Describe los hechos.</strong> Explica qué ocurre y cómo afecta a las personas, sin suposiciones.</li>
+      <li class="list-group-item"><strong>Indica dónde sucede.</strong> Marca la ubicación en el mapa o utiliza las coordenadas disponibles.</li>
+      <li class="list-group-item"><strong>Agrega una fotografía, si es posible.</strong> Evita exponer rostros, placas u otros datos personales innecesarios.</li>
+      <li class="list-group-item"><strong>Revisa antes de enviar.</strong> Comprueba que la categoría, descripción y ubicación sean correctas.</li>
+    </ol>
+  </section>
+  <section class="row g-4 mb-5" aria-label="Seguimiento y recomendaciones">
+    <div class="col-lg-7"><div class="card h-100 border-primary"><div class="card-body"><h2 class="h4">¿Qué sucede después de enviar un reporte?</h2><p>El reporte se registra con un código. El personal autorizado puede revisarlo y actualizar su estado. Si tienes una cuenta ciudadana, puedes consultar tus reportes desde <strong>Mis reportes</strong>.</p><p class="mb-0">Registrar un reporte no garantiza una atención inmediata; los tiempos dependen de su evaluación y de las áreas responsables.</p></div></div></div>
+    <div class="col-lg-5"><div class="card h-100"><div class="card-body"><h2 class="h4">Importante ante una emergencia</h2><p class="mb-0">CiudadConecta es una plataforma de reporte urbano, <strong>no un canal de emergencias</strong>. Ante una situación de peligro inmediato, utiliza los servicios de emergencia correspondientes.</p></div></div></div>
+  </section>
+  <section aria-labelledby="faq-titulo" class="mb-5">
+    <h2 id="faq-titulo" class="h3 fw-bold mb-3">Preguntas frecuentes</h2>
+    <div class="accordion" id="faq-reportes">
+      <div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">¿Necesito una cuenta para registrar un reporte?</button></h3><div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faq-reportes"><div class="accordion-body">Por ahora, el formulario de registro de incidencias requiere iniciar sesión como ciudadano. Esta guía puede consultarse sin registrarse.</div></div></div>
+      <div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">¿Qué hago si me equivoco al señalar la ubicación?</button></h3><div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faq-reportes"><div class="accordion-body">Antes de enviar, utiliza las opciones de edición del paso de resumen para corregir la ubicación.</div></div></div>
+      <div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">¿Puedo consultar el estado de mis incidencias?</button></h3><div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faq-reportes"><div class="accordion-body">Sí. Después de iniciar sesión con tu cuenta ciudadana, entra a «Mis reportes» para revisar tus registros y sus estados.</div></div></div>
+    </div>
+  </section>
+  <section class="p-4 rounded-3 bg-body-tertiary mb-4" aria-labelledby="accion-titulo">
+    <h2 id="accion-titulo" class="h4">¿Listo para contribuir a mejorar Chorrillos?</h2>
+    <p>Ingresa con tu cuenta ciudadana o crea una para comenzar.</p>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" th:href="@{/reportes/nuevo}" sec:authorize="hasRole('CIUDADANO')">Crear nuevo reporte</a>
+      <a class="btn btn-primary" th:href="@{/login}" sec:authorize="isAnonymous()">Ingresar para reportar</a>
+      <a class="btn btn-outline-primary" th:href="@{/registro}" sec:authorize="isAnonymous()">Crear cuenta</a>
+      <a class="btn btn-outline-secondary" th:href="@{/}">Volver al inicio</a>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>
