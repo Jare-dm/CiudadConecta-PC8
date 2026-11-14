@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head
+	th:replace="~{fragments/base :: head('Centro de soporte y ayuda')}"></head>
+<body>
+	<div th:replace="~{fragments/base :: nav}"></div>
+
+	<main id="contenido" class="container py-4 py-md-5">
+		<style>
+.pc8-support-hero {
+	padding: clamp(1.25rem, 3vw, 2.25rem);
+	background: linear-gradient(115deg, #eaf4ff, #ffffff);
+	border: 1px solid #c7dbea;
+	border-radius: 1rem;
+}
+
+.pc8-support-hero h1 {
+	color: #173550;
+}
+
+.pc8-support-eyebrow {
+	font-weight: 800;
+	font-size: .83rem;
+	color: #12569c;
+	letter-spacing: .035em;
+}
+
+.pc8-support-card {
+	background: #fff;
+	border: 1px solid #cbdbea;
+	border-radius: .8rem;
+	padding: 1.25rem;
+	height: 100%;
+}
+
+.pc8-support-card h3 {
+	color: #173c5e;
+	font-size: 1.13rem;
+	font-weight: 750;
+}
+
+.pc8-support-card a, .pc8-support-hero .btn, .pc8-support-actions .btn {
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+}
+
+.pc8-support-faq details {
+	background: #fff;
+	border: 1px solid #cbdbea;
+	border-radius: .7rem;
+	padding: 0;
+	margin-bottom: .7rem;
+}
+
+.pc8-support-faq summary {
+	cursor: pointer;
+	padding: 1rem 1.2rem;
+	font-weight: 700;
+	color: #153a5c;
+}
+
+.pc8-support-faq details[open] summary {
+	border-bottom: 1px solid #d8e6f1;
+}
+
+.pc8-support-faq .pc8-answer {
+	padding: 1rem 1.2rem;
+}
+
+.pc8-support-faq .pc8-answer>:last-child {
+	margin-bottom: 0;
+}
+
+.pc8-support-faq summary:focus-visible, .pc8-support-card a:focus-visible,
+	.pc8-support-hero a:focus-visible {
+	outline: 3px solid #d99c20;
+	outline-offset: 3px;
+}
+
+.pc8-support-note {
+	background: #fff5df;
+	color: #3c2b0d;
+	border-left: 4px solid #bd8b24;
+	border-radius: .5rem;
+	padding: 1.1rem 1.25rem;
+}
+
+.pc8-support-warning {
+	background: #eaf2f9;
+	border-left: 4px solid #286b9f;
+	border-radius: .5rem;
+	padding: 1.1rem 1.25rem;
+}
+
+.pc8-support-section {
+	scroll-margin-top: 1.5rem;
+}
+
+html.contraste-alto .pc8-support-hero, html.contraste-alto .pc8-support-card,
+	html.contraste-alto .pc8-support-faq details, html.contraste-alto .pc8-support-note,
+	html.contraste-alto .pc8-support-warning {
+	background: #000 !important;
+	color: #fff !important;
+	border: 2px solid #ffff66 !important;
+}
+
+html.contraste-alto .pc8-support-hero h1, html.contraste-alto .pc8-support-eyebrow,
+	html.contraste-alto .pc8-support-card h3, html.contraste-alto .pc8-support-faq summary
+	{
+	color: #ffff66 !important;
+}
+
+html.contraste-alto .pc8-support-card a:not(.btn), html.contraste-alto .pc8-support-faq a:not(.btn)
+	{
+	color: #ffff66 !important;
+}
+
+html.contraste-alto .pc8-support-faq details[open] summary {
+	border-bottom: 2px solid #ffff66 !important;
+}
+
+@media ( prefers-reduced-motion : reduce) {
+	.pc8-support-faq * {
+		scroll-behavior: auto !important;
+	}
+}
+
+/* Formulario de contacto accesible */
+#formulario-soporte {
+	scroll-margin-top: 1.5rem;
+}
+
+.pc8-contact-form {
+	background: #fff;
+	border: 1px solid #cbdbea;
+	border-radius: .9rem;
+	padding: clamp(1rem, 3vw, 1.8rem);
+}
+
+.pc8-contact-form .form-label {
+	color: #163a5d;
+	font-weight: 700;
+}
+
+.pc8-contact-form .form-control, .pc8-contact-form .form-select {
+	min-height: 44px;
+}
+
+.pc8-contact-form textarea.form-control {
+	min-height: 148px;
+	resize: vertical;
+}
+
+.pc8-contact-form :is(input, select, textarea, button):focus-visible {
+	outline: 3px solid #c88d1d;
+	outline-offset: 2px;
+}
+
+.pc8-contact-antispam {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+html.contraste-alto .pc8-contact-form {
+	background: #000 !important;
+	color: #fff !important;
+	border: 2px solid #ffff66 !important;
+}
+
+html.contraste-alto .pc8-contact-form .form-label {
+	color: #ffff66 !important;
+}
+
+html.contraste-alto .pc8-contact-form :is(.form-control, .form-select) {
+	background: #000 !important;
+	color: #fff !important;
+	border: 2px solid #ffff66 !important;
+}
+
+html.contraste-alto .pc8-contact-form .text-secondary {
+	color: #fff !important;
+}
+</style>
+
+		<nav class="mb-3" aria-label="Ruta de navegación">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+				<li class="breadcrumb-item active" aria-current="page">Centro
+					de soporte</li>
+			</ol>
+		</nav>
+
+		<header class="pc8-support-hero mb-4" aria-labelledby="titulo-soporte">
+			<p class="pc8-support-eyebrow mb-2">AYUDA PARA CIUDADCONECTA PC8
+				· CHORRILLOS</p>
+			<h1 id="titulo-soporte" class="display-6 fw-bold">Centro de
+				soporte y ayuda</h1>
+			<p class="lead mb-2">Encuentra soluciones a dudas sobre tu
+				cuenta, el envío de incidencias, el mapa y el seguimiento de
+				reportes.</p>
+			<p class="mb-3">Esta sección está disponible sin iniciar sesión.
+				Además de las guías, encontrarás un formulario para contactar al
+				equipo cuando se configure el correo de soporte.</p>
+			<div class="d-flex flex-wrap gap-2 pc8-support-actions">
+				<a class="btn btn-primary" href="#formulario-soporte">Contactar
+					con soporte</a> <a class="btn btn-outline-primary"
+					href="#preguntas-soporte">Ver preguntas frecuentes</a> <a
+					class="btn btn-outline-primary" th:href="@{/manual}">Leer
+					manual paso a paso</a> <a class="btn btn-outline-primary"
+					th:href="@{/que-reportar}">Qué puedo reportar</a>
+			</div>
+		</header>
+
+		<section class="mb-5 pc8-support-section"
+			aria-labelledby="titulo-temas" id="temas-soporte">
+			<h2 id="titulo-temas" class="h3 fw-bold mb-3">¿En qué necesitas
+				ayuda?</h2>
+			<div class="row g-3">
+				<div class="col-md-6 col-lg-4">
+					<article class="pc8-support-card">
+						<h3>Cuenta e inicio de sesión</h3>
+						<p>Registro, contraseña, acceso a la cuenta y errores de
+							permisos.</p>
+						<a href="#ayuda-cuenta">Consultar soluciones →</a>
+					</article>
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<article class="pc8-support-card">
+						<h3>Crear un reporte</h3>
+						<p>Completar el formulario, indicar el problema y revisar
+							antes de enviar.</p>
+						<a href="#ayuda-reporte">Consultar soluciones →</a>
+					</article>
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<article class="pc8-support-card">
+						<h3>Ubicación y mapa</h3>
+						<p>Colocar el marcador en Chorrillos o utilizar las
+							coordenadas manuales.</p>
+						<a href="#ayuda-mapa">Consultar soluciones →</a>
+					</article>
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<article class="pc8-support-card">
+						<h3>Mis reportes y seguimiento</h3>
+						<p>Encontrar un reporte, comprender los estados y revisar su
+							historial.</p>
+						<a href="#ayuda-seguimiento">Consultar soluciones →</a>
+					</article>
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<article class="pc8-support-card">
+						<h3>Accesibilidad</h3>
+						<p>Ajustar el texto, aumentar el contraste y utilizar la
+							navegación por teclado.</p>
+						<a th:href="@{/accesibilidad}">Abrir ayuda de accesibilidad →</a>
+					</article>
+				</div>
+				<div class="col-md-6 col-lg-4">
+					<article class="pc8-support-card">
+						<h3>Consultar como invitado</h3>
+						<p>Descubre qué funciones puedes utilizar sin crear una cuenta
+							ciudadana.</p>
+						<a th:href="@{/invitado}">Explorar como invitado →</a>
+					</article>
+				</div>
+			</div>
+		</section>
+
+		<section class="mb-5 pc8-support-section" id="preguntas-soporte"
+			aria-labelledby="titulo-preguntas">
+			<h2 id="titulo-preguntas" class="h3 fw-bold">Preguntas
+				frecuentes y soluciones</h2>
+			<p class="text-secondary">Selecciona una pregunta para mostrar su
+				respuesta. También puedes abrirlas con el teclado.</p>
+			<div class="pc8-support-faq">
+				<h3 class="h5 mt-4" id="ayuda-cuenta">Cuenta e inicio de sesión</h3>
+				<details>
+					<summary>No puedo entrar a mi cuenta. ¿Qué reviso?</summary>
+					<div class="pc8-answer">
+						<ol>
+							<li>Confirma que escribiste el correo utilizado al
+								registrarte.</li>
+							<li>Verifica la contraseña, las mayúsculas y los espacios
+								accidentales.</li>
+							<li>Vuelve a abrir <a th:href="@{/login}">Iniciar sesión</a>
+								y comprueba si el sistema muestra un mensaje de error.
+							</li>
+						</ol>
+						<p>No compartas tu contraseña con otras personas.</p>
+					</div>
+				</details>
+				<details>
+					<summary>Me aparece un error 403. ¿Qué significa?</summary>
+					<div class="pc8-answer">
+						<p>Puede significar que intentas abrir una sección sin los
+							permisos adecuados o que hubo un problema con la sesión o la
+							solicitud.</p>
+						<ol>
+							<li>Regresa a la <a th:href="@{/}">portada</a> o a <a
+								th:href="@{/login}">Iniciar sesión</a>.
+							</li>
+							<li>Comprueba que ingresaste con el tipo de cuenta adecuado
+								para esa sección.</li>
+							<li>Si el error continúa, anota la ruta y el momento en que
+								ocurrió para la futura consulta de soporte.</li>
+						</ol>
+						<p>No envíes contraseñas, cookies ni tokens de seguridad.</p>
+					</div>
+				</details>
+				<details>
+					<summary>Olvidé mi contraseña. ¿Cómo la recupero?</summary>
+					<div class="pc8-answer">
+						<p>Si tu pantalla de acceso no muestra una función de
+							recuperación, no existe todavía un procedimiento de
+							restablecimiento de contraseña disponible desde esta guía. No
+							crees un reporte urbano para publicar datos de tu cuenta.</p>
+					</div>
+				</details>
+
+				<h3 class="h5 mt-4" id="ayuda-reporte">Crear un reporte</h3>
+				<details>
+					<summary>¿Qué información debo incluir para registrar una
+						incidencia?</summary>
+					<div class="pc8-answer">
+						<p>Indica la categoría del problema, una descripción concreta
+							y la ubicación donde ocurre. Puedes añadir una fotografía cuando
+							el formulario lo permita.</p>
+						<p>
+							Si necesitas ejemplos, visita <a th:href="@{/que-reportar}">Qué
+								puedo reportar</a>.
+						</p>
+					</div>
+				</details>
+				<details>
+					<summary>¿Puedo corregir los datos antes de enviar el
+						reporte?</summary>
+					<div class="pc8-answer">
+						<p>Sí. En el resumen final utiliza «Editar problema» o «Editar
+							ubicación» para regresar al paso correspondiente. Revisa todo
+							antes de confirmar.</p>
+					</div>
+				</details>
+				<details>
+					<summary>¿Por qué no puedo enviar el formulario?</summary>
+					<div class="pc8-answer">
+						<p>Revisa los mensajes de validación y comprueba que
+							completaste los campos requeridos, seleccionaste una ubicación
+							válida y que la fotografía, si existe, cumple las restricciones
+							que muestre el formulario.</p>
+						<p>Evita pulsar repetidas veces «Enviar». Si el problema
+							continúa, anota el mensaje mostrado, sin incluir datos privados.</p>
+					</div>
+				</details>
+
+				<h3 class="h5 mt-4" id="ayuda-mapa">Ubicación y mapa</h3>
+				<details>
+					<summary>El mapa no muestra mi ubicación. ¿Puedo
+						continuar?</summary>
+					<div class="pc8-answer">
+						<p>El marcador debe situarse en el lugar de la incidencia, no
+							necesariamente en tu ubicación actual. Puedes seleccionarlo
+							manualmente en el mapa de Chorrillos y utilizar la opción de
+							coordenadas manuales disponible en el formulario.</p>
+					</div>
+				</details>
+				<details>
+					<summary>¿Qué hago si coloqué mal el marcador?</summary>
+					<div class="pc8-answer">
+						<p>Antes de confirmar el reporte, vuelve al paso de ubicación
+							con «Editar ubicación» y comprueba el punto señalado. Una
+							dirección o referencia cercana puede ayudar a describir mejor el
+							lugar.</p>
+					</div>
+				</details>
+
+				<h3 class="h5 mt-4" id="ayuda-seguimiento">Mis reportes y
+					seguimiento</h3>
+				<details>
+					<summary>¿Dónde consulto los reportes que envié?</summary>
+					<div class="pc8-answer">
+						<p>Inicia sesión con tu cuenta ciudadana y abre «Mis
+							reportes». Allí podrás filtrar la lista y abrir cada incidencia
+							para revisar el detalle.</p>
+						<p sec:authorize="hasRole('CIUDADANO')">
+							<a th:href="@{/mis-reportes}">Ir a Mis reportes →</a>
+						</p>
+						<p sec:authorize="isAnonymous()">
+							<a th:href="@{/login}">Iniciar sesión →</a>
+						</p>
+					</div>
+				</details>
+				<details>
+					<summary>¿Qué significa el estado de mi reporte?</summary>
+					<div class="pc8-answer">
+						<p>El sistema puede mostrar estados como «Registrado», «En
+							revisión», «Atendido», «Cerrado» o «Rechazado». Consulta el
+							historial del reporte para conocer los cambios disponibles; el
+							estado no garantiza un plazo fijo de atención.</p>
+					</div>
+				</details>
+				<details>
+					<summary>¿Puedo reportar sin registrarme?</summary>
+					<div class="pc8-answer">
+						<p>
+							Por ahora no. El <a th:href="@{/invitado}">modo invitado</a>
+							permite consultar información pública. Para enviar y seguir una
+							incidencia necesitas una cuenta ciudadana.
+						</p>
+					</div>
+				</details>
+			</div>
+		</section>
+
+		<section class="pc8-support-section mb-5"
+			aria-labelledby="titulo-contacto" id="contacto-soporte">
+			<h2 class="h3 fw-bold" id="titulo-contacto">Comunicación con
+				soporte</h2>
+			<p>Envía una consulta sobre el funcionamiento de CiudadConecta.
+				También pueden escribir las personas que navegan como invitadas.</p>
+
+			<div th:if="${soporteEnviado == true}" class="alert alert-success"
+				role="status" tabindex="-1">
+				<strong>Consulta enviada correctamente al correo de
+					soporte.</strong>
+				<p class="mb-0">
+					Referencia del correo: <strong th:text="${referenciaSoporte}">PC8-SOP-XXXXXXXX</strong>.
+					Consérvala si necesitas volver a contactar. Todavía no existe
+					seguimiento automático en la web.
+				</p>
+			</div>
+			<div th:if="${errorEnvio != null}" class="alert alert-danger"
+				role="alert" th:text="${errorEnvio}">No fue posible enviar la
+				consulta.</div>
+			<div th:if="${!correoSoporteDisponible}"
+				class="pc8-support-note mb-3" role="status">
+				<strong>Envío de correo aún no habilitado.</strong> El formulario se
+				muestra para preparar su uso, pero el botón de envío permanecerá
+				desactivado hasta configurar el servicio SMTP de soporte. Las guías
+				y preguntas frecuentes continúan disponibles.
+			</div>
+
+			<form id="formulario-soporte" class="pc8-contact-form"
+				th:action="@{/soporte}" method="post" th:object="${contactoForm}"
+				novalidate aria-labelledby="titulo-formulario-soporte">
+				<h3 class="h4 fw-bold" id="titulo-formulario-soporte">Formulario
+					de contacto</h3>
+				<p class="text-secondary">Los campos marcados con * son
+					obligatorios. No incluyas contraseñas, DNI, tokens ni información
+					privada de terceros.</p>
+
+				<input type="hidden" th:if="${_csrf != null}"
+					th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+				<div class="row g-3">
+					<div class="col-md-6">
+						<label class="form-label" for="soporte-nombre">Nombre *</label> <input
+							class="form-control" id="soporte-nombre" type="text"
+							th:field="*{nombre}" maxlength="100" minlength="2"
+							autocomplete="name" required
+							th:classappend="${#fields.hasErrors('nombre')} ? ' is-invalid' : ''"
+							th:attr="aria-invalid=${#fields.hasErrors('nombre')}">
+						<div class="invalid-feedback d-block"
+							th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">Escribe
+							tu nombre.</div>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="soporte-correo">Correo para
+							recibir respuesta *</label> <input class="form-control"
+							id="soporte-correo" type="email" th:field="*{correo}"
+							maxlength="180" autocomplete="email" required
+							th:classappend="${#fields.hasErrors('correo')} ? ' is-invalid' : ''"
+							th:attr="aria-invalid=${#fields.hasErrors('correo')}">
+						<div class="invalid-feedback d-block"
+							th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}">Revisa
+							el correo.</div>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="soporte-tipo">Motivo de
+							consulta *</label> <select class="form-select" id="soporte-tipo"
+							th:field="*{tipo}" required
+							th:classappend="${#fields.hasErrors('tipo')} ? ' is-invalid' : ''"
+							th:attr="aria-invalid=${#fields.hasErrors('tipo')}">
+							<option value="">Selecciona una opción</option>
+							<option value="Cuenta e inicio de sesión">Cuenta e
+								inicio de sesión</option>
+							<option value="Crear un reporte">Crear un reporte</option>
+							<option value="Ubicación y mapa">Ubicación y mapa</option>
+							<option value="Seguimiento de reportes">Seguimiento de
+								reportes</option>
+							<option value="Accesibilidad">Accesibilidad</option>
+							<option value="Otro">Otro</option>
+						</select>
+						<div class="invalid-feedback d-block"
+							th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}">Selecciona
+							un motivo.</div>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="soporte-asunto">Asunto *</label> <input
+							class="form-control" id="soporte-asunto" type="text"
+							th:field="*{asunto}" minlength="5" maxlength="120" required
+							th:classappend="${#fields.hasErrors('asunto')} ? ' is-invalid' : ''"
+							th:attr="aria-invalid=${#fields.hasErrors('asunto')}">
+						<div class="invalid-feedback d-block"
+							th:if="${#fields.hasErrors('asunto')}" th:errors="*{asunto}">Escribe
+							el asunto.</div>
+					</div>
+					<div class="col-12">
+						<label class="form-label" for="soporte-mensaje">Descripción
+							de tu consulta *</label>
+						<textarea class="form-control" id="soporte-mensaje"
+							th:field="*{mensaje}" minlength="20" maxlength="2500" rows="6"
+							required
+							placeholder="Explica qué estabas intentando hacer, qué ocurrió y cuándo."
+							th:classappend="${#fields.hasErrors('mensaje')} ? ' is-invalid' : ''"
+							th:attr="aria-invalid=${#fields.hasErrors('mensaje')}"></textarea>
+						<div class="invalid-feedback d-block"
+							th:if="${#fields.hasErrors('mensaje')}" th:errors="*{mensaje}">Describe
+							tu consulta.</div>
+						<div class="form-text">Entre 20 y 2500 caracteres. No
+							adjuntes datos personales delicados.</div>
+					</div>
+
+					<!-- Campo de protección básica contra bots: dejar vacío. -->
+					<div class="pc8-contact-antispam" aria-hidden="true">
+						<label for="soporte-sitio">Sitio web (dejar vacío)</label> <input
+							type="text" id="soporte-sitio" th:field="*{sitioWeb}"
+							tabindex="-1" autocomplete="off">
+					</div>
+
+					<div class="col-12">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input"
+								id="soporte-acepta" th:field="*{aceptaDatos}" required
+								th:attr="aria-invalid=${#fields.hasErrors('aceptaDatos')}">
+							<label class="form-check-label" for="soporte-acepta">
+								Acepto que mi nombre, correo y consulta se envíen al equipo de
+								soporte para recibir una respuesta. * </label>
+							<div class="text-danger mt-1"
+								th:if="${#fields.hasErrors('aceptaDatos')}"
+								th:errors="*{aceptaDatos}">Confirma el uso de tus datos.</div>
+						</div>
+					</div>
+					<div class="col-12 d-flex flex-wrap align-items-center gap-3">
+						<button type="submit" class="btn btn-primary px-4"
+							style="min-height: 44px"
+							th:disabled="${!correoSoporteDisponible}">Enviar
+							consulta</button>
+						<span class="text-secondary small">No es un chat. El equipo
+							responderá por correo si el buzón está configurado y atendido.</span>
+					</div>
+				</div>
+			</form>
+			<div class="pc8-support-warning mt-3">
+				<strong>Ten en cuenta:</strong> este formulario es para asistencia
+				técnica y consultas sobre CiudadConecta; no reemplaza el registro de
+				una incidencia urbana ni un canal de atención de emergencias.
+			</div>
+		</section>
+
+		<section class="border rounded-3 p-3 p-md-4 bg-body-tertiary"
+			aria-labelledby="titulo-soporte-mas">
+			<h2 class="h4" id="titulo-soporte-mas">Más recursos de ayuda</h2>
+			<div class="d-flex flex-wrap gap-2 pc8-support-actions">
+				<a class="btn btn-primary" th:href="@{/manual}">Manual de
+					usuario</a> <a class="btn btn-outline-primary"
+					th:href="@{/accesibilidad}">Ayuda de accesibilidad</a> <a
+					class="btn btn-outline-secondary" th:href="@{/}">Volver al
+					inicio</a>
+			</div>
+		</section>
+	</main>
+
+	<footer th:replace="~{fragments/base :: footer}"></footer>
+</body>
+</html>

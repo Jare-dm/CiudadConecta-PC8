@@ -1,498 +1,1348 @@
 <!DOCTYPE html>
+
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/base :: head('Nuevo reporte')}">
+
 </head>
+
 <body>
+
 	<nav th:replace="~{fragments/base :: nav}"></nav>
+
 	<style>
+
 /* Opciones de privacidad del reporte */
+
 .pc8-privacidad-panel {
+
 	border: 1px solid #dce6ef;
+
 	border-radius: 1rem;
+
 	padding: 1.25rem;
+
 	background: #f8fbff;
+
 }
 
 .pc8-privacidad-opcion {
+
 	display: block;
+
 	border: 1px solid #d4dfe9;
+
 	border-radius: .8rem;
+
 	padding: 1rem;
+
 	background: #fff;
+
 	cursor: pointer;
+
 	margin-bottom: .75rem;
+
 }
 
 .pc8-privacidad-opcion:has(input:checked) {
+
 	border: 2px solid #075aa1;
+
 	background: #eff7ff;
+
 }
 
 .pc8-privacidad-opcion:focus-within {
+
 	outline: 2px solid #075aa1;
+
 	outline-offset: 2px;
+
 }
 
 .pc8-privacidad-opcion .form-check-input {
+
 	margin-top: .2rem;
+
 	flex-shrink: 0;
+
 }
 
 .pc8-privacidad-titulo {
+
 	font-weight: 700;
+
 	color: #173a61;
+
 }
 
 .pc8-privacidad-descripcion {
+
 	color: #475569;
+
 	font-size: .9rem;
+
 	margin-top: .35rem;
+
 	line-height: 1.5;
+
 }
 
 .pc8-privacidad-aviso {
+
 	background: #eef8f6;
+
 	border-left: 4px solid #087e8b;
+
 	border-radius: .5rem;
+
 	padding: .85rem 1rem;
+
 	font-size: .9rem;
+
 }
 
 @media ( max-width : 575.98px) {
+
 	.pc8-privacidad-panel {
+
 		padding: 1rem;
+
 	}
+
 }
+
+/* Fase 2: errores accesibles del formulario */
+
+.pc8-error-campo {
+
+	color: #a11919;
+
+	font-size: 0.95rem;
+
+	font-weight: 600;
+
+	line-height: 1.5;
+
+	margin: 0.45rem 0 0;
+
+}
+
+.pc8-error-campo[hidden] {
+
+	display: none !important;
+
+}
+
+.pc8-reporte-page
+
+:is(input, select, textarea)[aria-invalid="true"] {
+
+	border: 2px solid #b42318 !important;
+
+	box-shadow: 0 0 0 1px rgba(180, 35, 24, 0.12);
+
+}
+
+.pc8-reporte-page
+
+:is(input, select, textarea)[aria-invalid="true"]:focus {
+
+	outline: 3px solid #b42318;
+
+	outline-offset: 2px;
+
+}
+
+/* Alto contraste */
+
+html.contraste-alto .pc8-error-campo {
+
+	color: #ffff66 !important;
+
+}
+
+html.contraste-alto .pc8-reporte-page
+
+:is(input, select, textarea)[aria-invalid="true"] {
+
+	border: 3px solid #ffff66 !important;
+
+}
+
+/* Celulares */
+
+@media ( max-width : 575.98px) {
+
+	.pc8-error-campo {
+
+		font-size: 1rem;
+
+	}
+
+}
+
+/* ==========================================
+   CIUDADCONECTA PC8
+   FASE 2 - FORMULARIO RESPONSIVE Y ACCESIBLE
+
+   ========================================== */
+
+/* Evitar que el contenido desborde */
+
+.pc8-reporte-page, .pc8-reporte-page .pc8-reporte-panel,
+
+	.pc8-reporte-page .pc8-panel-cuerpo {
+
+	min-width: 0;
+
+	overflow-wrap: anywhere;
+
+}
+
+/* Campos cómodos para escribir y seleccionar */
+
+.pc8-reporte-page .form-control, .pc8-reporte-page .form-select {
+
+	max-width: 100%;
+
+	min-height: 44px;
+
+}
+
+/* Navegación entre pasos */
+
+.pc8-navegacion-pasos button {
+
+	min-height: 48px;
+
+	white-space: normal;
+
+	overflow-wrap: anywhere;
+
+}
+
+/* Foco visible para quienes utilizan teclado */
+
+.pc8-reporte-page button:focus-visible, .pc8-reporte-page input:focus-visible,
+
+	.pc8-reporte-page select:focus-visible, .pc8-reporte-page textarea:focus-visible,
+
+	.pc8-reporte-page a:focus-visible, .pc8-reporte-page summary:focus-visible
+
+	{
+
+	outline: 3px solid #b36b00 !important;
+
+	outline-offset: 3px !important;
+
+}
+
+/* Foco visible sobre los títulos de cada paso */
+
+.pc8-form-step h2:focus {
+
+	outline: 3px solid #b36b00;
+
+	outline-offset: 5px;
+
+	border-radius: 4px;
+
+}
+
+/* Compatibilidad con alto contraste */
+
+html.contraste-alto
+
+.pc8-reporte-page :focus-visible, html.contraste-alto
+
+.pc8-form-step h2:focus {
+
+	outline-color: #ffff66 !important;
+
+}
+
+/* Diseño para celulares */
+
+@media ( max-width : 575.98px) {
+
+	/* Botones uno debajo del otro */
+
+	.pc8-navegacion-pasos>div {
+
+		flex-direction: column;
+
+		align-items: stretch;
+
+	}
+
+	/* Botones grandes y fáciles de pulsar */
+
+	.pc8-navegacion-pasos button {
+
+		width: 100%;
+
+		min-height: 52px;
+
+		margin-left: 0 !important;
+
+		font-size: 1rem;
+
+		line-height: 1.4;
+
+	}
+
+	/* Más espacio entre controles */
+
+	.pc8-reporte-page .form-control, .pc8-reporte-page .form-select {
+
+		min-height: 48px;
+
+	}
+
+	/* Evitar que las imágenes sobrepasen el ancho */
+
+	.pc8-reporte-page img {
+
+		max-width: 100%;
+
+		height: auto;
+
+	}
+
+}
+
+/* ==========================================
+
+   CIUDADCONECTA PC8
+
+   GUARDADO TEMPORAL DEL FORMULARIO
+
+   ========================================== */
+
+.pc8-borrador-panel {
+
+	padding: 1.25rem;
+
+	border: 1px solid #cbd5e1;
+
+	border-left: 4px solid #1764a4;
+
+	border-radius: 12px;
+
+	background-color: #f8fafc;
+
+}
+
+.pc8-borrador-panel button {
+
+	min-height: 44px;
+
+}
+
+.pc8-borrador-panel [hidden] {
+
+	display: none !important;
+
+}
+
+#pc8-borrador-estado {
+
+	overflow-wrap: anywhere;
+
+}
+
+/* Alto contraste */
+
+html.contraste-alto .pc8-borrador-panel {
+
+	background: #000 !important;
+
+	color: #fff !important;
+
+	border: 2px solid #ffff66 !important;
+
+}
+
+html.contraste-alto
+
+.pc8-borrador-panel .text-secondary {
+
+	color: #fff !important;
+
+}
+
+/* Celulares */
+
+@media ( max-width : 575.98px) {
+
+	.pc8-borrador-panel {
+
+		padding: 1rem;
+
+	}
+
+	.pc8-borrador-panel button {
+
+		width: 100%;
+
+	}
+
+}
+
+/* ==========================================
+
+   CIUDADCONECTA PC8
+
+   EDICIÓN DESDE LA REVISIÓN FINAL
+
+   ========================================== */
+
+.pc8-resumen-acciones {
+
+    padding-top: 1rem;
+
+    border-top: 1px solid #cbd5e1;
+
+}
+
+.pc8-resumen-acciones button {
+
+    min-height: 48px;
+
+    white-space: normal;
+
+}
+
+/* Alto contraste */
+
+html.contraste-alto .pc8-resumen-acciones {
+
+    border-top: 2px solid #ffff66;
+
+}
+
+/* Celulares */
+
+@media (max-width: 575.98px) {
+
+    .pc8-resumen-acciones .btn {
+
+        width: 100%;
+
+        min-height: 52px;
+
+    }
+
+}
+
 </style>
+
 	<main id="contenido" class="container pc8-reporte-page py-4 py-lg-5">
+
 		<!-- INTRODUCCIÓN -->
+
 		<div class="pc8-reporte-intro">
+
 			<a th:href="@{/mis-reportes}" class="pc8-volver"> ← Mis reportes
+
 			</a>
+
 			<p class="pc8-reporte-supra mt-3 mb-2">Participación ciudadana ·
+
 				Chorrillos, Lima</p>
+
 			<h1 class="pc8-reporte-title">Registrar un problema urbano</h1>
+
 			<p class="pc8-reporte-lead">Cuéntanos qué ocurrió, señala el
+
 				lugar en Chorrillos y revisa los datos antes de enviar.</p>
+
 		</div>
+
 		<!-- ERRORES -->
+
 		<div th:if="${error}" class="alert alert-danger" role="alert"
+
 			th:text="${error}"></div>
+
 		<!-- FORMULARIO -->
+
 		<form id="form-nuevo-reporte" th:action="@{/reportes/nuevo}"
+
 			th:object="${form}" enctype="multipart/form-data" method="post">
+
+			<!-- ======================================
+
+     BORRADOR TEMPORAL DEL REPORTE
+
+     ====================================== -->
+
+			<div class="pc8-borrador-panel mb-4"
+
+				aria-label="Guardado temporal del reporte">
+
+				<h2 class="h5 fw-bold mb-2">Guardado temporal</h2>
+
+				<p class="small text-secondary mb-3">CiudadConecta guarda
+
+					temporalmente la categoría, la descripción y la dirección en esta
+
+					pestaña. Las fotografías y las coordenadas no se guardan.</p>
+
+				<div class="d-flex flex-wrap gap-2">
+
+					<button type="button" id="pc8-recuperar-borrador"
+
+						class="btn btn-outline-primary" hidden>Recuperar borrador
+
+					</button>
+
+					<button type="button" id="pc8-descartar-borrador"
+
+						class="btn btn-outline-danger" hidden>Descartar borrador
+
+					</button>
+
+				</div>
+
+				<p id="pc8-borrador-estado" class="small mt-3 mb-0" role="status"
+
+					aria-live="polite">Preparando el guardado temporal...</p>
+
+			</div>
+
 			<!-- INDICADOR DE PASOS -->
+
 			<div id="pc8-pasos" class="pc8-pasos"
+
 				aria-label="Progreso del registro" hidden>
+
 				<p class="pc8-progreso-texto" id="pc8-paso-estado" role="status"
+
 					aria-live="polite">Paso 1 de 3: Información</p>
+
 				<ol class="pc8-pasos-lista">
+
 					<li data-indicador="0" aria-current="step"><span
+
 						aria-hidden="true">1</span> <span>Problema</span></li>
+
 					<li data-indicador="1"><span aria-hidden="true">2</span> <span>Ubicación</span>
+
 					</li>
+
 					<li data-indicador="2"><span aria-hidden="true">3</span> <span>Revisión</span>
+
 					</li>
+
 				</ol>
+
 			</div>
+
 			<!-- ================================= -->
+
 			<!-- PASO 1: PROBLEMA -->
+
 			<!-- ================================= -->
+
 			<section class="pc8-reporte-panel pc8-form-step" data-step="0"
+
 				aria-labelledby="pc8-titulo-problema">
+
 				<div class="pc8-panel-encabezado">
+
 					<span class="pc8-paso-chapa"> 01 / 03 </span>
+
 					<h2 id="pc8-titulo-problema" tabindex="-1">¿Qué problema
+
 						encontraste?</h2>
+
 					<p>Elige una categoría y describe el incidente con palabras
+
 						sencillas.</p>
+
 				</div>
+
 				<div class="pc8-panel-cuerpo">
+
 					<!-- CATEGORÍA -->
+
 					<div class="mb-4">
+
 						<label for="categoria" class="form-label fw-semibold">
+
 							Tipo de problema <span aria-hidden="true">*</span> <span
+
 							class="visually-hidden">(obligatorio)</span>
+
 						</label> <select id="categoria" th:field="*{categoriaOpcion}"
+
 							class="form-select form-select-lg" required
+
 							aria-describedby="pc8-categoria-ayuda">
+
 							<option value="">Selecciona una categoría</option>
+
 							<optgroup label="Categorías municipales">
+
 								<option th:each="c : ${categorias}"
+
 									th:value="${'BASE:' + c.name()}" th:text="${c.etiqueta}">
+
 								</option>
+
 							</optgroup>
+
 							<optgroup label="Categorías agregadas por ciudadanos"
+
 								id="categoria-opciones-nuevas">
+
 								<option th:each="c : ${categoriasPersonalizadas}"
+
 									th:value="${'P:' + c.id}" th:text="${c.nombre}"></option>
+
 							</optgroup>
+
 							<option value="CREAR">＋ Agregar una categoría nueva…</option>
+
 						</select>
+
 						<p id="pc8-categoria-ayuda" class="form-text">Si tu problema
+
 							no está en la lista, puedes proponer una nueva categoría. La
+
 							municipalidad deberá aprobarla antes de que esté disponible.</p>
+
 						<div class="text-danger small" th:errors="*{categoriaOpcion}">
+
 						</div>
+
 						<!-- CREACIÓN DE CATEGORÍAS -->
+
 						<div id="categoria-panel" class="pc8-categoria-alta mt-3" hidden
+
 							th:attr="data-url=@{/categorias/personalizadas},
+
                                   data-csrf=${_csrf.token},
+
                                   data-csrf-name=${_csrf.parameterName}">
+
 							<label for="categoria-nombre" class="form-label fw-semibold">
+
 								Nueva categoría </label> <input type="text" id="categoria-nombre"
+
 								class="form-control" maxlength="65" minlength="3"
+
 								placeholder="Ej. Semáforo averiado" autocomplete="off">
+
 							<p class="form-text">Tu propuesta será revisada por la
+
 								administración municipal. Recibirás una notificación cuando sea
+
 								aprobada o rechazada. No escribas datos personales.</p>
+
 							<button class="btn btn-outline-primary" id="guardar-categoria"
+
 								type="button">Enviar categoría a revisión</button>
+
 							<p id="categoria-respuesta" class="small mt-2 mb-0" role="status"
+
 								aria-live="polite"></p>
+
 						</div>
+
 					</div>
+
 					<!-- ===================================== -->
+
 					<!-- SUBCATEGORÍA DEPENDIENTE (OPCIONAL) -->
+
 					<!-- ===================================== -->
+
 					<div id="pc8-subcategoria-panel" class="mb-4" hidden>
+
 						<label for="subcategoria" class="form-label fw-semibold">
+
 							Tipo específico de problema </label> <select id="subcategoria"
+
 							th:field="*{subcategoriaOpcion}" class="form-select"
+
 							aria-describedby="pc8-subcategoria-ayuda">
+
 							<option value="">Sin especificar (opcional)</option>
+
 							<option th:each="s : ${subcategorias}" th:value="${s.name()}"
+
 								th:text="${s.etiqueta}"
+
 								th:attr="data-categoria=${s.categoria.name()}"></option>
+
 						</select>
+
 						<p id="pc8-subcategoria-ayuda" class="form-text">Las opciones
+
 							cambian según la categoría principal.</p>
+
 						<div class="text-danger small" th:errors="*{subcategoriaOpcion}"></div>
+
 					</div>
+
 					<!-- DESCRIPCIÓN -->
+
 					<div>
+
 						<label for="descripcion" class="form-label fw-semibold">
+
 							Descripción del problema <span aria-label="obligatorio">*</span>
+
 						</label>
+
 						<textarea id="descripcion" rows="5" th:field="*{descripcion}"
+
 							minlength="12" maxlength="1000" class="form-control"
+
 							placeholder="Ej. Hay un bache profundo frente al parque; dificulta el paso desde hace varios días."
+
 							required
+
 							aria-describedby="pc8-descripcion-ayuda pc8-descripcion-contador">
+
                     </textarea>
+
 						<div
+
 							class="d-flex justify-content-between
+
                                 gap-2 flex-wrap">
+
 							<p id="pc8-descripcion-ayuda" class="form-text mb-0">Escribe
+
 								al menos 12 caracteres, sin datos personales innecesarios.</p>
+
 							<p id="pc8-descripcion-contador" class="form-text mb-0"
+
 								aria-live="off">0 / 1000</p>
+
 						</div>
+
 						<div class="text-danger small" th:errors="*{descripcion}"></div>
+
 					</div>
+
 				</div>
+
 			</section>
+
 			<!-- ================================= -->
+
 			<!-- PASO 2: UBICACIÓN -->
+
 			<!-- ================================= -->
+
 			<section class="pc8-reporte-panel pc8-form-step" data-step="1"
+
 				aria-labelledby="pc8-titulo-ubicacion">
+
 				<div class="pc8-panel-encabezado">
+
 					<span class="pc8-paso-chapa"> 02 / 03 </span>
+
 					<h2 id="pc8-titulo-ubicacion" tabindex="-1">¿Dónde se
+
 						encuentra?</h2>
+
 					<p>Solo se aceptan reportes ubicados dentro de Chorrillos.
+
 						Puedes usar el mapa o ingresar coordenadas manualmente.</p>
+
 				</div>
+
 				<div class="pc8-panel-cuerpo">
+
 					<!-- DIRECCIÓN -->
+
 					<div class="mb-4">
+
 						<label for="ubicacion" class="form-label fw-semibold">
+
 							Dirección o referencia <span aria-label="obligatorio">*</span>
+
 						</label> <input id="ubicacion" th:field="*{ubicacion}"
+
 							class="form-control" minlength="8" maxlength="260" required
+
 							placeholder="Ej. Av. Defensores del Morro, frente a un parque"
+
 							aria-describedby="pc8-ubicacion-ayuda">
+
 						<p id="pc8-ubicacion-ayuda" class="form-text">Incluye una
+
 							referencia fácil de reconocer para el personal municipal.</p>
+
 						<div class="text-danger small" th:errors="*{ubicacion}"></div>
+
 					</div>
+
 					<!-- MAPA -->
+
 					<div>
+
 						<h3 class="pc8-seccion-titulo">
+
 							Punto exacto en Chorrillos <span aria-label="obligatorio">*</span>
+
 						</h3>
+
 						<div id="mapa-reporte" class="mapa-pc8" role="group"
+
 							aria-label="Mapa de Chorrillos para seleccionar la ubicación">
+
 						</div>
+
 						<div
+
 							class="d-flex flex-wrap
+
                                 align-items-center gap-2 mt-3">
+
 							<button class="btn btn-outline-primary" type="button"
+
 								id="mi-ubicacion">Usar mi ubicación actual</button>
+
 							<span id="mapa-ayuda" class="small text-secondary" role="status"
+
 								aria-live="polite"> Cargando los límites de Chorrillos… </span>
+
 						</div>
+
 						<!-- COORDENADAS MANUALES -->
+
 						<details class="pc8-coordenadas mt-3"
+
 							id="pc8-coordenadas-detalles">
+
 							<summary> Escribir coordenadas manualmente (alternativa
+
 								accesible) </summary>
+
 							<div class="row g-3 mt-1">
+
 								<div class="col-sm-6">
+
 									<label for="latitud" class="form-label"> Latitud * </label> <input
+
 										id="latitud" type="number" step="any" min="-90" max="90"
+
 										th:field="*{latitud}" class="form-control"
+
 										placeholder="-12.18">
+
 									<div class="text-danger small" th:errors="*{latitud}"></div>
+
 								</div>
+
 								<div class="col-sm-6">
+
 									<label for="longitud" class="form-label"> Longitud * </label> <input
+
 										id="longitud" type="number" step="any" min="-180" max="180"
+
 										th:field="*{longitud}" class="form-control"
+
 										placeholder="-77.01">
+
 									<div class="text-danger small" th:errors="*{longitud}"></div>
+
 								</div>
+
 							</div>
+
 						</details>
+
 						<p class="form-text mt-2">La ubicación también será validada
+
 							por Spring Boot. El GPS puede requerir HTTPS desde el celular.</p>
+
 					</div>
+
 				</div>
+
 			</section>
+
 			<!-- ================================= -->
+
 			<!-- PASO 3: EVIDENCIA Y REVISIÓN -->
+
 			<!-- ================================= -->
+
 			<section class="pc8-reporte-panel pc8-form-step" data-step="2"
+
 				aria-labelledby="pc8-titulo-revision">
+
 				<div class="pc8-panel-encabezado">
+
 					<span class="pc8-paso-chapa"> 03 / 03 </span>
+
 					<h2 id="pc8-titulo-revision" tabindex="-1">Evidencia y
+
 						revisión</h2>
+
 					<p>Adjunta una foto si la tienes, elige la privacidad de tu
+
 						reporte y revisa los datos antes de enviarlo.</p>
+
 				</div>
+
 				<div class="pc8-panel-cuerpo">
+
 					<!-- FOTOGRAFÍA -->
+
 					<div class="mb-4">
+
 						<label for="foto" class="form-label fw-semibold">
+
 							Fotografía de evidencia (opcional) </label> <input id="foto"
+
 							th:field="*{foto}" type="file" accept="image/jpeg,image/png"
+
 							class="form-control" aria-describedby="pc8-foto-ayuda">
+
 						<p id="pc8-foto-ayuda" class="form-text">JPG o PNG, máximo 3
+
 							MB. Evita fotografiar rostros o información privada.</p>
+
 						<p id="pc8-foto-mensaje" class="small" role="status"
+
 							aria-live="polite"></p>
+
 						<img id="pc8-foto-vista" class="pc8-foto-previa"
+
 							alt="Vista previa de la fotografía seleccionada" hidden>
+
 					</div>
+
 					<!-- ================================= -->
+
 					<!-- NUEVO: PRIVACIDAD DEL REPORTE -->
+
 					<!-- ================================= -->
+
 					<fieldset class="pc8-privacidad-panel mb-4">
+
 						<legend class="h5 fw-bold mb-2"> 🔒 Privacidad de tu
+
 							reporte </legend>
+
 						<p class="text-secondary small mb-3">Decide si deseas mantener
+
 							tu nombre oculto durante la gestión municipal. Esta opción no
+
 							cambia la información del problema ni su seguimiento.</p>
+
 						<!-- OPCIÓN 1: IDENTIDAD RESERVADA -->
+
 						<label class="pc8-privacidad-opcion" for="identidad-reservada-si">
+
 							<span class="d-flex align-items-start gap-3"> <input
+
 								class="form-check-input" type="radio"
+
 								id="identidad-reservada-si" th:field="*{identidadReservada}"
+
 								value="true"> <span> <span
+
 									class="pc8-privacidad-titulo
+
                                              d-block">
+
 										Mantener mi identidad reservada </span> <span
+
 									class="pc8-privacidad-descripcion
+
                                              d-block">
+
 										Mi nombre no deberá mostrarse al personal operativo que
+
 										atienda la incidencia. </span>
+
 							</span>
+
 						</span>
+
 						</label>
+
 						<!-- OPCIÓN 2: IDENTIFICADO -->
+
 						<label class="pc8-privacidad-opcion" for="identidad-reservada-no">
+
 							<span class="d-flex align-items-start gap-3"> <input
+
 								class="form-check-input" type="radio"
+
 								id="identidad-reservada-no" th:field="*{identidadReservada}"
+
 								value="false"> <span> <span
+
 									class="pc8-privacidad-titulo
+
                                              d-block">
+
 										Presentar mi reporte identificado </span> <span
+
 									class="pc8-privacidad-descripcion
+
                                              d-block">
+
 										El personal municipal autorizado podrá consultar mi nombre
+
 										para gestionar el reporte. </span>
+
 							</span>
+
 						</span>
+
 						</label>
+
 						<div class="pc8-privacidad-aviso mt-3">
+
 							<strong>Importante:</strong> En ambas modalidades debes iniciar
+
 							sesión en CiudadConecta. Tu cuenta se conserva para consultar el
+
 							estado, recibir notificaciones y confirmar la atención. No se
+
 							trata de una denuncia totalmente anónima.
+
 						</div>
+
 					</fieldset>
+
 					<!-- ================================= -->
+
 					<!-- RESUMEN DEL REPORTE -->
+
 					<!-- ================================= -->
+
 					<div class="pc8-resumen" aria-labelledby="pc8-resumen-titulo">
+
 						<h3 id="pc8-resumen-titulo">Comprueba tu reporte</h3>
+
 						<dl>
+
 							<div>
+
 								<dt>Categoría</dt>
+
 								<dd id="pc8-resumen-categoria">—</dd>
+
 							</div>
+
 							<div>
+
 								<dt>Subcategoría</dt>
+
 								<dd id="pc8-resumen-subcategoria">Sin especificar</dd>
+
 							</div>
+
 							<div>
+
 								<dt>Descripción</dt>
+
 								<dd id="pc8-resumen-descripcion">—</dd>
+
 							</div>
+
 							<div>
+
 								<dt>Dirección o referencia</dt>
+
 								<dd id="pc8-resumen-ubicacion">—</dd>
+
 							</div>
+
 							<div>
+
 								<dt>Coordenadas</dt>
+
 								<dd id="pc8-resumen-coordenadas">—</dd>
+
 							</div>
+
 							<div>
+
 								<dt>Fotografía</dt>
+
 								<dd id="pc8-resumen-foto">Sin fotografía adjunta</dd>
+
 							</div>
+
 							<!-- NUEVO: RESUMEN DE PRIVACIDAD -->
+
 							<div>
+
 								<dt>Privacidad</dt>
+
 								<dd id="pc8-resumen-privacidad" aria-live="polite">
+
 									Identidad reservada</dd>
+
 							</div>
+
 						</dl>
+
+                <!-- Acciones para corregir la información -->
+<div class="pc8-resumen-acciones mt-4">
+
+								<p class="fw-semibold mb-2">¿Necesitas corregir algún dato?
+
+								</p>
+
+								<div class="d-flex flex-wrap gap-2">
+
+									<button type="button" id="pc8-editar-problema"
+
+										class="btn btn-outline-primary">Editar problema</button>
+
+									<button type="button" id="pc8-editar-ubicacion"
+
+										class="btn btn-outline-primary">Editar ubicación</button>
+
+								</div>
+
+							</div>
+
 					</div>
+
 					<!-- CONSENTIMIENTO -->
+
 					<p class="pc8-consentimiento mt-3 mb-0">Después de enviarlo,
+
 						recibirás un código para consultar el estado del reporte. El
+
 						registro no garantiza atención inmediata.</p>
+
 				</div>
+
 			</section>
+
 			<!-- ================================= -->
+
 			<!-- NAVEGACIÓN ENTRE PASOS -->
+
 			<!-- ================================= -->
+
 			<div class="pc8-navegacion-pasos mt-3"
+
 				aria-label="Acciones del formulario">
+
 				<p id="pc8-form-mensaje" class="pc8-form-mensaje" role="alert"
+
 					hidden></p>
+
 				<div
+
 					class="d-flex flex-wrap
+
                         justify-content-between gap-2">
+
 					<button type="button" class="btn btn-outline-secondary btn-lg"
+
 						id="pc8-anterior" hidden>← Anterior</button>
+
 					<button type="button" class="btn btn-primary btn-lg ms-auto"
+
 						id="pc8-siguiente" hidden>Siguiente: ubicación →</button>
+
 					<button type="submit" class="btn btn-primary btn-lg ms-auto"
+
 						id="pc8-enviar">Enviar reporte</button>
+
 				</div>
+
 			</div>
+
 		</form>
+
 	</main>
+
 	<!-- LEAFLET Y FORMULARIO EXISTENTE -->
+
 	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+
 </script>
+
 	<script th:src="@{/js/nuevo-reporte.js}" defer>
+
 </script>
+
+	<script th:src="@{/js/pc8-borrador-reporte.js}" defer></script>
+
+	<script th:src="@{/js/pc8-validacion-accesible.js}" defer></script>
+
 	<!-- SUBCATEGORÍAS: SELECCIÓN DEPENDIENTE -->
+
 	<script>
+
 document.addEventListener('DOMContentLoaded', () => {
+
     'use strict';
 
     const categoria = document.getElementById('categoria');
+
     const subcategoria = document.getElementById('subcategoria');
+
     const panel = document.getElementById('pc8-subcategoria-panel');
+
     const resumen = document.getElementById('pc8-resumen-subcategoria');
 
     if (!categoria || !subcategoria || !panel) return;
 
     // Mantener el catálogo original para reconstruir las opciones.
+
     const opciones = [...subcategoria.querySelectorAll('option[data-categoria]')]
+
         .map(op => op.cloneNode(true));
+
     const opcionVacia = subcategoria.querySelector('option[value=""]').cloneNode(true);
 
     function actualizarResumen() {
+
         if (!resumen) return;
+
         const seleccion = subcategoria.selectedOptions[0];
+
         resumen.textContent = subcategoria.value && seleccion
+
             ? seleccion.textContent.trim()
+
             : 'Sin especificar';
+
     }
 
     function filtrarSubcategorias(conservarSeleccion = false) {
+
         const categoriaBase = categoria.value.startsWith('BASE:')
+
             ? categoria.value.slice(5)
+
             : null;
+
         const valorAnterior = conservarSeleccion ? subcategoria.value : '';
+
         const disponibles = opciones.filter(op => op.dataset.categoria === categoriaBase);
 
         subcategoria.replaceChildren(
+
             opcionVacia.cloneNode(true),
+
             ...disponibles.map(op => op.cloneNode(true))
+
         );
 
         // Recuperar el valor tras un error de validación del servidor.
+
         if (disponibles.some(op => op.value === valorAnterior)) {
+
             subcategoria.value = valorAnterior;
+
         } else {
+
             subcategoria.value = '';
+
         }
 
         panel.hidden = disponibles.length === 0;
+
         subcategoria.disabled = disponibles.length === 0;
+
         actualizarResumen();
+
     }
 
     categoria.addEventListener('change', () => filtrarSubcategorias(false));
+
     subcategoria.addEventListener('change', actualizarResumen);
+
     filtrarSubcategorias(true);
+
 });
+
 </script>
 
 	<!-- NUEVO: ACTUALIZAR RESUMEN DE PRIVACIDAD -->
+
 	<script>
+
 document.addEventListener('DOMContentLoaded', () => {
+
     'use strict';
+
     const opciones = document.querySelectorAll(
+
         'input[name="identidadReservada"]'
+
     );
+
     const resumen = document.getElementById(
+
         'pc8-resumen-privacidad'
+
     );
+
     if (!resumen || opciones.length === 0) {
+
         return;
+
     }
+
     function actualizarPrivacidad() {
+
         const seleccionada = document.querySelector(
+
             'input[name="identidadReservada"]:checked'
+
         );
+
         if (!seleccionada) {
+
             resumen.textContent = 'Sin seleccionar';
+
             return;
+
         }
+
         resumen.textContent =
+
             seleccionada.value === 'true'
+
                 ? 'Identidad reservada'
+
                 : 'Reporte identificado';
+
     }
+
     opciones.forEach(opcion => {
+
         opcion.addEventListener(
+
             'change',
+
             actualizarPrivacidad
+
         );
+
     });
+
     actualizarPrivacidad();
+
 });
+
 </script>
+
 	<footer th:replace="~{fragments/base :: footer}"> </footer>
+
 </body>
+
 </html>

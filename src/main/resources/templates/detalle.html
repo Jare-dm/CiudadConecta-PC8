@@ -119,8 +119,74 @@
             width: 100%;
         }
     }
+
+    /* Fase 3: seguimiento más claro y accesible */
+    .pc8-detalle-enlaces {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .6rem;
+        margin: 0 0 1.5rem;
+    }
+    .pc8-detalle-enlaces a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        border: 1px solid #bfd1e2;
+        border-radius: .65rem;
+        padding: .45rem .85rem;
+        color: #124f85;
+        background: #fff;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .pc8-detalle-enlaces a:hover { background: #eaf3fb; }
+    .pc8-detalle-enlaces a:focus-visible,
+    .pc8-detalle-page a:focus-visible,
+    .pc8-detalle-page button:focus-visible,
+    .pc8-detalle-page textarea:focus-visible {
+        outline: 3px solid #b36b00 !important;
+        outline-offset: 3px !important;
+    }
+    .pc8-detalle-page section[id] { scroll-margin-top: 2rem; }
+    .pc8-estado-explicacion {
+        border-left: 4px solid #1463a5;
+        border-radius: .5rem;
+        background: #f1f7fc;
+        padding: 1rem 1.2rem;
+        line-height: 1.6;
+    }
+    .pc8-ubicacion-textual {
+        margin: 1rem 0 0;
+        padding: .85rem 1rem;
+        border: 1px solid #d6e4f2;
+        border-radius: .7rem;
+        overflow-wrap: anywhere;
+        background: #f8fafc;
+    }
+    .pc8-timeline-item h3 { line-height: 1.45; }
+    html.contraste-alto .pc8-detalle-enlaces a,
+    html.contraste-alto .pc8-estado-explicacion,
+    html.contraste-alto .pc8-ubicacion-textual {
+        color: #fff !important;
+        background: #000 !important;
+        border: 2px solid #ffff66 !important;
+    }
+    html.contraste-alto .pc8-detalle-page :focus-visible {
+        outline-color: #ffff66 !important;
+    }
+    html.contraste-alto .pc8-timeline::before {
+        background: #ffff66 !important;
+    }
+    html.contraste-alto .pc8-timeline-item::before {
+        background: #000 !important;
+        border-color: #ffff66 !important;
+    }
+    @media (max-width: 575.98px) {
+        .pc8-detalle-enlaces { flex-direction: column; }
+        .pc8-detalle-enlaces a { width: 100%; }
+    }
 </style>
-<main id="contenido" class="container py-5">
+<main id="contenido" class="container py-5 pc8-detalle-page">
     <!-- VOLVER -->
     <a class="small link-secondary text-decoration-none"
        th:href="${personal} ? @{/gestion} : @{/mis-reportes}">
@@ -207,16 +273,41 @@
             </span>
         </div>
     </header>
+
+    <!-- Navegación rápida; los enlaces solo apuntan a secciones existentes -->
+    <nav class="pc8-detalle-enlaces" aria-label="Secciones del reporte">
+        <a href="#pc8-info-problema">Información</a>
+        <a href="#titulo-evidencias">Fotografías</a>
+        <a th:if="${reporte.latitud != null and reporte.longitud != null}"
+           href="#titulo-mapa">Ubicación</a>
+        <a href="#titulo-historial">Historial</a>
+    </nav>
+
+    <div class="pc8-estado-explicacion mb-4" role="note"
+         aria-label="Explicación del estado actual">
+        <strong>Estado actual del reporte:</strong>
+        <span th:switch="${reporte.estado.name()}">
+            <span th:case="'REGISTRADO'">Se registró tu incidencia y está pendiente de revisión municipal.</span>
+            <span th:case="'EN_REVISION'">El personal municipal está evaluando el reporte.</span>
+            <span th:case="'ASIGNADO'">El reporte ya fue asignado para su atención.</span>
+            <span th:case="'EN_ATENCION'">La incidencia se encuentra en proceso de atención.</span>
+            <span th:case="'ATENDIDO'">La municipalidad registró una atención. Consulta los detalles y, cuando corresponda, confírmala o solicita una nueva revisión.</span>
+            <span th:case="'CERRADO'">El seguimiento de este reporte se encuentra cerrado.</span>
+            <span th:case="'RECHAZADO'">El reporte fue rechazado. Consulta las observaciones y el historial para conocer la información registrada.</span>
+            <span th:case="*">Consulta el historial para conocer las actualizaciones de tu reporte.</span>
+        </span>
+    </div>
+
     <div class="row g-4">
         <!-- ===================================== -->
         <!-- COLUMNA PRINCIPAL -->
         <!-- ===================================== -->
         <div class="col-lg-7">
             <!-- INFORMACIÓN DEL PROBLEMA -->
-            <section class="card border-0 shadow-sm
-                            pc8-detalle-card mb-4">
+            <section id="pc8-info-problema" class="card border-0 shadow-sm
+                            pc8-detalle-card mb-4" aria-labelledby="pc8-info-titulo">
                 <div class="card-body p-4">
-                    <h2 class="h5 fw-bold mb-3">
+                    <h2 id="pc8-info-titulo" class="h5 fw-bold mb-3">
                         Información del problema
                     </h2>
                     <!-- NUEVO: MODALIDAD DE PRIVACIDAD -->
@@ -418,6 +509,14 @@
                          th:attr="data-lat=${reporte.latitud},
                                   data-lon=${reporte.longitud}">
                     </div>
+                    <div class="pc8-ubicacion-textual" role="note">
+                        <strong>Alternativa al mapa:</strong>
+                        ubicación registrada en
+                        <span th:text="${reporte.ubicacion}">Chorrillos</span>.
+                        <span>Coordenadas: latitud</span>
+                        <span th:text="${reporte.latitud}">-12.18</span>,
+                        longitud <span th:text="${reporte.longitud}">-77.01</span>.
+                    </div>
                 </div>
             </section>
             <!-- ===================================== -->
@@ -455,9 +554,10 @@
                                 class="form-control"
                                 rows="4"
                                 maxlength="700"
+                                aria-describedby="pc8-motivo-ayuda motivo-error"
                                 placeholder="Explica qué parte del problema sigue pendiente">
                             </textarea>
-                            <div class="form-text">
+                            <div id="pc8-motivo-ayuda" class="form-text">
                                 Solo es obligatorio si
                                 solicitas una nueva revisión.
                                 Escribe al menos 10 caracteres.
@@ -696,5 +796,25 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <footer th:replace="~{fragments/base :: footer}">
 </footer>
+
+<!-- Limpiar borrador solo después de registrar
+     correctamente un nuevo reporte -->
+
+<script
+    th:if="${exito != null and #strings.startsWith(exito, '¡Reporte registrado!')}">
+
+    try {
+        sessionStorage.removeItem(
+            'pc8-borrador-reporte-v1'
+        );
+    } catch (error) {
+        console.warn(
+            'No se pudo limpiar el borrador temporal.',
+            error
+        );
+    }
+
+</script>
+
 </body>
 </html>

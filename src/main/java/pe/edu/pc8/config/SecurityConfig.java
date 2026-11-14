@@ -1,3 +1,4 @@
+
 package pe.edu.pc8.config;
 
 import pe.edu.pc8.repository.UsuarioRepository;
@@ -135,7 +136,7 @@ public class SecurityConfig {
     }
 
     // ==========================================
-    // APLICACION WEB: CONSERVAR SEGURIDAD ACTUAL
+    // APLICACION WEB
     // ==========================================
 
     @Bean
@@ -145,63 +146,110 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
 
+            // =====================================
+            // PAGINAS PUBLICAS EXISTENTES
+            // =====================================
             .requestMatchers(
                 "/",
                 "/login",
                 "/registro",
+                "/que-reportar",
+                "/manual",
+                "/invitado",
+                "/soporte",
                 "/accesibilidad",
                 "/transparencia",
+                "/transparencia/mapa-publico",
                 "/css/**",
                 "/js/**",
                 "/favicon.ico",
                 "/error"
             ).permitAll()
 
-            .requestMatchers("/admin/**")
-            .hasRole("ADMIN")
+            // =====================================
+            // MODO INVITADO: CONSULTAR FORMULARIO
+            // =====================================
+            .requestMatchers(
+                HttpMethod.GET,
+                "/invitado/reportar",
+                "/invitado/recibido",
+                "/api/distritos/chorrillos"
+            ).permitAll()
 
+            // =====================================
+            // MODO INVITADO: ENVIAR REPORTE
+            // =====================================
+            .requestMatchers(
+                HttpMethod.POST,
+                "/invitado/reportar"
+            ).permitAll()
+
+            // =====================================
+            // ADMINISTRADOR
+            // =====================================
+            .requestMatchers(
+                "/admin/**"
+            ).hasRole("ADMIN")
+
+            // =====================================
+            // GESTION MUNICIPAL
+            // =====================================
             .requestMatchers(
                 "/gestion",
                 "/gestion/**"
-            )
-            .hasAnyRole(
+            ).hasAnyRole(
                 "FUNCIONARIO",
                 "MANTENIMIENTO",
                 "SUPERVISOR",
                 "ADMIN"
             )
 
+            // =====================================
+            // NOTIFICACIONES
+            // =====================================
             .requestMatchers(
                 "/notificaciones",
                 "/notificaciones/**"
-            )
-            .hasAnyRole(
+            ).hasAnyRole(
                 "CIUDADANO",
                 "MANTENIMIENTO"
             )
 
+            // =====================================
+            // PREFERENCIAS DEL CIUDADANO
+            // =====================================
             .requestMatchers(
                 "/preferencias",
                 "/preferencias/**"
-            )
-            .hasRole("CIUDADANO")
+            ).hasRole("CIUDADANO")
 
+            // =====================================
+            // CATEGORIAS PERSONALIZADAS
+            // =====================================
             .requestMatchers(
                 "/categorias/personalizadas",
                 "/categorias/personalizadas/**"
-            )
-            .hasRole("CIUDADANO")
+            ).hasRole("CIUDADANO")
 
+            // =====================================
+            // REGISTRO Y SEGUIMIENTO DE REPORTES
+            // PARA CIUDADANOS AUTENTICADOS
+            // =====================================
             .requestMatchers(
                 "/mis-reportes",
                 "/reportes/nuevo",
                 "/reportes/*/confirmar"
-            )
-            .hasRole("CIUDADANO")
+            ).hasRole("CIUDADANO")
 
+            // =====================================
+            // DEMAS RUTAS: REQUIEREN INICIAR SESION
+            // =====================================
             .anyRequest().authenticated()
         );
 
+        // ==========================================
+        // INICIO DE SESION WEB
+        // ==========================================
         http.formLogin(form -> form
 
             .loginPage("/login")
@@ -213,6 +261,9 @@ public class SecurityConfig {
             .permitAll()
         );
 
+        // ==========================================
+        // CIERRE DE SESION WEB
+        // ==========================================
         http.logout(logout -> logout
 
             .logoutUrl("/logout")

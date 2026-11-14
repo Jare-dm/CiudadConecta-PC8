@@ -66,6 +66,9 @@
 <!-- ALTO CONTRASTE -->
 <link rel="stylesheet" th:href="@{/css/pc8-contraste-mejorado.css}">
 
+<!-- MEJORAS GLOBALES DE ACCESIBILIDAD (PRESERVADO) -->
+<link rel="stylesheet" th:href="@{/css/pc8-accesibilidad-global.css}">
+
 <!-- ENLACE PARA SALTAR AL CONTENIDO -->
 <style>
 a.pc8-skip-link:not(:focus) {
@@ -117,126 +120,159 @@ a.pc8-skip-link:focus {
 		<a href="#contenido" class="pc8-skip-link"> Saltar al contenido
 			principal </a>
 
-		<nav
-			class="navbar navbar-expand-xxl navbar-dark navbar-pc8 pc8-navbar"
-			aria-label="Navegación principal">
+        <nav class="navbar navbar-expand-xxl navbar-dark navbar-pc8 pc8-navbar"
+             aria-label="Navegación principal">
+            <div class="container-fluid px-3 px-lg-4 pc8-nav-container">
 
-			<div class="container-fluid px-3 px-lg-4 pc8-nav-container">
+                <a class="navbar-brand pc8-brand" th:href="@{/}"
+                   aria-label="CiudadConecta, ir al inicio">
+                    <span class="pc8-brand-symbol" aria-hidden="true">✦</span>
+                    <span class="pc8-brand-text">
+                        <span class="pc8-brand-name">CiudadConecta</span>
+                        <small class="pc8-brand-subtitle">Participación ciudadana · Chorrillos</small>
+                    </span>
+                </a>
 
-				<!-- MARCA -->
-				<a class="navbar-brand pc8-brand" th:href="@{/}"
-					aria-label="CiudadConecta, ir a la página principal"> <span
-					class="pc8-brand-symbol" aria-hidden="true"> ✦ </span> <span
-					class="pc8-brand-text"> <span class="pc8-brand-name">
-							CiudadConecta </span> <small class="pc8-brand-subtitle">
-							Participación ciudadana </small>
+                <button class="navbar-toggler pc8-menu-toggle" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#pc8-menu"
+                        aria-controls="pc8-menu" aria-expanded="false"
+                        aria-label="Abrir o cerrar el menú de navegación">
+                    <span class="navbar-toggler-icon" aria-hidden="true"></span>
+                    <span class="pc8-menu-word">Menú</span>
+                </button>
 
-				</span>
+                <div class="collapse navbar-collapse pc8-menu-collapse" id="pc8-menu">
+                    <ul class="navbar-nav ms-auto pc8-menu-items align-items-xxl-center">
+                        <li class="nav-item">
+                            <a class="nav-link pc8-nav-link" th:href="@{/}" data-pc8-ruta="inicio">
+                                <span aria-hidden="true"></span> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link pc8-nav-link" th:href="@{/transparencia}" data-pc8-ruta="transparencia">
+                                <span aria-hidden="true"></span> Transparencia
+                            </a>
+                        </li>
 
-				</a>
+                        <li class="nav-item dropdown">
+                            <button class="nav-link pc8-nav-link dropdown-toggle pc8-nav-dropdown-toggle"
+                                    type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false" id="pc8-servicios-menu">
+                                <span aria-hidden="true"></span> Servicios
+                            </button>
+                            <ul class="dropdown-menu pc8-nav-dropdown" aria-labelledby="pc8-servicios-menu">
+                                <li sec:authorize="isAnonymous()"><a class="dropdown-item" th:href="@{/invitado}">Explorar como invitado</a></li>
+                                <li sec:authorize="isAnonymous()"><a class="dropdown-item" th:href="@{/invitado/reportar}">Reportar sin cuenta</a></li>
+                                <li sec:authorize="hasRole('CIUDADANO')"><a class="dropdown-item" th:href="@{/mis-reportes}">Mis reportes</a></li>
+                                <li sec:authorize="hasRole('CIUDADANO')"><a class="dropdown-item" th:href="@{/reportes/nuevo}">Crear reporte</a></li>
+                                <li sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')">
+                                    <a class="dropdown-item" th:href="@{/gestion}">Panel municipal</a>
+                                </li>
+                                <li sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')">
+                                    <a class="dropdown-item" th:href="@{/gestion/estadisticas}">Estadísticas y mapa municipal</a>
+                                </li>
+                                <li sec:authorize="hasRole('ADMIN')">
+                                    <a class="dropdown-item" th:href="@{/admin/usuarios}">Administración de usuarios</a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" th:href="@{/transparencia}">Mapa urbano público</a></li>
+                            </ul>
+                        </li>
 
-				<!-- BOTÓN MÓVIL -->
-				<button class="navbar-toggler pc8-menu-toggle" type="button"
-					data-bs-toggle="collapse" data-bs-target="#pc8-menu"
-					aria-controls="pc8-menu" aria-expanded="false"
-					aria-label="Mostrar u ocultar el menú de navegación">
+                        <li class="nav-item dropdown">
+                            <button class="nav-link pc8-nav-link dropdown-toggle pc8-nav-dropdown-toggle"
+                                    type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false" id="pc8-ayuda-menu">
+                                <span aria-hidden="true"></span> Ayuda
+                            </button>
+                            <ul class="dropdown-menu pc8-nav-dropdown" aria-labelledby="pc8-ayuda-menu">
+                                <li><a class="dropdown-item" th:href="@{/que-reportar}">¿Qué puedo reportar?</a></li>
+                                <li><a class="dropdown-item" th:href="@{/manual}">Manual de ayuda</a></li>
+                                <li><a class="dropdown-item" th:href="@{/soporte}">Centro de soporte</a></li>
+                            </ul>
+                        </li>
 
-					<span class="navbar-toggler-icon" aria-hidden="true"> </span> <span
-						class="pc8-menu-word"> Menú </span>
+                        <li class="nav-item" sec:authorize="hasAnyRole('CIUDADANO','MANTENIMIENTO')">
+                            <a class="nav-link pc8-nav-link" th:href="@{/notificaciones}">
+                                <span aria-hidden="true"></span> Avisos
+                                <span class="pc8-notification-count" aria-hidden="true"
+                                      th:if="${avisosPendientes != null and avisosPendientes > 0}"
+                                      th:text="${avisosPendientes}">0</span>
+                                <span class="visually-hidden"
+                                      th:if="${avisosPendientes != null and avisosPendientes > 0}"
+                                      th:text="${avisosPendientes} + ' notificaciones sin leer'"></span>
+                            </a>
+                        </li>
 
-				</button>
+                        <li class="nav-item pc8-cta-item" sec:authorize="isAnonymous()">
+                            <a class="btn pc8-nav-cta" th:href="@{/invitado/reportar}">
+                                <span aria-hidden="true">＋</span> Reportar problema
+                            </a>
+                        </li>
+                        <li class="nav-item pc8-cta-item" sec:authorize="hasRole('CIUDADANO')">
+                            <a class="btn pc8-nav-cta" th:href="@{/reportes/nuevo}">
+                                <span aria-hidden="true">＋</span> Reportar problema
+                            </a>
+                        </li>
 
-				<!-- ENLACES -->
-				<div class="collapse navbar-collapse pc8-menu-collapse"
-					id="pc8-menu">
+                        <li class="nav-item pc8-header-actions" sec:authorize="isAnonymous()">
+                            <a class="btn pc8-nav-login" th:href="@{/login}">Ingresar</a>
+                        </li>
+                        <li class="nav-item pc8-register-item" sec:authorize="isAnonymous()">
+                            <a class="btn pc8-nav-register" th:href="@{/registro}">Crear cuenta</a>
+                        </li>
 
-					<ul
-						class="navbar-nav ms-auto pc8-menu-items align-items-xxl-center">
+                        <li class="nav-item dropdown pc8-header-actions" sec:authorize="isAuthenticated()">
+                            <button class="btn pc8-nav-login dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                    id="pc8-perfil-menu">Mi cuenta</button>
+                            <div class="dropdown-menu dropdown-menu-end pc8-nav-dropdown"
+                                 aria-labelledby="pc8-perfil-menu">
+                                <a sec:authorize="hasRole('CIUDADANO')" class="dropdown-item"
+                                   th:href="@{/preferencias}">Preferencias</a>
+                                <a sec:authorize="hasRole('CIUDADANO')" class="dropdown-item"
+                                   th:href="@{/mis-reportes}">Mis reportes</a>
+                                <a sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')"
+                                   class="dropdown-item" th:href="@{/gestion}">Panel municipal</a>
+                                <hr class="dropdown-divider">
+                                <form th:action="@{/logout}" method="post" class="px-2 mb-0">
+                                    <input type="hidden" th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <button class="dropdown-item pc8-nav-logout-option" type="submit">Cerrar sesión</button>
+                                </form>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
-						<!-- TRANSPARENCIA -->
-						<li class="nav-item"><a class="nav-link pc8-nav-link"
-							th:href="@{/transparencia}"> Transparencia </a></li>
-
-						<!-- MIS REPORTES -->
-						<li class="nav-item" sec:authorize="hasRole('CIUDADANO')"><a
-							class="nav-link pc8-nav-link" th:href="@{/mis-reportes}"> Mis
-								reportes </a></li>
-
-						<!-- PANEL MUNICIPAL -->
-						<li class="nav-item"
-							sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')">
-
-							<a class="nav-link pc8-nav-link" th:href="@{/gestion}"> Panel
-								municipal </a>
-
-						</li>
-
-						<!-- NOTIFICACIONES -->
-						<li class="nav-item"
-							sec:authorize="hasAnyRole('CIUDADANO','MANTENIMIENTO')"><a
-							class="nav-link pc8-nav-link" th:href="@{/notificaciones}">
-
-								Notificaciones <span class="pc8-notification-count"
-								aria-hidden="true"
-								th:if="${avisosPendientes != null and avisosPendientes > 0}"
-								th:text="${avisosPendientes}"> 0 </span> <span
-								class="visually-hidden"
-								th:if="${avisosPendientes != null and avisosPendientes > 0}"
-								th:text="${avisosPendientes} + ' notificaciones sin leer'">
-							</span>
-
-						</a></li>
-
-						<!-- PREFERENCIAS -->
-						<li class="nav-item" sec:authorize="hasRole('CIUDADANO')"><a
-							class="nav-link pc8-nav-link" th:href="@{/preferencias}">
-								Preferencias </a></li>
-
-						<!-- ADMINISTRACIÓN DE USUARIOS -->
-						<li class="nav-item" sec:authorize="hasRole('ADMIN')"><a
-							class="nav-link pc8-nav-link" th:href="@{/admin/usuarios}">
-								Usuarios </a></li>
-
-						<!-- NUEVO REPORTE -->
-						<li class="nav-item pc8-cta-item"
-							sec:authorize="hasRole('CIUDADANO')"><a
-							class="btn pc8-nav-cta" th:href="@{/reportes/nuevo}"> <span
-								aria-hidden="true">＋</span> Nuevo reporte
-
-						</a></li>
-
-						<!-- INGRESAR -->
-						<li class="nav-item pc8-header-actions"
-							sec:authorize="isAnonymous()"><a class="btn pc8-nav-login"
-							th:href="@{/login}"> Ingresar </a></li>
-
-						<!-- REGISTRO -->
-						<li class="nav-item pc8-register-item"
-							sec:authorize="isAnonymous()"><a
-							class="btn pc8-nav-register" th:href="@{/registro}"> Crear
-								cuenta </a></li>
-
-						<!-- CERRAR SESIÓN -->
-						<li class="nav-item pc8-header-actions"
-							sec:authorize="isAuthenticated()">
-
-							<form th:action="@{/logout}" method="post"
-								class="pc8-logout-form">
-
-								<button type="submit" class="btn pc8-nav-logout">
-									Cerrar sesión</button>
-
-							</form>
-
-						</li>
-
-					</ul>
-
-				</div>
-
-			</div>
-
-		</nav>
+        <!-- Accesos rápidos para teléfonos. Solo enlaces compatibles con cada rol. -->
+        <nav class="pc8-mobile-nav" aria-label="Accesos rápidos para móviles">
+            <a class="pc8-mobile-link" th:href="@{/}" data-pc8-ruta="inicio">
+                <span class="pc8-mobile-icon" aria-hidden="true">⌂</span><span>Inicio</span>
+            </a>
+            <a class="pc8-mobile-link" th:href="@{/transparencia}" data-pc8-ruta="transparencia">
+                <span class="pc8-mobile-icon" aria-hidden="true">▧</span><span>Mapa</span>
+            </a>
+            <a sec:authorize="isAnonymous()" class="pc8-mobile-link pc8-mobile-action"
+               th:href="@{/invitado/reportar}"><span class="pc8-mobile-icon" aria-hidden="true">＋</span><span>Reportar</span></a>
+            <a sec:authorize="hasRole('CIUDADANO')" class="pc8-mobile-link pc8-mobile-action"
+               th:href="@{/reportes/nuevo}"><span class="pc8-mobile-icon" aria-hidden="true">＋</span><span>Reportar</span></a>
+            <a sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')"
+               class="pc8-mobile-link pc8-mobile-action" th:href="@{/gestion}">
+               <span class="pc8-mobile-icon" aria-hidden="true">▦</span><span>Gestión</span></a>
+            <a sec:authorize="hasAnyRole('CIUDADANO','MANTENIMIENTO')" class="pc8-mobile-link"
+               th:href="@{/notificaciones}"><span class="pc8-mobile-icon" aria-hidden="true">♧</span><span>Avisos</span></a>
+            <a sec:authorize="isAnonymous()" class="pc8-mobile-link" th:href="@{/soporte}">
+               <span class="pc8-mobile-icon" aria-hidden="true">?</span><span>Ayuda</span></a>
+            <a sec:authorize="isAuthenticated()" class="pc8-mobile-link" th:href="@{/inicio}">
+               <span class="pc8-mobile-icon" aria-hidden="true">◉</span><span>Portal</span></a>
+            <a sec:authorize="isAnonymous()" class="pc8-mobile-link" th:href="@{/login}">
+               <span class="pc8-mobile-icon" aria-hidden="true">◉</span><span>Ingresar</span></a>
+            <a sec:authorize="hasAnyRole('FUNCIONARIO','SUPERVISOR','ADMIN')" class="pc8-mobile-link"
+               th:href="@{/gestion/estadisticas}"><span class="pc8-mobile-icon" aria-hidden="true">▥</span><span>Datos</span></a>
+        </nav>
 
 		<!-- ============================================ -->
 		<!-- BARRA DE ACCESIBILIDAD -->

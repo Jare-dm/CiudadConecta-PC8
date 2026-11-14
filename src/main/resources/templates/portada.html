@@ -1,139 +1,675 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head th:replace="~{fragments/base :: head('Inicio')}"></head>
+
 <body>
-<div th:replace="~{fragments/base :: nav}"></div>
 
-<main id="contenido" class="pc8-home">
-  <section class="pc8-home-hero" aria-label="Presentación de CiudadConecta">
-    <div class="container pc8-home-container py-5">
-      <div class="row align-items-center gy-4 gx-xl-5">
-        <div class="col-lg-7">
-          <div class="pc8-home-eyebrow"><span class="pc8-home-dot" aria-hidden="true"></span> Chorrillos · Lima, Perú · Proyecto académico</div>
+	<div th:replace="~{fragments/base :: nav}"></div>
 
-          <!-- Las acciones cambian según el rol real autenticado. -->
-          <div sec:authorize="isAnonymous()">
-            <h1 class="pc8-home-title">Reporta un problema. <span>Mejoremos Chorrillos.</span></h1>
-            <p class="pc8-home-lead">Informa sobre problemas en los espacios públicos de Chorrillos y conoce cómo avanza su atención, sin tener que acudir presencialmente.</p>
-            <div class="pc8-home-actions">
-              <a class="btn pc8-home-primary" th:href="@{/registro}">Crear mi cuenta <span aria-hidden="true">→</span></a>
-              <a class="btn pc8-home-secondary" th:href="@{/login}">Ya tengo una cuenta</a>
-            </div>
-          </div>
 
-          <div sec:authorize="hasRole('CIUDADANO')">
-            <h1 class="pc8-home-title">Tu participación <span>mejora Chorrillos.</span></h1>
-            <p class="pc8-home-lead">Registra una incidencia, revisa el estado de tus reportes y recibe avisos sobre la atención municipal.</p>
-            <div class="pc8-home-actions">
-              <a class="btn pc8-home-primary" th:href="@{/reportes/nuevo}">＋ Nuevo reporte</a>
-              <a class="btn pc8-home-secondary" th:href="@{/mis-reportes}">Consultar mis reportes</a>
-            </div>
-          </div>
 
-          <div sec:authorize="hasRole('FUNCIONARIO')">
-            <h1 class="pc8-home-title">Gestiona los reportes <span>de Chorrillos.</span></h1>
-            <p class="pc8-home-lead">Revisa las incidencias recibidas, clasifica los casos y coordina su atención con las áreas municipales.</p>
-            <div class="pc8-home-actions"><a class="btn pc8-home-primary" th:href="@{/gestion}">Abrir bandeja municipal <span aria-hidden="true">→</span></a></div>
-          </div>
+	<main id="contenido" class="pc8-home">
 
-          <div sec:authorize="hasRole('MANTENIMIENTO')">
-            <h1 class="pc8-home-title">Tu trabajo <span>transforma la ciudad.</span></h1>
-            <p class="pc8-home-lead">Consulta las incidencias asignadas, registra avances y adjunta las evidencias de los trabajos realizados.</p>
-            <div class="pc8-home-actions"><a class="btn pc8-home-primary" th:href="@{/gestion}">Ver trabajos e incidencias <span aria-hidden="true">→</span></a></div>
-          </div>
+		<section class="pc8-home-hero"
+			aria-label="Presentación de CiudadConecta">
 
-          <div sec:authorize="hasRole('SUPERVISOR')">
-            <h1 class="pc8-home-title">Supervisa una atención <span>más oportuna.</span></h1>
-            <p class="pc8-home-lead">Consulta el avance de los reportes, identifica retrasos y verifica las acciones de atención.</p>
-            <div class="pc8-home-actions"><a class="btn pc8-home-primary" th:href="@{/gestion}">Ver seguimiento municipal <span aria-hidden="true">→</span></a></div>
-          </div>
+			<div class="container pc8-home-container py-5">
 
-          <div sec:authorize="hasRole('ADMIN')">
-            <h1 class="pc8-home-title">Administra una plataforma <span>al servicio de Chorrillos.</span></h1>
-            <p class="pc8-home-lead">Gestiona usuarios y permisos, y accede a los reportes y estadísticas de la plataforma.</p>
-            <div class="pc8-home-actions">
-              <a class="btn pc8-home-primary" th:href="@{/admin/usuarios}">Administrar usuarios <span aria-hidden="true">→</span></a>
-              <a class="btn pc8-home-secondary" th:href="@{/gestion}">Panel municipal</a>
-            </div>
-          </div>
+				<div class="row align-items-center gy-4 gx-xl-5">
 
-          <p class="pc8-home-location-note"><span aria-hidden="true">⌖</span> Se aceptan reportes de incidencias ubicadas dentro del distrito de Chorrillos.</p>
-        </div>
+					<div class="col-lg-7">
 
-        <div class="col-lg-5">
-          <aside class="pc8-home-process" aria-labelledby="proceso-titulo">
-            <span class="pc8-home-process-label">Cómo funciona</span>
-            <h2 id="proceso-titulo">Un reporte con seguimiento</h2>
-            <ol class="pc8-home-steps">
-              <li><span class="pc8-home-step-number" aria-hidden="true">01</span><div><strong>Registra la incidencia</strong><p>Indica el problema, su ubicación en Chorrillos y adjunta una foto si la tienes.</p></div></li>
-              <li><span class="pc8-home-step-number" aria-hidden="true">02</span><div><strong>Se revisa y se asigna</strong><p>El personal municipal verifica el reporte y registra su gestión.</p></div></li>
-              <li><span class="pc8-home-step-number" aria-hidden="true">03</span><div><strong>Consulta el resultado</strong><p>Sigue los cambios de estado y revisa la información de atención.</p></div></li>
-            </ol>
-          </aside>
-        </div>
-      </div>
-    </div>
-  </section>
+						<div class="pc8-home-eyebrow">
 
-  <section class="pc8-home-section pc8-home-services" aria-labelledby="servicios-titulo">
-    <div class="container pc8-home-container py-5">
-      <div class="pc8-home-section-header">
-        <div><span class="pc8-home-kicker">Servicios de CiudadConecta</span><h2 id="servicios-titulo">Accede a lo que necesitas</h2><p>Opciones claras según tu tipo de acceso.</p></div>
-      </div>
-      <div class="row g-3">
-        <div class="col-md-6 col-xl-4" sec:authorize="isAnonymous()">
-          <a th:href="@{/registro}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">＋</span><h3>Crear una cuenta</h3><p>Regístrate para reportar y seguir tus incidencias urbanas.</p><span class="pc8-home-card-link">Registrarme <span aria-hidden="true">→</span></span></a>
-        </div>
-        <div class="col-md-6 col-xl-4" sec:authorize="hasRole('CIUDADANO')">
-          <a th:href="@{/reportes/nuevo}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">＋</span><h3>Registrar un reporte</h3><p>Describe el problema y ubícalo dentro del distrito.</p><span class="pc8-home-card-link">Crear reporte <span aria-hidden="true">→</span></span></a>
-        </div>
-        <div class="col-md-6 col-xl-4" sec:authorize="hasRole('CIUDADANO')">
-          <a th:href="@{/mis-reportes}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">≡</span><h3>Mis reportes</h3><p>Consulta códigos, estados y las respuestas a tus incidencias.</p><span class="pc8-home-card-link">Consultar <span aria-hidden="true">→</span></span></a>
-        </div>
-        <div class="col-md-6 col-xl-4" sec:authorize="hasRole('CIUDADANO')">
-          <a th:href="@{/notificaciones}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">!</span><h3>Notificaciones</h3><p>Revisa los avisos sobre el avance de tus reportes.</p><span class="pc8-home-card-link">Ver avisos <span aria-hidden="true">→</span></span></a>
-        </div>
-        <div class="col-md-6 col-xl-4" sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')">
-          <a th:href="@{/gestion}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">≡</span><h3>Gestión municipal</h3><p>Accede a la bandeja de reportes y a su seguimiento.</p><span class="pc8-home-card-link">Abrir panel <span aria-hidden="true">→</span></span></a>
-        </div>
-        <div class="col-md-6 col-xl-4" sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')">
-          <a th:href="@{/gestion/estadisticas}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">▥</span><h3>Estadísticas municipales</h3><p>Consulta recuentos y gráficos de los reportes registrados.</p><span class="pc8-home-card-link">Ver estadísticas <span aria-hidden="true">→</span></span></a>
-        </div>
-        <div class="col-md-6 col-xl-4" sec:authorize="hasRole('ADMIN')">
-          <a th:href="@{/admin/usuarios}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">⚙</span><h3>Usuarios y permisos</h3><p>Administra el acceso del personal y la ciudadanía.</p><span class="pc8-home-card-link">Administrar <span aria-hidden="true">→</span></span></a>
-        </div>
-        <div class="col-md-6 col-xl-4">
-          <a th:href="@{/transparencia}" class="pc8-home-service-card"><span class="pc8-home-service-icon" aria-hidden="true">▥</span><h3>Transparencia ciudadana</h3><p>Conoce las cifras agregadas del funcionamiento de esta plataforma.</p><span class="pc8-home-card-link">Ver indicadores <span aria-hidden="true">→</span></span></a>
-        </div>
-      </div>
-    </div>
-  </section>
+							<span class="pc8-home-dot" aria-hidden="true"></span> Chorrillos
 
-  <section class="pc8-home-section pc8-home-impact" aria-labelledby="cifras-titulo">
-    <div class="container pc8-home-container py-5">
-      <div class="pc8-home-section-header"><div><span class="pc8-home-kicker">Información transparente</span><h2 id="cifras-titulo">Actividad registrada en CiudadConecta</h2><p>Cifras calculadas a partir de los reportes guardados en esta instalación.</p></div><a class="pc8-home-text-link" th:href="@{/transparencia}">Ver detalle de estadísticas <span aria-hidden="true">→</span></a></div>
-      <div class="row g-3">
-        <div class="col-6 col-lg-3"><div class="pc8-home-stat"><strong th:text="${inicioTotal}">0</strong><span>Reportes registrados</span></div></div>
-        <div class="col-6 col-lg-3"><div class="pc8-home-stat"><strong th:text="${inicioPendientes}">0</strong><span>En proceso</span></div></div>
-        <div class="col-6 col-lg-3"><div class="pc8-home-stat"><strong th:text="${inicioAtendidos}">0</strong><span>Atendidos o cerrados</span></div></div>
-        <div class="col-6 col-lg-3"><div class="pc8-home-stat"><strong th:text="${inicioRechazados}">0</strong><span>Rechazados</span></div></div>
-      </div>
-      <p class="pc8-home-disclaimer mt-3">Datos de demostración de esta plataforma académica. No representan estadísticas oficiales de la Municipalidad de Chorrillos.</p>
-    </div>
-  </section>
+							· Lima, Perú · Proyecto académico
 
-  <section class="pc8-home-section" aria-labelledby="problemas-titulo">
-    <div class="container pc8-home-container py-5">
-      <div class="pc8-home-section-header"><div><span class="pc8-home-kicker">Incidencias urbanas</span><h2 id="problemas-titulo">¿Qué problemas puedes reportar?</h2><p>Algunos ejemplos de situaciones que afectan los espacios públicos.</p></div></div>
-      <div class="row g-3">
-        <div class="col-md-4"><article class="pc8-home-example"><span class="pc8-home-example-number" aria-hidden="true">01</span><h3>Pistas y veredas</h3><p>Baches, huecos y pavimento deteriorado.</p></article></div>
-        <div class="col-md-4"><article class="pc8-home-example"><span class="pc8-home-example-number" aria-hidden="true">02</span><h3>Alumbrado público</h3><p>Postes apagados y luminarias dañadas.</p></article></div>
-        <div class="col-md-4"><article class="pc8-home-example"><span class="pc8-home-example-number" aria-hidden="true">03</span><h3>Limpieza y áreas verdes</h3><p>Basura acumulada y espacios públicos afectados.</p></article></div>
-      </div>
-      <p class="pc8-home-assist mt-4">¿Necesitas adaptar la visualización? <a th:href="@{/accesibilidad}">Consulta las opciones de accesibilidad</a>.</p>
-    </div>
-  </section>
-</main>
-<footer th:replace="~{fragments/base :: footer}"></footer>
+						</div>
+
+
+
+						<!-- Las acciones cambian según el rol real autenticado. -->
+
+						<div sec:authorize="isAnonymous()">
+
+							<h1 class="pc8-home-title">
+
+								Reporta un problema. <span>Mejoremos Chorrillos.</span>
+
+							</h1>
+
+							<p class="pc8-home-lead">Informa sobre problemas en los
+
+								espacios públicos de Chorrillos y conoce cómo avanza su
+
+								atención, sin tener que acudir presencialmente.</p>
+
+
+							<div class="pc8-home-actions">
+
+								<a class="btn pc8-home-primary" th:href="@{/invitado/reportar}">
+									<span aria-hidden="true">＋</span> Reportar sin cuenta
+								</a> <a class="btn pc8-home-secondary" th:href="@{/registro}">
+									Crear mi cuenta </a> <a class="btn pc8-home-secondary"
+									th:href="@{/login}"> Ya tengo una cuenta </a>
+
+							</div>
+
+							<p class="pc8-home-lead mt-3 mb-0" style="font-size: .92rem">
+								Reporta sin proporcionar nombre, DNI ni correo. Conserva tu
+								código de confirmación. Esta modalidad no incluye seguimiento
+								privado.</p>
+
+							<p class="pc8-home-lead mt-3 mb-0" style="font-size: .92rem">
+								El reporte como invitado no solicita nombre, DNI ni correo.
+								Guarda el código de confirmación: esta modalidad no incluye
+								seguimiento privado.</p>
+
+						</div>
+
+
+
+						<div sec:authorize="hasRole('CIUDADANO')">
+
+							<h1 class="pc8-home-title">
+
+								Tu participación <span>mejora Chorrillos.</span>
+
+							</h1>
+
+							<p class="pc8-home-lead">Registra una incidencia, revisa el
+
+								estado de tus reportes y recibe avisos sobre la atención
+
+								municipal.</p>
+
+							<div class="pc8-home-actions">
+
+								<a class="btn pc8-home-primary" th:href="@{/reportes/nuevo}">＋
+
+									Nuevo reporte</a> <a class="btn pc8-home-secondary"
+									th:href="@{/mis-reportes}">Consultar mis reportes</a>
+
+							</div>
+
+						</div>
+
+
+
+						<div sec:authorize="hasRole('FUNCIONARIO')">
+
+							<h1 class="pc8-home-title">
+
+								Gestiona los reportes <span>de Chorrillos.</span>
+
+							</h1>
+
+							<p class="pc8-home-lead">Revisa las incidencias recibidas,
+
+								clasifica los casos y coordina su atención con las áreas
+
+								municipales.</p>
+
+							<div class="pc8-home-actions">
+
+								<a class="btn pc8-home-primary" th:href="@{/gestion}">Abrir
+
+									bandeja municipal <span aria-hidden="true">→</span>
+
+								</a>
+
+							</div>
+
+						</div>
+
+
+
+						<div sec:authorize="hasRole('MANTENIMIENTO')">
+
+							<h1 class="pc8-home-title">
+
+								Tu trabajo <span>transforma la ciudad.</span>
+
+							</h1>
+
+							<p class="pc8-home-lead">Consulta las incidencias asignadas,
+
+								registra avances y adjunta las evidencias de los trabajos
+
+								realizados.</p>
+
+							<div class="pc8-home-actions">
+
+								<a class="btn pc8-home-primary" th:href="@{/gestion}">Ver
+
+									trabajos e incidencias <span aria-hidden="true">→</span>
+
+								</a>
+
+							</div>
+
+						</div>
+
+
+
+						<div sec:authorize="hasRole('SUPERVISOR')">
+
+							<h1 class="pc8-home-title">
+
+								Supervisa una atención <span>más oportuna.</span>
+
+							</h1>
+
+							<p class="pc8-home-lead">Consulta el avance de los reportes,
+
+								identifica retrasos y verifica las acciones de atención.</p>
+
+							<div class="pc8-home-actions">
+
+								<a class="btn pc8-home-primary" th:href="@{/gestion}">Ver
+
+									seguimiento municipal <span aria-hidden="true">→</span>
+
+								</a>
+
+							</div>
+
+						</div>
+
+
+
+						<div sec:authorize="hasRole('ADMIN')">
+
+							<h1 class="pc8-home-title">
+
+								Administra una plataforma <span>al servicio de
+
+									Chorrillos.</span>
+
+							</h1>
+
+							<p class="pc8-home-lead">Gestiona usuarios y permisos, y
+
+								accede a los reportes y estadísticas de la plataforma.</p>
+
+							<div class="pc8-home-actions">
+
+								<a class="btn pc8-home-primary" th:href="@{/admin/usuarios}">Administrar
+
+									usuarios <span aria-hidden="true">→</span>
+
+								</a> <a class="btn pc8-home-secondary" th:href="@{/gestion}">Panel
+
+									municipal</a>
+
+							</div>
+
+						</div>
+
+
+
+						<p class="pc8-home-location-note">
+
+							<span aria-hidden="true">⌖</span> Se aceptan reportes de
+
+							incidencias ubicadas dentro del distrito de Chorrillos.
+
+						</p>
+
+					</div>
+
+
+
+					<div class="col-lg-5">
+
+						<aside class="pc8-home-process" aria-labelledby="proceso-titulo">
+
+							<span class="pc8-home-process-label">Cómo funciona</span>
+
+							<h2 id="proceso-titulo">Un reporte con seguimiento</h2>
+
+							<ol class="pc8-home-steps">
+
+								<li><span class="pc8-home-step-number" aria-hidden="true">01</span>
+
+									<div>
+
+										<strong>Registra la incidencia</strong>
+
+										<p>Indica el problema, su ubicación en Chorrillos y
+
+											adjunta una foto si la tienes.</p>
+
+									</div></li>
+
+								<li><span class="pc8-home-step-number" aria-hidden="true">02</span>
+
+									<div>
+
+										<strong>Se revisa y se asigna</strong>
+
+										<p>El personal municipal verifica el reporte y registra su
+
+											gestión.</p>
+
+									</div></li>
+
+								<li><span class="pc8-home-step-number" aria-hidden="true">03</span>
+
+									<div>
+
+										<strong>Consulta el resultado</strong>
+
+										<p>Sigue los cambios de estado y revisa la información de
+
+											atención.</p>
+
+									</div></li>
+
+							</ol>
+
+						</aside>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</section>
+
+
+
+		<section class="pc8-home-section pc8-home-services"
+			aria-labelledby="servicios-titulo">
+
+			<div class="container pc8-home-container py-5">
+
+				<div class="pc8-home-section-header">
+
+					<div>
+
+						<span class="pc8-home-kicker">Servicios de CiudadConecta</span>
+
+						<h2 id="servicios-titulo">Accede a lo que necesitas</h2>
+
+						<p>Opciones claras según tu tipo de acceso.</p>
+
+					</div>
+
+				</div>
+
+				<div class="row g-3">
+
+					<!-- SERVICIO: REPORTAR SIN CUENTA (SOLO VISITANTES) -->
+					<div class="col-md-6 col-xl-4" sec:authorize="isAnonymous()">
+						<a th:href="@{/invitado/reportar}" class="pc8-home-service-card">
+							<span class="pc8-home-service-icon" aria-hidden="true">⌖</span>
+							<h3>Reportar como invitado</h3>
+							<p>Informa sobre un problema urbano en Chorrillos sin
+								registrarte. Ubica el lugar en el mapa y recibe un código de
+								confirmación.</p> <span class="pc8-home-card-link">Registrar
+								sin cuenta <span aria-hidden="true">→</span>
+						</span>
+						</a>
+					</div>
+
+					<!-- REPORTAR COMO INVITADO -->
+					<div class="col-md-6 col-xl-4" sec:authorize="isAnonymous()">
+
+						<a th:href="@{/invitado/reportar}" class="pc8-home-service-card">
+
+							<span class="pc8-home-service-icon" aria-hidden="true"> ⌖
+						</span>
+
+							<h3>Reportar como invitado</h3>
+
+							<p>Informa sobre un problema urbano en Chorrillos sin
+								registrarte. Selecciona su ubicación en el mapa y recibe un
+								código de confirmación.</p> <span class="pc8-home-card-link">
+								Registrar sin cuenta <span aria-hidden="true">→</span>
+						</span>
+
+						</a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4" sec:authorize="isAnonymous()">
+
+						<a th:href="@{/registro}" class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">＋</span>
+
+							<h3>Crear una cuenta</h3>
+
+							<p>Regístrate para reportar y seguir tus incidencias urbanas.</p>
+
+							<span class="pc8-home-card-link">Registrarme <span
+								aria-hidden="true">→</span></span></a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4" sec:authorize="hasRole('CIUDADANO')">
+
+						<a th:href="@{/reportes/nuevo}" class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">＋</span>
+
+							<h3>Registrar un reporte</h3>
+
+							<p>Describe el problema y ubícalo dentro del distrito.</p> <span
+							class="pc8-home-card-link">Crear reporte <span
+								aria-hidden="true">→</span></span></a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4" sec:authorize="hasRole('CIUDADANO')">
+
+						<a th:href="@{/mis-reportes}" class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">≡</span>
+
+							<h3>Mis reportes</h3>
+
+							<p>Consulta códigos, estados y las respuestas a tus
+
+								incidencias.</p> <span class="pc8-home-card-link">Consultar <span
+								aria-hidden="true">→</span></span></a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4" sec:authorize="hasRole('CIUDADANO')">
+
+						<a th:href="@{/notificaciones}" class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">!</span>
+
+							<h3>Notificaciones</h3>
+
+							<p>Revisa los avisos sobre el avance de tus reportes.</p> <span
+							class="pc8-home-card-link">Ver avisos <span
+								aria-hidden="true">→</span></span></a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4"
+						sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')">
+
+						<a th:href="@{/gestion}" class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">≡</span>
+
+							<h3>Gestión municipal</h3>
+
+							<p>Accede a la bandeja de reportes y a su seguimiento.</p> <span
+							class="pc8-home-card-link">Abrir panel <span
+								aria-hidden="true">→</span></span></a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4"
+						sec:authorize="hasAnyRole('FUNCIONARIO','MANTENIMIENTO','SUPERVISOR','ADMIN')">
+
+						<a th:href="@{/gestion/estadisticas}"
+							class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">▥</span>
+
+							<h3>Estadísticas municipales</h3>
+
+							<p>Consulta recuentos y gráficos de los reportes registrados.</p>
+
+							<span class="pc8-home-card-link">Ver estadísticas <span
+								aria-hidden="true">→</span></span></a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4" sec:authorize="hasRole('ADMIN')">
+
+						<a th:href="@{/admin/usuarios}" class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">⚙</span>
+
+							<h3>Usuarios y permisos</h3>
+
+							<p>Administra el acceso del personal y la ciudadanía.</p> <span
+							class="pc8-home-card-link">Administrar <span
+								aria-hidden="true">→</span></span></a>
+
+					</div>
+
+					<div class="col-md-6 col-xl-4">
+
+						<a th:href="@{/transparencia}" class="pc8-home-service-card"><span
+							class="pc8-home-service-icon" aria-hidden="true">▥</span>
+
+							<h3>Transparencia ciudadana</h3>
+
+							<p>Conoce las cifras agregadas del funcionamiento de esta
+
+								plataforma.</p> <span class="pc8-home-card-link">Ver
+								indicadores <span aria-hidden="true">→</span>
+						</span></a>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</section>
+
+
+
+		<section class="pc8-home-section pc8-home-impact"
+			aria-labelledby="cifras-titulo">
+
+			<div class="container pc8-home-container py-5">
+
+				<div class="pc8-home-section-header">
+
+					<div>
+
+						<span class="pc8-home-kicker">Información transparente</span>
+
+						<h2 id="cifras-titulo">Actividad registrada en CiudadConecta</h2>
+
+						<p>Cifras calculadas a partir de los reportes guardados en
+
+							esta instalación.</p>
+
+					</div>
+
+					<a class="pc8-home-text-link" th:href="@{/transparencia}">Ver
+
+						detalle de estadísticas <span aria-hidden="true">→</span>
+
+					</a>
+
+				</div>
+
+				<div class="row g-3">
+
+					<div class="col-6 col-lg-3">
+
+						<div class="pc8-home-stat">
+
+							<strong th:text="${inicioTotal}">0</strong><span>Reportes
+
+								registrados</span>
+
+						</div>
+
+					</div>
+
+					<div class="col-6 col-lg-3">
+
+						<div class="pc8-home-stat">
+
+							<strong th:text="${inicioPendientes}">0</strong><span>En
+
+								proceso</span>
+
+						</div>
+
+					</div>
+
+					<div class="col-6 col-lg-3">
+
+						<div class="pc8-home-stat">
+
+							<strong th:text="${inicioAtendidos}">0</strong><span>Atendidos
+
+								o cerrados</span>
+
+						</div>
+
+					</div>
+
+					<div class="col-6 col-lg-3">
+
+						<div class="pc8-home-stat">
+
+							<strong th:text="${inicioRechazados}">0</strong><span>Rechazados</span>
+
+						</div>
+
+					</div>
+
+				</div>
+
+				<p class="pc8-home-disclaimer mt-3">Datos de demostración de
+
+					esta plataforma académica. No representan estadísticas oficiales de
+
+					la Municipalidad de Chorrillos.</p>
+
+			</div>
+
+		</section>
+
+
+
+		<section class="pc8-home-section" aria-labelledby="problemas-titulo">
+
+			<div class="container pc8-home-container py-5">
+
+				<div class="pc8-home-section-header">
+
+					<div>
+
+						<span class="pc8-home-kicker">Incidencias urbanas</span>
+
+						<h2 id="problemas-titulo">¿Qué problemas puedes reportar?</h2>
+
+						<p>Algunos ejemplos de situaciones que afectan los espacios
+
+							públicos.</p>
+
+					</div>
+
+				</div>
+
+				<div class="row g-3">
+					<div class="col-md-6 col-lg-4">
+						<article class="pc8-home-example h-100">
+							<span class="pc8-home-example-number" aria-hidden="true">01</span>
+							<h3>Baches o pistas dañadas</h3>
+							<p>Huecos, pavimento deteriorado y veredas dañadas.</p>
+						</article>
+					</div>
+					<div class="col-md-6 col-lg-4">
+						<article class="pc8-home-example h-100">
+							<span class="pc8-home-example-number" aria-hidden="true">02</span>
+							<h3>Basura acumulada</h3>
+							<p>Residuos en calles, parques y espacios públicos.</p>
+						</article>
+					</div>
+					<div class="col-md-6 col-lg-4">
+						<article class="pc8-home-example h-100">
+							<span class="pc8-home-example-number" aria-hidden="true">03</span>
+							<h3>Alumbrado público</h3>
+							<p>Postes apagados y luminarias en mal estado.</p>
+						</article>
+					</div>
+					<div class="col-md-6 col-lg-4">
+						<article class="pc8-home-example h-100">
+							<span class="pc8-home-example-number" aria-hidden="true">04</span>
+							<h3>Parques y jardines</h3>
+							<p>Áreas verdes deterioradas y espacios recreativos
+								afectados.</p>
+						</article>
+					</div>
+					<div class="col-md-6 col-lg-4">
+						<article class="pc8-home-example h-100">
+							<span class="pc8-home-example-number" aria-hidden="true">05</span>
+							<h3>Fuga de agua</h3>
+							<p>Fugas en vías públicas y desperdicio de agua.</p>
+						</article>
+					</div>
+					<div class="col-md-6 col-lg-4">
+						<article class="pc8-home-example h-100">
+							<span class="pc8-home-example-number" aria-hidden="true">06</span>
+							<h3>Señalización dañada</h3>
+							<p>Señales deterioradas y elementos de tránsito afectados.</p>
+						</article>
+					</div>
+				</div>
+
+				<p class="pc8-home-assist mt-4">
+
+					¿Necesitas adaptar la visualización? <a th:href="@{/accesibilidad}">Consulta
+
+						las opciones de accesibilidad</a>.
+
+				</p>
+
+			</div>
+
+		</section>
+
+		<section class="pc8-home-section pc8-home-services"
+			aria-labelledby="reportes-recientes-titulo">
+			<div class="container pc8-home-container py-5">
+				<div class="pc8-home-section-header">
+					<div>
+						<span class="pc8-home-kicker">Actividad ciudadana</span>
+						<h2 id="reportes-recientes-titulo">Reportes recientes</h2>
+						<p>Consulta los últimos reportes registrados en CiudadConecta.</p>
+					</div>
+				</div>
+
+				<div th:if="${hayReportesRecientes}" class="row g-3">
+					<div class="col-md-6 col-lg-4"
+						th:each="reporte : ${reportesRecientes}">
+						<article class="pc8-home-example h-100">
+							<span class="pc8-home-example-number" th:text="${reporte.codigo}">REP-001</span>
+							<h3 th:text="${reporte.categoria}">Categoría</h3>
+							<p
+								th:if="${reporte.subcategoria != null and !#strings.isEmpty(reporte.subcategoria)}"
+								th:text="${reporte.subcategoria}">Subcategoría</p>
+							<p>
+								Estado: <strong th:text="${reporte.estado}">Registrado</strong>
+							</p>
+							<small class="text-secondary"> Registrado el: <span
+								th:text="${reporte.fecha}">08/11/2026</span>
+							</small>
+						</article>
+					</div>
+				</div>
+
+				<div th:unless="${hayReportesRecientes}" class="pc8-home-example">
+					<h3>Aún no hay reportes registrados</h3>
+					<p>Cuando se registren nuevas incidencias, aparecerán aquí.</p>
+				</div>
+
+				<p class="pc8-home-disclaimer mt-3">Se muestra información
+					general de los reportes. Los datos personales y las ubicaciones
+					particulares de los ciudadanos permanecen protegidos.</p>
+			</div>
+		</section>
+
+	</main>
+
+	<footer th:replace="~{fragments/base :: footer}"></footer>
+
 </body>
+
 </html>

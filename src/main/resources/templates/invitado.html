@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/base :: head('Explorar como invitado')}"></head>
+<body>
+<div th:replace="~{fragments/base :: nav}"></div>
+<main id="contenido" class="container py-4 py-md-5">
+  <style>
+    .pc8-guest-hero {background:linear-gradient(120deg,#e9f3ff,#fff);border:1px solid #c9dced;border-radius:1rem;padding:clamp(1.2rem,3vw,2.2rem)}
+    .pc8-guest-card {height:100%;background:#fff;border:1px solid #cbd9e6;border-radius:.85rem;padding:1.25rem}
+    .pc8-guest-card h2 {font-size:1.2rem;font-weight:700;color:#153a5c}
+    .pc8-guest-card a {min-height:44px;display:inline-flex;align-items:center}
+    .pc8-guest-note {background:#fff7e5;border-left:4px solid #b98218;border-radius:.5rem;padding:1.1rem}
+    .pc8-guest-hero .btn {min-height:44px;display:inline-flex;align-items:center}
+    html.contraste-alto .pc8-guest-hero,html.contraste-alto .pc8-guest-card,html.contraste-alto .pc8-guest-note {background:#000!important;color:#fff!important;border:2px solid #ffff66!important}
+    html.contraste-alto .pc8-guest-card h2 {color:#ffff66!important}
+    html.contraste-alto .pc8-guest-card a:not(.btn) {color:#ffff66!important}
+  </style>
+  <nav aria-label="Ruta de navegación" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Explorar como invitado</li>
+    </ol>
+  </nav>
+
+  <header class="pc8-guest-hero mb-4">
+    <p class="fw-bold text-primary mb-2">CIUDADCONECTA PC8 · CHORRILLOS</p>
+    <h1 class="display-6 fw-bold">Participa en CiudadConecta sin registrarte</h1>
+    <p class="lead">Consulta información pública y registra incidencias urbanas de Chorrillos sin crear una cuenta ni proporcionar tu nombre, DNI o correo.</p>
+    <p class="mb-3">Puedes <strong>enviar un reporte como invitado</strong> y recibir un código de comprobante. Para consultar un historial privado, confirmar la atención o recibir notificaciones, utiliza una cuenta ciudadana.</p>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" th:href="@{/invitado/reportar}">Registrar incidencia sin cuenta</a>
+      <a class="btn btn-outline-primary" th:href="@{/que-reportar}">Ver qué puedo reportar</a>
+      <a class="btn btn-outline-primary" th:href="@{/manual}">Leer el manual</a>
+    </div>
+  </header>
+
+  <section class="mb-4" aria-labelledby="titulo-opciones">
+    <h2 class="h3 fw-bold mb-3" id="titulo-opciones">¿Qué puedes hacer como invitado?</h2>
+    <div class="row g-3">
+      <div class="col-md-6 col-lg-4">
+        <article class="pc8-guest-card">
+          <h2>Enviar una incidencia como invitado</h2>
+          <p>Describe un problema urbano, señala su ubicación y obtén un código sin registrarte. El personal municipal podrá revisar el caso.</p>
+          <a th:href="@{/invitado/reportar}">Registrar un reporte →</a>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="pc8-guest-card">
+          <h2>Conocer las incidencias</h2>
+          <p>Consulta ejemplos de problemas que pueden reportarse: limpieza, alumbrado, pistas, veredas y otros espacios públicos.</p>
+          <a th:href="@{/que-reportar}">Qué puedo reportar →</a>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="pc8-guest-card">
+          <h2>Aprender a usar la plataforma</h2>
+          <p>Lee instrucciones para crear una cuenta, ubicar una incidencia en el mapa y consultar su seguimiento.</p>
+          <a th:href="@{/manual}">Abrir manual de ayuda →</a>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="pc8-guest-card">
+          <h2>Consultar transparencia</h2>
+          <p>Accede a la información pública disponible en CiudadConecta, sin consultar datos privados de otros usuarios.</p>
+          <a th:href="@{/transparencia}">Ver transparencia →</a>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="pc8-guest-card">
+          <h2>Ver el resumen público</h2>
+          <p>Visita la portada para conocer los indicadores generales y los reportes recientes que publica el proyecto.</p>
+          <a th:href="@{/}">Ir a la portada →</a>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="pc8-guest-card">
+          <h2>Configurar la accesibilidad</h2>
+          <p>Utiliza los controles para aumentar el texto, activar alto contraste o reducir animaciones.</p>
+          <a th:href="@{/accesibilidad}">Ayuda de accesibilidad →</a>
+        </article>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <article class="pc8-guest-card">
+          <h2>Participar con una cuenta</h2>
+          <p>Para consultar tus reportes en privado, recibir notificaciones y confirmar una atención, crea una cuenta ciudadana o inicia sesión.</p>
+          <a th:href="@{/registro}" sec:authorize="isAnonymous()">Crear cuenta →</a>
+          <a th:href="@{/login}" sec:authorize="isAnonymous()" class="ms-3">Ingresar →</a>
+          <a th:href="@{/inicio}" sec:authorize="isAuthenticated()">Ir a mi área →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="pc8-guest-note" aria-labelledby="titulo-limites">
+    <h2 class="h5 fw-bold" id="titulo-limites">Importante sobre el modo invitado</h2>
+    <p class="mb-0">Puedes enviar incidencias sin registrarte y adjuntar una fotografía opcional. No pedimos nombre, correo, teléfono ni DNI, y los envíos cuentan con controles antispam y validación de ubicación. No hay seguimiento privado para invitados: conserva tu código y evita incluir datos personales en el contenido o las fotos.</p>
+  </section>
+</main>
+<div th:replace="~{fragments/base :: footer}"></div>
+</body>
+</html>

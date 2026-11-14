@@ -336,6 +336,52 @@ public class TransparenciaController {
                 : "Sin datos";
 
         // ======================================
+        // KPI 5: TIEMPO PROMEDIO HASTA CIERRE
+        // ======================================
+        // Se calcula solamente para reportes que tienen
+        // al menos una transición CERRADO en el historial.
+        // Se toma el primer cierre válido posterior a la creación.
+
+        Map<Long, LocalDateTime> primerCierre = new HashMap<>();
+
+        historial.findByEstado(Estado.CERRADO).stream()
+                .filter(h -> h.getFecha() != null)
+                .sorted(Comparator.comparing(HistorialReporte::getFecha))
+                .forEach(h -> {
+                    Reporte r = h.getReporte();
+                    if (r != null && r.getId() != null) {
+                        primerCierre.putIfAbsent(r.getId(), h.getFecha());
+                    }
+                });
+
+        double sumaDiasCierre = 0.0;
+        long reportesConCierre = 0;
+
+        for (Reporte r : registros) {
+            if (r.getId() == null || r.getCreadoEn() == null) {
+                continue;
+            }
+            LocalDateTime fechaCierre = primerCierre.get(r.getId());
+            if (fechaCierre == null) {
+                continue;
+            }
+            long segundos = Duration.between(r.getCreadoEn(), fechaCierre).getSeconds();
+            if (segundos >= 0) {
+                sumaDiasCierre += segundos / 86400.0;
+                reportesConCierre++;
+            }
+        }
+
+        double promedioCierreDias = reportesConCierre > 0
+                ? sumaDiasCierre / reportesConCierre
+                : 0.0;
+        promedioCierreDias = Math.round(promedioCierreDias * 10.0) / 10.0;
+
+        String promedioCierreTexto = reportesConCierre > 0
+                ? promedioCierreDias + " días"
+                : "Sin datos";
+
+        // ======================================
         // GRÁFICO 1: REPORTES POR CATEGORÍA
         // ======================================
 
@@ -471,6 +517,9 @@ public class TransparenciaController {
         model.addAttribute("promedioDias", promedioDias);
         model.addAttribute("promedioTexto", promedioTexto);
         model.addAttribute("reportesConTiempo", reportesConTiempo);
+        model.addAttribute("promedioCierreDias", promedioCierreDias);
+        model.addAttribute("promedioCierreTexto", promedioCierreTexto);
+        model.addAttribute("reportesConCierre", reportesConCierre);
 
         model.addAttribute("categorias", categorias);
         model.addAttribute("estados", estados);
